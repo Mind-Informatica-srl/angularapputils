@@ -17,7 +17,13 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "angular-app-utils-lib": [
+        "dist/angular-app-utils-lib/angular-app-utils-lib",
+        "dist/angular-app-utils-lib"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

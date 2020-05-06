@@ -1,0 +1,37 @@
+
+table {
+  width: 100%;
+}
+
+//evidenziazione rigo grid selezionato
+.highlight td{
+  background-color: #b5c7db!important;
+}
+
+tr {
+  cursor: pointer;
+}
+
+.loading-shade {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer-row td {
+  color: #900000;
+}
+
+.button-new {
+  position:fixed;
+	width:60px;
+	height:60px;
+	bottom:40px;
+  right:40px;
+  z-index: 100;
+}
+
+.filter-field {
+  margin-left: 1%;
+  margin-right: 1%;
+}

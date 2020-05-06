@@ -1,0 +1,25 @@
+<div mat-dialog-title *ngIf="title" [innerHtml]="title"></div>
+
+<div mat-dialog-content>
+    <div [innerHtml]="message">
+    </div> 
+    <form name="dialogInputForm" #f="ngForm" autocomplete="off">
+        <mat-form-field>
+          <mat-label for="dialogInput">{{inputLabel}}</mat-label>
+          <textarea matInput
+            cdkTextareaAutosize
+            #autosize="cdkTextareaAutosize"
+            cdkAutosizeMinRows="1"
+            cdkAutosizeMaxRows="5"
+            id="dialogInput" 
+            name="dialogInput" 
+            #dialogInput
+            ></textarea>
+          <mat-hint>Facoltativo</mat-hint>
+        </mat-form-field>
+    </form>
+</div>
+<div mat-dialog-actions>
+    <button mat-raised-button color="accent" style="margin-right: 1%;" *ngIf="showNegativeButton">Annulla</button>
+    <button mat-raised-button color="primary" [mat-dialog-close]="dialogInput.value" cdkFocusInitial>OK</button>
+</div>

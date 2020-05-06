@@ -1,5 +1,5 @@
 
-## Importazione della libreria in un progetto angular
+# Importazione della libreria in un progetto angular
 
 Seguire i seguenti passi in ordine
 
@@ -12,11 +12,36 @@ Seguire i seguenti passi in ordine
 6. **Eseguire** il comando per installare la dipendenza della libreria indicando come path quello della cartella dist generata: npm install ../../AngularAppUt/angular-app-utils-workspace/dist/angular-app-utils-lib
 7. Si noterà quindi nel file package.json in dependencies il rigo: "angular-app-utils-lib": "file:../../AngularAppUtils/angular-app-utils-workspace/dist/angular-app-utils-lib",
 8. In **tsconfig.json** in **compilerOptions** aggiungere quanto segue:
+
 "paths": {
       "@angular/*": [
         "./node_modules/@angular/*"
       ]
 }
 
+9. Al momento, fino a che non vengono risolti i TODO, Il progetto che utilizza questa libreria deve avere installato anche **angular-material**
+
+ng add @angular/material
+
+10. e anche **angular-flex**
+
+npm i -s @angular/flex-layout @angular/cdk
+
 
 ---
+
+# TODO
+
+Angular libraries should list all @angular/* dependencies as peer dependencies
+
+Cercare di capire come gestire questo punto.
+
+
+---
+
+## Per uleriori riferimenti vedere:
+1. https://angular.io/guide/creating-libraries
+2. https://github.com/angular/angular/issues/25813
+
+## Esempio di progetto che importa la libreria
+https://bitbucket.org/mindinformatica/pratiko/src/master/

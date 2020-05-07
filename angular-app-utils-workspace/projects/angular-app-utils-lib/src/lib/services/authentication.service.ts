@@ -16,19 +16,25 @@ export abstract class AuthenticationService<LoginInfo> {
     public currentLoginInfo: Observable<LoginInfo>;
     private httpHeaders: HttpHeaders;
 
-
     constructor(private http: HttpClient, private apiUrl: string) {
         this.currentLoginInfoSubject = new BehaviorSubject<LoginInfo>(JSON.parse(localStorage.getItem(CURRENT_USER)));
         if(localStorage.getItem(CURRENT_USER_TO_DELETE)){
             this.removeUserFromCache();
         }
         this.currentLoginInfo = this.currentLoginInfoSubject.asObservable();
-        this.httpHeaders = new HttpHeaders({
+        this.httpHeaders = this.prepareHttpHeaders();
+    }
+
+    abstract getContenutiUtente(): any[];
+
+    
+    protected prepareHttpHeaders(): HttpHeaders{
+        return new HttpHeaders({
             'Content-Type': 'application/json; charset=utf-8;',
             'access-control-allow-origin': '*',
         })
     }
-    
+
     public get currentLoginInfoValue(): LoginInfo {
         return this.currentLoginInfoSubject.value;
     }
@@ -40,9 +46,6 @@ export abstract class AuthenticationService<LoginInfo> {
      */
     public isAuthorized(codContenuti: string[], searchAll: boolean = false): boolean {
         if (codContenuti != null && codContenuti.length > 0 && this.currentLoginInfoValue != null) {
-            /*const contenutiUtente = this.currentLoginInfoValue.Utente.Ruolo.Contenuti.map(el => {
-                return el.CodContenuto;
-            })*/
             const contenutiUtente = this.getContenutiUtente();
             if(contenutiUtente == null){
                 return false;
@@ -56,7 +59,6 @@ export abstract class AuthenticationService<LoginInfo> {
         }
     }
 
-    abstract getContenutiUtente(): any[];
 
     /**
      * Metodo chiamato per ricevere la one-time-password dal server

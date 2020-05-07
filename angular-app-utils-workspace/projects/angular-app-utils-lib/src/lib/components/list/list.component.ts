@@ -127,10 +127,15 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   }
 
   onItemSelected(item: T){
-    this.selectedElement = item;
-    this.onSelectElement.emit(item);
+    if(this.selectedElement == null || this.idExtractor(this.selectedElement) != this.idExtractor(item)){
+      this.selectedElement = item;
+    }else{
+      //altrimenti si deseleziona
+      this.selectedElement = null;
+    }
+    this.onSelectElement.emit(this.selectedElement);
     if(this.subscribeRoute){
-      this.router.navigate([this.currentPath, this.apiDatasource.apiIdExtractor(item)]);
+      this.router.navigate([this.currentPath, this.apiDatasource.apiIdExtractor(this.selectedElement)]);
     }
   }
 

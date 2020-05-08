@@ -93,6 +93,18 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }
   }
 
+  private _onlyPreview: boolean = true;
+  //indica se stiamo mostrando solo una preview del detail
+  get onlyPreview(): boolean {
+    return this._onlyPreview;
+  }
+
+  //se si vuole mostrare solo un anteprima, siamo del dettaglio di una grid per esempio; subscribeRoute quindi dovrà essere l'opposto
+  @Input() set onlyPreview(val: boolean) {
+    this._onlyPreview = val;
+    this.subscribeRoute = !val;
+  }
+  
   prepareForNewItem(): void {
     this.element = {} as T;
   }

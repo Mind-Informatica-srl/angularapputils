@@ -93,7 +93,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }
   }
 
-  private _onlyPreview: boolean = true;
+  private _onlyPreview: boolean = false;
   //indica se stiamo mostrando solo una preview del detail
   get onlyPreview(): boolean {
     return this._onlyPreview;
@@ -104,7 +104,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this._onlyPreview = val;
     this.subscribeRoute = !val;
   }
-  
+
   prepareForNewItem(): void {
     this.element = {} as T;
   }

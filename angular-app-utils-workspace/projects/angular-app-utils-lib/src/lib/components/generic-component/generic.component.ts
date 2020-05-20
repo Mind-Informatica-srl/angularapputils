@@ -10,6 +10,7 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
    * Nel caso sia false, va settato element passandolo come input nel component
    */
   @Input() subscribeRoute: boolean = true;
+  @Input() loadDataOnLoad: boolean = true;
   protected apiDatasource: ApiDatasource<T> | null;
   /**
    * Il path da aggiungere alla url del server per le comunicazioni

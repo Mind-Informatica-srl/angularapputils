@@ -1,6 +1,6 @@
 import { ApiActionsType } from './../../api-datasource/api-datasource';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { AfterViewInit, Output, EventEmitter } from '@angular/core';
+import { AfterViewInit, Output, EventEmitter, Input } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericComponent } from '../generic-component/generic.component';
@@ -15,12 +15,11 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   abstract displayedColumns: string[];
   abstract pageTitle: string;
 
-  
   currentPath: string;
 
-  isLoadingResults: boolean = true;
+  isLoadingResults: boolean = false;
   listError: boolean = false;
-  dataSource: T[] | MatTableDataSource<T>;
+  @Input() dataSource: T[] | MatTableDataSource<T>;
   selectedElement: T;
   @Output() onSelectElement = new EventEmitter<T>();
 
@@ -36,7 +35,11 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       this.sub.add(this.router.events.subscribe((val) => {
         this.onRouteChanged(val);
       }));
-     }
+      if(this.dataSource == null && this.loadDataOnLoad){
+        //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
+        this.isLoadingResults = true;
+      }      
+  }
 
   protected onRouteChanged(val: import("@angular/router").Event) {
     if(val instanceof NavigationEnd && val.url.endsWith(this.currentPath)){
@@ -50,7 +53,10 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   
   ngAfterViewInit(): void {
     this.apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
-    this.loadListData();
+    if(this.dataSource == null && this.loadDataOnLoad){
+      //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
+      this.loadListData();
+    }
     this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem<T>) => {
       if(res && res.ListName === this.LIST_NAME){
         if(this.refreshAll){

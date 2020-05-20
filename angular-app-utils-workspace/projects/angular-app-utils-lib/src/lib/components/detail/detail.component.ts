@@ -229,7 +229,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   protected resetForm(){
     if(this.form){
       this.form.control.markAsPristine();
-      if(this.isAuthorizedToModify()){
+      if(this.isAuthorizedToModify() && !this.onlyPreview){
         this.form.control.enable();
       }else{
         this.form.control.disable();

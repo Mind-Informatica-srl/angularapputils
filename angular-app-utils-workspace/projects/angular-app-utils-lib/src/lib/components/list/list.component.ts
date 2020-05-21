@@ -1,6 +1,6 @@
-import { ApiActionsType } from './../../api-datasource/api-datasource';
+import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { AfterViewInit, Output, EventEmitter, Input } from '@angular/core';
+import { AfterViewInit, Output, EventEmitter, Input, ViewChild } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericComponent } from '../generic-component/generic.component';
@@ -8,6 +8,9 @@ import { DataRefreshService, DataRefreshItem } from '../../services/data-refresh
 import { UserMessageService } from '../../services/user-message.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { ApiDatasource } from '../../api-datasource/api-datasource';
+import { MatSort } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import { merge } from 'rxjs';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements AfterViewInit {
@@ -68,7 +71,28 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
         }
       }
     }));
+    if(this.paginator){
+      // If the user changes the sort order, reset back to the first page.
+      this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+      merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData());
+    }
   }
+
+  protected sort: MatSort;
+  protected paginator: MatPaginator;
+  resultsLength = 0;//campo utile per il paginator per l'input [length]
+
+  @ViewChild(MatSort) set matSort(ms: MatSort) {
+    this.sort = ms;
+    this.setDataSourceAttributes();
+  }
+
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSourceAttributes();
+  }
+
+  setDataSourceAttributes() {}//utile per grid-list.component
 
   /**
    * metodo per aggiornare un elemento nella lista
@@ -111,8 +135,15 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.isLoadingResults = true;
     this.listError = false;
     const params: HttpParams = this.prepareLoadParameters();
-    this.sub.add(this.apiDatasource.getFilteredElements(params).subscribe((data) => {
-      this.onItemLoaded(data);
+    this.sub.add(this.apiDatasource.getFilteredElements(params).subscribe((data: T[] | ApiPaginatorListResponse<T>) => {
+      if(data['totalCount']){
+        this.resultsLength = data['totalCount'];
+      }
+      if(data['items']){
+        this.onListLoaded(data['items']);
+      }else{
+        this.onListLoaded(data as T[]);
+      }
       if(callback != null){
         callback();
       }
@@ -125,10 +156,22 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   }
   
   prepareLoadParameters(): HttpParams {
-    return new HttpParams();
+    let params = new HttpParams();
+    if(this.sort){
+      params = params.set("sort", `${this.sort.active}`);
+      params = params.set("order", `${this.sort.direction}`)
+    }
+    if(this.paginator){
+      params = params.set("page", `${this.paginator.pageIndex + 1}`);
+      params = params.set("pageSize", `${this.paginator.pageSize}`);
+    }
+    if(this.dataSource.filter){
+      params = params.set("filter", `${this.dataSource.filter}`);
+    }
+    return params;
   }
 
-  onItemLoaded(data: T[]){
+  onListLoaded(data: T[]){
     this.dataSource = data;    
   }
 

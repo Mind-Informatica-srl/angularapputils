@@ -34,16 +34,19 @@ export class ApiDatasource<T> {
     }
   }
 
-  getElements(): Observable<T[]> {
-    return this.getSortedElements(null, null, null, null);
+  /**
+   * Restituisce lista di oggetti
+   */
+  getElements(): Observable<T[] | ApiPaginatorListResponse<T>> {
+    return this.getFilteredElements(null);
   }
 
-  getFilteredElements(parameters: HttpParams): Observable<T[]> {
-    return this.getSortedElements(null, null, null, parameters);
-  }
-
-  getSortedElements(sort: string, order: string, page: number, params: HttpParams): Observable<T[]> {
-    return this._httpClient.get<T[]>(this.requestUrl, { params })
+  /**
+   * Restituisce array o ApiPaginatorListResponse costituito da array lista più attributo con il totale della lista (per esempio, per irportarlo sul totale del paginator)
+   * @param params HttpParams parametri per filtrare la lista
+   */
+  getFilteredElements(params: HttpParams): Observable<T[] | ApiPaginatorListResponse<T>> {
+    return this._httpClient.get<T[] | ApiPaginatorListResponse<T>>(this.requestUrl, { params })
     .pipe(
       catchError(err => {
         return this.onError(null, err);
@@ -139,4 +142,10 @@ export class ApiDatasource<T> {
       'Qualcosa è andato storto; riprovare più tardi.');
   }
 
+}
+
+
+export interface ApiPaginatorListResponse<T> {
+  items: T[];
+  totalCount: number;
 }

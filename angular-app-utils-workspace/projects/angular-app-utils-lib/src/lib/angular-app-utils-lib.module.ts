@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 
-
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -27,6 +26,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
+import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
+import { ItalianMatPaginatorIntl } from './utils/italian-mat-paginator-intl';
+
 
 @NgModule({
   declarations: [
@@ -55,10 +57,12 @@ import { MatButtonModule } from '@angular/material/button';
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
-    MatButtonModule
+    MatButtonModule,
+    MatPaginatorModule
   ],
   providers: [
     { provide: DateAdapter, useClass: AauDateAdapter },
+    { provide: MatPaginatorIntl, useClass: ItalianMatPaginatorIntl }//per cambiare le label al paginator
   ],
   exports: [
     AngularAppUtilsLibComponent,

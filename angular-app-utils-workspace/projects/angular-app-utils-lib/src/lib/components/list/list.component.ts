@@ -165,7 +165,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       params = params.set("page", `${this.paginator.pageIndex + 1}`);
       params = params.set("pageSize", `${this.paginator.pageSize}`);
     }
-    if(this.dataSource.filter){
+    if(this.dataSource && this.dataSource.filter){
       params = params.set("filter", `${this.dataSource.filter}`);
     }
     return params;

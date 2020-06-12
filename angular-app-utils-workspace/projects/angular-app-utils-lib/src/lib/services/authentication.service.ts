@@ -1,4 +1,3 @@
-import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
@@ -12,11 +11,11 @@ export const CURRENT_USER_TO_DELETE: string = "CURRENT_USER_TO_DELETE";
 //@Injectable({ providedIn: 'root' })
 export abstract class AuthenticationService<LoginInfo> {
 
-    private currentLoginInfoSubject: BehaviorSubject<LoginInfo>;
+    protected currentLoginInfoSubject: BehaviorSubject<LoginInfo>;
     public currentLoginInfo: Observable<LoginInfo>;
-    private httpHeaders: HttpHeaders;
+    protected httpHeaders: HttpHeaders;
 
-    constructor(private http: HttpClient, private apiUrl: string) {
+    constructor(protected http: HttpClient, protected apiUrl: string) {
         this.currentLoginInfoSubject = new BehaviorSubject<LoginInfo>(JSON.parse(localStorage.getItem(CURRENT_USER)));
         if(localStorage.getItem(CURRENT_USER_TO_DELETE)){
             this.removeUserFromCache();

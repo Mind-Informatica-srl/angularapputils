@@ -5,7 +5,8 @@ export interface PromptDialogData {
   title: string;
   message: string;
   inputLabel: string;
-  showNegativeButton: boolean;
+  showNegativeButton?: boolean;
+  inputRequired: boolean;
 }
 
 @Component({
@@ -22,7 +23,7 @@ export class PromptDialogComponent {
   title: string = null;
   message: string;
   inputLabel: string;
-  inputRequired: boolean = false;
+  inputRequired: boolean;
   
   constructor(public dialogRef: MatDialogRef<PromptDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: PromptDialogData) { 
@@ -30,6 +31,7 @@ export class PromptDialogComponent {
       this.message = data.message;
       this.inputLabel = data.inputLabel;
       this.showNegativeButton = data.showNegativeButton;
+      this.inputRequired = data.inputRequired;
   }
 
 }

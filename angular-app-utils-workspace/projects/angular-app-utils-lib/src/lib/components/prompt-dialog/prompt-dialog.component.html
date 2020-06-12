@@ -14,8 +14,9 @@
             id="dialogInput" 
             name="dialogInput" 
             #dialogInput
+            [required]="inputRequired"
             ></textarea>
-          <mat-hint>Facoltativo</mat-hint>
+          <mat-hint *ngIf="!inputRequired">Facoltativo</mat-hint>
         </mat-form-field>
     </form>
 </div>

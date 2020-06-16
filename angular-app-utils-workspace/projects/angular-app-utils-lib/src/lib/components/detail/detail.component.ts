@@ -36,6 +36,8 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     return this.idExtractor(this.element) == null;
   }
 
+  //Al salvataggio di un item, dice se notificare a tutte le tab aperte il cambiamento 
+  protected onUpdateRefreshAllPages: boolean = true;
   /**
    * se subscribeRoute è false va passato element come input;
    * se subscribeRoute è true element viene caricato tramite apiDatasource nell'ngOnInit;
@@ -109,7 +111,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.element = {} as T;
   }
 
-  loadData(id: number) {
+  loadData(id: number | string) {
     this.isLoadingResults = true;
     this.dataError = false;
     this.sub.add(this.apiDatasource.getElement(id).subscribe((data) => {
@@ -217,7 +219,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   protected onItemSaved(data: T, action: ApiActionsType): void {
     this.resetForm();
     if(this.dataRefreshService != null){
-      this.dataRefreshService.dataHasChange(this.LIST_NAME, data, action);
+      this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
     }
   }
 

@@ -1,10 +1,10 @@
 import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { AfterViewInit, Output, EventEmitter, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Output, EventEmitter, Input, ViewChild, HostListener } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { MatTableDataSource } from '@angular/material/table';
 import { GenericComponent } from '../generic-component/generic.component';
-import { DataRefreshService, DataRefreshItem } from '../../services/data-refresh.service';
+import { DataRefreshService, DataRefreshItem, DATA_REFRESH_SERVICE_TAG } from '../../services/data-refresh.service';
 import { UserMessageService } from '../../services/user-message.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { ApiDatasource } from '../../api-datasource/api-datasource';
@@ -61,20 +61,40 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       this.loadListData();
     }
     this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem<T>) => {
-      if(res && res.ListName === this.LIST_NAME){
-        if(this.refreshAll){
-          //si ricarica tutta la lista
-          this.loadListData();
-        }else{
-          //si aggiorna il solo elemento
-          this.refreshItemList(res.ElementUpdated, res.Action);
-        }
-      }
+      this.refreshFromService(res);
     }));
     if(this.paginator){
       // If the user changes the sort order, reset back to the first page.
       this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
       merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData());
+    }
+  }
+
+  @HostListener('window:storage', ['$event'])
+  onStorageChange(ev: StorageEvent) {
+    if(ev.key && ev.key.startsWith(DATA_REFRESH_SERVICE_TAG)){
+       /*console.log('onStorageChange', ev.key);
+       console.log('oldValue', ev.oldValue);        
+       console.log('newValue', ev.newValue);  */
+       this.refreshFromService(JSON.parse(ev.newValue) )
+    }     
+  }
+
+  /**
+   * Si occupa di valutare se va eseguito il refresh dei dati della lista. In caso affermativo, fa il refresh
+   * Esegue il refresh se LIST_NAME coincide con il ListName di res
+   * Se refreshAll è true ricarica tutta la lista, altrimenti ricarica solo l'elemento
+   * @param res DatRefreshItem<T> oggetto contenente le info da valutare per il refresh. 
+   */
+  refreshFromService(res: DataRefreshItem<T>) {
+    if(res && res.IdentifierName === this.LIST_NAME){
+      if(this.refreshAll || (res.ElementUpdatedId == null && res.ElementUpdated == null)){
+        //si ricarica tutta la lista se refreshAll è true o se non abbiamo info sul detail aggiornato
+        this.loadListData();
+      }else{
+        //si aggiorna il solo elemento
+        this.refreshItemList(res.Action, res.ElementUpdatedId, res.ElementUpdated);
+      }
     }
   }
 
@@ -96,37 +116,78 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
 
   /**
    * metodo per aggiornare un elemento nella lista
-   * @param el elemento da aggiornare nella lista
+   * Se è presente el si eseguono gli aggiornamenti della lista direttamente con questo dato
+   * Se manca el e abbiamo id si chiede al server i dati
+   * Se mancano el e id si logga un errore
+   * @param action azione che è stata appena eseguita e che ha scatenato la chiamata di questo metodo
+   * @param id id del detail da aggiungere/aggiornare/eliminare
+   * @param el il detail completo
    */
-  refreshItemList(el: T, action: ApiActionsType){
-    if(this.dataSource instanceof MatTableDataSource){
-      //TODO
-      
+  refreshItemList(action: ApiActionsType, id: any, el?: T){
+    if(el == null){
+      if(id){
+        //se abbiamo id, si richiede il detail al server
+        this.loadSingleRowById(id, action);
+      }else{
+        //se mancano el e id, si logga l'impossibilità di esecuzione
+        this.listError = true;
+        console.log("ListComponent", "Impossibile ricaricare il dettaglio nella lista. Manca id");          
+      }
     }else{
-      switch (action) {
-        case ApiActionsType.AddAction:
-          this.dataSource.push(el);
-          break;
-        case ApiActionsType.UpdateAction:
-          this.dataSource = this.dataSource.map((item: T) => {
-            if(this.idExtractor(item) === this.idExtractor(el)){
-              return el;
-            }
-            return item;
-          });
-          break;
-        case ApiActionsType.DeleteAction:
-          this.dataSource = this.dataSource.filter((item: T) => {
-            return this.idExtractor(item) !== this.idExtractor(el);
-          })
-          break;      
-        default:
-          break;
+      //se esiste el, si manipola direttamente il dataSource
+      if(this.dataSource instanceof MatTableDataSource){
+        //gestione in caso di grid
+        this.refreshItemRow(action, id, el);
+      }else{
+        switch (action) {
+          case ApiActionsType.AddAction:
+            this.dataSource.push(el);
+            break;
+          case ApiActionsType.UpdateAction:
+            this.dataSource = this.dataSource.map((item: T) => {
+              if(this.idExtractor(item) === this.idExtractor(el)){
+                return el;
+              }
+              return item;
+            });
+            break;
+          case ApiActionsType.DeleteAction:
+            this.dataSource = this.dataSource.filter((item: T) => {
+              return this.idExtractor(item) !== this.idExtractor(el);
+            })
+            break;      
+          default:
+            break;
+        }
       }
       
-    }    
+    }
+  }
+
+  /**
+   * Chiamato da refreshItemList in caso si stia usando un GridListComponent
+   * @param action azione che è stata appena eseguita
+   * @param id id del detail da aggiungere/aggiornare/eliminare
+   * @param el il detail completo 
+   */
+  refreshItemRow(action: ApiActionsType, id: any, el: T){
+    //TODO implementato in GridListComponent
   }
   
+  loadSingleRowById(id: number | string, action: ApiActionsType = ApiActionsType.AddAction) {
+    this.isLoadingResults = true;
+    this.listError = false;
+    this.sub.add(this.apiDatasource.getElement(id).subscribe((data) => {
+      this.isLoadingResults = false;
+      if(data != null){
+        this.refreshItemList(action, id, data);
+      }
+    },(error) => {
+      this.listError = true;
+      console.error(error);      
+    }));
+  }
+
   /**
    * carica la lista dal server. Volendo si può passare una funzione di callback da eseguire dopo onItemLoaded()
    * @param callback funzione di callback opzionale

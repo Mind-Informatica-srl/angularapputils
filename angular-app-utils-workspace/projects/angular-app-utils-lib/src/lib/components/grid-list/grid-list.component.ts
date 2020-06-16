@@ -1,5 +1,6 @@
 import { ListComponent } from '../list/list.component';
 import { MatTableDataSource } from '@angular/material/table';
+import { ApiActionsType } from '../../api-datasource/api-datasource';
 
 
 export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, LoginInfo> {
@@ -42,6 +43,49 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     if (this.tableDataSource.paginator) {
       this.tableDataSource.paginator.firstPage();
     }
+  }
+
+  refreshItemRow(action: ApiActionsType, id: any, el: T){
+    super.refreshItemRow(action, id, el);
+    switch (action) {
+      case ApiActionsType.AddAction:
+        this.tableDataSource.data.push(el);
+        break;
+      case ApiActionsType.UpdateAction:
+        this.tableDataSource.data = this.tableDataSource.data.map((item: T) => {
+          if(this.idExtractor(item) === this.idExtractor(el)){
+            return el;
+          }
+          return item;
+        });
+        break;
+      case ApiActionsType.DeleteAction:
+        this.tableDataSource.data = this.tableDataSource.data.filter((item: T) => {
+          return this.idExtractor(item) !== this.idExtractor(el);
+        })
+        break;      
+      default:
+        break;
+    }
+    /*const oldElement = this.tableDataSource.data.filter(t => {
+      return this.idExtractor(t) === this.idExtractor(el)
+    });
+    const index = this.tableDataSource.data.indexOf(oldElement[0]);
+    switch (action) {
+      case ApiActionsType.AddAction:
+        this.tableDataSource.data.push(el);
+        break;
+      case ApiActionsType.UpdateAction:
+        this.tableDataSource.data.splice(index, 1, el);
+        break;
+      case ApiActionsType.DeleteAction:
+        
+        this.tableDataSource.data.splice(index, 1);
+        break;      
+      default:
+        break;
+    }*/
+
   }
 
 }

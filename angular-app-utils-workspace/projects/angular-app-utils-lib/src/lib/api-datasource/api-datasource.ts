@@ -120,6 +120,7 @@ export class ApiDatasource<T> {
     this.userMessageService.message({
       element: element,
       error: err,
+      errorMessage: typeof err == "string" ? err : null,
       messageType: MessageType.Error
     });
     ApiDatasource.handleError(err);

@@ -115,8 +115,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.isLoadingResults = true;
     this.dataError = false;
     this.sub.add(this.apiDatasource.getElement(id).subscribe((data) => {
-      this.onLoadedData(data);
-      this.isLoadingResults = false;
+      this.onLoadedData(data);      
     },(error) => {
       this.onLoadingDataError(error);
     }));
@@ -131,6 +130,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   protected onLoadedData(data: T) {
     this.element = data;
+    this.isLoadingResults = false;
   }
   
   protected onElementChanged(): void{
@@ -238,6 +238,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       }
     }
     this.saving = false;
+    this.isLoadingResults = false;
   }
 
   protected validate(): boolean {

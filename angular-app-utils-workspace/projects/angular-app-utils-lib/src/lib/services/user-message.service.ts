@@ -20,7 +20,7 @@ export interface UserMessageData {
 //@Injectable({providedIn:"root"})
 export class UserMessageService {
     
-    private messageSubj = new Subject<any>();
+    private messageSubj = new Subject<UserMessageData>();
 
     get onMessage() {
         return this.messageSubj.asObservable();

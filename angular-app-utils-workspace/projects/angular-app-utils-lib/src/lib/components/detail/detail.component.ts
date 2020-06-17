@@ -95,15 +95,15 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }
   }
 
-  private _onlyPreview: boolean = false;
+  private _showOnlyPreview: boolean = false;
   //indica se stiamo mostrando solo una preview del detail
-  get onlyPreview(): boolean {
-    return this._onlyPreview;
+  get showOnlyPreview(): boolean {
+    return this._showOnlyPreview;
   }
 
   //se si vuole mostrare solo un anteprima, siamo del dettaglio di una grid per esempio; subscribeRoute quindi dovrà essere l'opposto
-  @Input() set onlyPreview(val: boolean) {
-    this._onlyPreview = val;
+  @Input() set showOnlyPreview(val: boolean) {
+    this._showOnlyPreview = val;
     this.subscribeRoute = !val;
   }
 
@@ -231,7 +231,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   protected resetForm(){
     if(this.form){
       this.form.control.markAsPristine();
-      if(this.isAuthorizedToModify() && !this.onlyPreview){
+      if(this.isAuthorizedToModify() && !this.showOnlyPreview){
         this.form.control.enable();
       }else{
         this.form.control.disable();

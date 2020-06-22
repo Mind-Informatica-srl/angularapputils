@@ -218,7 +218,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   
   prepareLoadParameters(): HttpParams {
     let params = new HttpParams();
-    if(this.sort){
+    if(this.sort && this.sort.active){
       params = params.set("sort", `${this.sort.active}`);
       params = params.set("order", `${this.sort.direction}`)
     }

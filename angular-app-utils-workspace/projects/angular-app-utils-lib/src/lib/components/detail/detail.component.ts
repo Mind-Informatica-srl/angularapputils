@@ -90,9 +90,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
           }
         }
       }));
-    }else if(this.element == null){
-      this.element = {} as T;
-    }
+    }else {
+      this.prepareForNewItem();
+    } 
   }
 
   private _showOnlyPreview: boolean = false;
@@ -108,7 +108,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   prepareForNewItem(): void {
-    this.element = {} as T;
+    if(this.element == null){
+      this.element = {} as T;
+    }else{
+      this.resetForm();
+    }
   }
 
   loadData(id: number | string) {
@@ -140,7 +144,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   save() {
     if(this.validate()){
       this.saving = true;
-      if(this.idExtractor(this.element) == null){
+      if(this.inserted){
         this.sub.add(this.apiDatasource.insert(this.element).subscribe((data) => {
           console.log('elemento inserito');
           this.onItemSaved(data, ApiActionsType.AddAction);

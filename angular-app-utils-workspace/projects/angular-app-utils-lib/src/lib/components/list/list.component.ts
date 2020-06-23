@@ -126,8 +126,22 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   refreshItemList(action: ApiActionsType, id: any, el?: T){
     if(el == null){
       if(id){
-        //se abbiamo id, si richiede il detail al server
-        this.loadSingleRowById(id, action);
+        //se abbiamo id
+        if(action == ApiActionsType.DeleteAction){
+          //se è il caso di una delete, si toglie il rigo dalla lista/grid
+          if(this.dataSource instanceof MatTableDataSource){
+            //caso della grid
+            this.deleteItemRow(id);
+          }else{
+            //caso lista generica
+            this.dataSource = this.dataSource.filter((item: T) => {
+              return this.idExtractor(item) !== id;
+            })
+          }          
+        }else {
+          //altrimenti si richiede il detail al server
+          this.loadSingleRowById(id, action);
+        }
       }else{
         //se mancano el e id, si logga l'impossibilità di esecuzione
         this.listError = true;
@@ -162,6 +176,13 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       }
       
     }
+  }
+  /**
+   * Chiamato da refreshItemList in caso si stia usando un GridListComponent
+   * @param id id dell'elemento da eliminare dalla gird
+   */
+  deleteItemRow(id: any) {
+    //TODO implementato in GridListComponent
   }
 
   /**

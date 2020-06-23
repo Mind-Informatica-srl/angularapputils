@@ -45,6 +45,13 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     }
   }
 
+  deleteItemRow(id: any) {
+    super.deleteItemRow(id);
+    this.tableDataSource.data = this.tableDataSource.data.filter((item: T) => {
+      return this.idExtractor(item) !== id;
+    })
+  }
+  
   refreshItemRow(action: ApiActionsType, id: any, el: T){
     super.refreshItemRow(action, id, el);
     switch (action) {

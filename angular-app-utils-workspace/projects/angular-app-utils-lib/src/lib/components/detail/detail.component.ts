@@ -1,6 +1,6 @@
 import { ApiActionsType } from './../../api-datasource/api-datasource';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { OnInit, Input, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -62,7 +62,8 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   isLoadingResults: boolean = true;
   dataError: boolean = false;
-
+  containerDialogRef: MatDialogRef<any> = null;//ref del dialog in cui può essere contenuto il detail
+  
   constructor(
     protected httpClient: HttpClient,
     protected route: ActivatedRoute,
@@ -148,13 +149,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         this.sub.add(this.apiDatasource.insert(this.element).subscribe((data) => {
           console.log('elemento inserito');
           this.onItemSaved(data, ApiActionsType.AddAction);
-          if (this.subscribeRoute) {
-            this.router.navigate(["../", this.idExtractor(data)], {
-              relativeTo: this.route
-            });
-          } else {
-            this.refreshElement(data);
-          }
+          this.reload(data);
         }, (err) => {
           this.onSaveError(err);
           
@@ -193,23 +188,35 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   protected deleteAction(){
-    if(this.idExtractor(this.element) == null){
+    if(this.inserted){
       //se non esiste id dell'elemento significa che stiamo eliminando un elemento appena generato, ma non salvato su server
       this.closeDetail();
     }else{
+      const oldId = this.idExtractor(this.element);
       this.saving = true;
       this.sub.add(this.apiDatasource.delete(this.element).subscribe((data) => {
         console.log('elemento eliminato');
-        this.onItemSaved(data, ApiActionsType.DeleteAction);
-        this.closeDetail();
-        /*if (this.subscribeRoute) {
-          this.router.navigate(["../"], {
-            relativeTo: this.route
-          });
-        }*/
+        this.onItemDeleted(oldId);
       }, (err) => {
         this.onSaveError(err)
       }));
+    }
+  }
+
+  onItemDeleted(oldId: string | number) {
+    if(this.dataRefreshService != null){
+      this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.DeleteAction, oldId, null, this.onUpdateRefreshAllPages);
+    } 
+    this.closeDetail();   
+  }
+
+  protected reload(data: T): void {
+    if (this.subscribeRoute) {
+      this.router.navigate(["../", this.idExtractor(data)], {
+        relativeTo: this.route
+      });
+    } else {
+      this.refreshElement(data);
     }
   }
 
@@ -255,6 +262,8 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       const path = this.router.url.substring(0, index);      
       this.router.navigate([path]);
       //this.location.back();
+    }else if(this.containerDialogRef){
+      this.containerDialogRef.close();
     }
   }
 

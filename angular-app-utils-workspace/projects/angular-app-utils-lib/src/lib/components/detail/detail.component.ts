@@ -77,7 +77,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
      }
 
   ngOnInit(): void {
-    this.apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
+    this.setApiDatasource();
     if(this.subscribeRoute){
       this.sub.add(this.route.params.subscribe(params => {
         const id = params["Id"];
@@ -94,6 +94,10 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }else {
       this.prepareForNewItem();
     } 
+  }
+
+  protected setApiDatasource() {
+    this.apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
   }
 
   private _showOnlyPreview: boolean = false;

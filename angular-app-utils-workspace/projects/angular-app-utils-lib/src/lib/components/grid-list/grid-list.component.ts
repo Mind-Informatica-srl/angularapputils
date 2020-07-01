@@ -7,7 +7,7 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
   
   setDataSourceAttributes() {
     if(this.tableDataSource != null) {
-      this.tableDataSource.paginator = this.paginator;
+      //this.tableDataSource.paginator = this.paginator;
       this.tableDataSource.sort = this.sort;
     }
   }
@@ -40,8 +40,11 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     //non si chiama il super. Qui dataSource è di tipo MatTableDataSource e possiamo applicare il suo metodo "filter"
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
-    if (this.tableDataSource.paginator) {
+    /*if (this.tableDataSource.paginator) {
       this.tableDataSource.paginator.firstPage();
+    }*/
+    if(this.paginator){
+      this.paginator.firstPage();
     }
   }
 

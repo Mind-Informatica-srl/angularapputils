@@ -19,8 +19,8 @@ export class ApiDatasource<T> {
     return this.idExtractor;
   }
   
-  constructor(private _httpClient: HttpClient, 
-    private path: string, 
+  constructor(protected _httpClient: HttpClient, 
+    protected path: string, 
     protected userMessageService: UserMessageService,
     idExtractor?: ((arg0: any) => any)
     ) {
@@ -116,7 +116,7 @@ export class ApiDatasource<T> {
     );
   }
 
-  private onError(element: T, err: any){
+  protected onError(element: T, err: any){
     this.userMessageService.message({
       element: element,
       error: err,

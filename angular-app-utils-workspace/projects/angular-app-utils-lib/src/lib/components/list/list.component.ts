@@ -55,7 +55,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   }
   
   ngAfterViewInit(): void {
-    this.apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
+    this.setApiDatasource();
     if(this.dataSource == null && this.loadDataOnLoad){
       //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
       this.loadListData();
@@ -68,6 +68,10 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
       merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData());
     }
+  }
+
+  protected setApiDatasource() {
+    this.apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
   }
 
   @HostListener('window:storage', ['$event'])

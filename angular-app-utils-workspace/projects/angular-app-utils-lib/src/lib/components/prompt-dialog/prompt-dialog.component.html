@@ -6,7 +6,18 @@
     <form name="dialogInputForm" #f="ngForm" autocomplete="off">
         <mat-form-field>
           <mat-label for="dialogInput">{{inputLabel}}</mat-label>
-          <textarea matInput
+          <input
+            *ngIf="!textArea; else textareaTemplate"
+            matInput
+            id="dialogInput" 
+            name="dialogInput" 
+            #dialogInput
+            [required]="inputRequired"
+            [(ngModel)]="value"
+          >
+          <ng-template #textareaTemplate>
+            <textarea             
+            matInput
             cdkTextareaAutosize
             #autosize="cdkTextareaAutosize"
             cdkAutosizeMinRows="1"
@@ -15,12 +26,15 @@
             name="dialogInput" 
             #dialogInput
             [required]="inputRequired"
+            [(ngModel)]="value"
             ></textarea>
+          </ng-template>
+                    
           <mat-hint *ngIf="!inputRequired">Facoltativo</mat-hint>
         </mat-form-field>
     </form>
 </div>
 <div mat-dialog-actions>
-    <button mat-raised-button color="accent" style="margin-right: 1%;" *ngIf="showNegativeButton">Annulla</button>
-    <button mat-raised-button color="primary" [mat-dialog-close]="dialogInput.value" cdkFocusInitial>OK</button>
+    <button mat-raised-button color="primary" [mat-dialog-close]="value" cdkFocusInitial [disabled]="inputRequired && !value">{{okLabel}}</button>
+    <button mat-raised-button color="accent" style="margin-right: 1%;" *ngIf="showNegativeButton" [mat-dialog-close]="">{{annullaLabel}}</button>
 </div>

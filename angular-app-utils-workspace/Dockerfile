@@ -10,3 +10,5 @@ WORKDIR '/'
 RUN mkdir AngularAppUtils
 WORKDIR '/AngularAppUtils'
 COPY --from=ng-builder /app/dist/angular-app-utils-lib/angular-app-utils-lib-0.0.1.tgz .
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD [ "node" ]

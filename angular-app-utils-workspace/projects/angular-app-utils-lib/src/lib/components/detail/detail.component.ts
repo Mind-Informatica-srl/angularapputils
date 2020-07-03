@@ -9,7 +9,6 @@ import { NgForm } from '@angular/forms';
 import { GenericComponent } from '../generic-component/generic.component';
 import { DataRefreshService } from '../../services/data-refresh.service';
 import { UserMessageService } from '../../services/user-message.service';
-import { ApiDatasource } from '../../api-datasource/api-datasource';
 import { AuthenticationService } from '../../services/authentication.service';
 
 
@@ -65,19 +64,18 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   containerDialogRef: MatDialogRef<any> = null;//ref del dialog in cui può essere contenuto il detail
   
   constructor(
-    protected httpClient: HttpClient,
+    httpClient: HttpClient,
     protected route: ActivatedRoute,
     protected router: Router,
     protected dataRefreshService: DataRefreshService<T>,
-    protected userMessageService: UserMessageService,
+    userMessageService: UserMessageService,
     protected location: Location,
     public dialog: MatDialog,
     authService: AuthenticationService<LoginInfo>) {
-      super(authService);
+      super(httpClient, userMessageService, authService);
      }
 
   ngOnInit(): void {
-    this.setApiDatasource();
     if(this.subscribeRoute){
       this.sub.add(this.route.params.subscribe(params => {
         const id = params["Id"];
@@ -94,10 +92,6 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }else {
       this.prepareForNewItem();
     } 
-  }
-
-  protected setApiDatasource() {
-    this.apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
   }
 
   private _showOnlyPreview: boolean = false;

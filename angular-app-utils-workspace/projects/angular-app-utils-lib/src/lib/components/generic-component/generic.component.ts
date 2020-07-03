@@ -2,6 +2,8 @@ import { Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ApiDatasource } from '../../api-datasource/api-datasource';
 import { AuthenticationService } from '../../services/authentication.service';
+import { HttpClient } from '@angular/common/http';
+import { UserMessageService } from '../../services/user-message.service';
 
 export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
 
@@ -11,7 +13,8 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
    */
   @Input() subscribeRoute: boolean = true;
   @Input() loadDataOnLoad: boolean = true;
-  protected apiDatasource: ApiDatasource<T> | null;
+  private _apiDatasource: ApiDatasource<T> | null;
+
   /**
    * Il path da aggiungere alla url del server per le comunicazioni
    */
@@ -29,11 +32,24 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
   protected sub: Subscription = new Subscription();
 
   constructor(
-      protected authService: AuthenticationService<LoginInfo>) {
-     }
+    protected httpClient: HttpClient,
+    protected userMessageService: UserMessageService,
+    protected authService: AuthenticationService<LoginInfo>) {
+ }
 
   ngOnDestroy(){
     this.sub.unsubscribe();
+  }
+
+  protected get apiDatasource(): ApiDatasource<T> {
+    if(!this._apiDatasource){
+      this._apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
+    }
+    return this._apiDatasource;
+  }
+
+  protected set apiDatasource(val: ApiDatasource<T>) {
+      this._apiDatasource = val;
   }
 
   /**

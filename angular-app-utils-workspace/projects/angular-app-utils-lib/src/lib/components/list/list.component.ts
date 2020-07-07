@@ -7,7 +7,6 @@ import { GenericComponent } from '../generic-component/generic.component';
 import { DataRefreshService, DataRefreshItem, DATA_REFRESH_SERVICE_TAG } from '../../services/data-refresh.service';
 import { UserMessageService } from '../../services/user-message.service';
 import { AuthenticationService } from '../../services/authentication.service';
-import { ApiDatasource } from '../../api-datasource/api-datasource';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { merge } from 'rxjs';

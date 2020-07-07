@@ -15,6 +15,8 @@ export abstract class AuthenticationService<LoginInfo> {
     public currentLoginInfo: Observable<LoginInfo>;
     protected httpHeaders: HttpHeaders;
 
+    usernameExtractor: ((arg0: any) => any) = (element: any) => element.Username;
+
     constructor(protected http: HttpClient, protected apiUrl: string) {
         this.currentLoginInfoSubject = new BehaviorSubject<LoginInfo>(JSON.parse(localStorage.getItem(CURRENT_USER)));
         if(localStorage.getItem(CURRENT_USER_TO_DELETE)){

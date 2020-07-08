@@ -61,10 +61,17 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem<T>) => {
       this.refreshFromService(res);
     }));
+    //this.setupPaginatorAndSort();
+  }
+
+  setupPaginatorAndSort() {
     if(this.paginator){
-      // If the user changes the sort order, reset back to the first page.
-      this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-      merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData());
+      if(this.sort){
+        this.sub.add(this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0));// If the user changes the sort order, reset back to the first page.
+        this.sub.add(merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData()));
+      }else{
+        this.sub.add(this.paginator.page.subscribe(() => this.loadListData()));
+      }
     }
   }
 
@@ -103,11 +110,13 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   @ViewChild(MatSort) set matSort(ms: MatSort) {
     this.sort = ms;
     this.setDataSourceAttributes();
+    this.setupPaginatorAndSort();
   }
 
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
     this.paginator = mp;
     this.setDataSourceAttributes();
+    this.setupPaginatorAndSort();
   }
 
   setDataSourceAttributes() {}//utile per grid-list.component

@@ -3,10 +3,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 export const DATA_REFRESH_SERVICE_TAG = 'data-refresh-service-tag.';
 
-export interface DataRefreshItem<T> {
+export interface DataRefreshItem {
     IdentifierName: string,
     Action: ApiActionsType,
-    ElementUpdated?: T,
+    ElementUpdated?: any,
     ElementUpdatedId: any,
     DummyString?: string //serve solo per il localStorage
 }
@@ -18,10 +18,10 @@ export interface DataRefreshItem<T> {
 /*@Injectable({
     providedIn:"root"
 })*/
-export class DataRefreshService<T> {
+export class DataRefreshService {
 
-  private refreshSub = new BehaviorSubject<DataRefreshItem<T>>(null);
-  refresh: Observable<DataRefreshItem<T>>;//fare subscriptiona refresh per essere notificati di una modifica
+  private refreshSub = new BehaviorSubject<DataRefreshItem>(null);
+  refresh: Observable<DataRefreshItem>;//fare subscriptiona refresh per essere notificati di una modifica
 
   constructor() {
       this.refresh = this.refreshSub.asObservable();
@@ -36,8 +36,8 @@ export class DataRefreshService<T> {
    * @param elementUpdated elemento aggiornato di tipo T
    * @param refreshAllPages se true manda la notifica attraverso localStorage a tutte le tab aperte
    */
-  dataHasChange(name: string, action: ApiActionsType, elementUpdatedId: any, elementUpdated: T, refreshAllPages: boolean = true) {
-    const params: DataRefreshItem<T> = {
+  dataHasChange(name: string, action: ApiActionsType, elementUpdatedId: any, elementUpdated: any, refreshAllPages: boolean = true) {
+    const params: DataRefreshItem = {
       IdentifierName: name, 
       Action: action,  
       ElementUpdatedId: elementUpdatedId,

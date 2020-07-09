@@ -54,9 +54,9 @@ export class ApiDatasource<T> {
     );
   }
 
-  getElement(id: any): Observable<T> {
+  getElement(id: any, params?: HttpParams): Observable<T> {
     const url = `${this.requestUrl}/${id}`;
-    return this._httpClient.get<T>(url)
+    return this._httpClient.get<T>(url, { params })
     .pipe(
       catchError(err => {
         return this.onError(null, err);

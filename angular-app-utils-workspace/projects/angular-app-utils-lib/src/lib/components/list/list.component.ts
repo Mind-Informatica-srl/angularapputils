@@ -9,7 +9,7 @@ import { UserMessageService } from '../../services/user-message.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
-import { merge } from 'rxjs';
+import { merge, Subscription } from 'rxjs';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements AfterViewInit {
@@ -24,11 +24,12 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   @Input() dataSource: T[] | MatTableDataSource<T>;
   selectedElement: T;
   @Output() onSelectElement = new EventEmitter<T>();
+  protected dataSub: Subscription;
 
   protected refreshAll: boolean = true; //booleano per decidere se ricaricare tutta la lista al momento di un aggiornamento di un item
 
   constructor(protected httpClient: HttpClient,
-    protected dataRefreshService: DataRefreshService<T>,
+    protected dataRefreshService: DataRefreshService,
     protected userMessageService: UserMessageService,
     protected router: Router,
     authService: AuthenticationService<LoginInfo>) {
@@ -58,19 +59,30 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
       this.loadListData();
     }
-    this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem<T>) => {
+    this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem) => {
       this.refreshFromService(res);
     }));
     //this.setupPaginatorAndSort();
   }
 
+  ngOnDestroy(){
+    super.ngOnDestroy();
+    if(this.dataSub){
+      this.dataSub.unsubscribe();
+    }
+  }
+
   setupPaginatorAndSort() {
+    if(this.dataSub){
+      this.dataSub.unsubscribe();
+    }
+    this.dataSub = new Subscription();
     if(this.paginator){
       if(this.sort){
-        this.sub.add(this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0));// If the user changes the sort order, reset back to the first page.
-        this.sub.add(merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData()));
+        this.dataSub.add(this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0));// If the user changes the sort order, reset back to the first page.
+        this.dataSub.add(merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData()));
       }else{
-        this.sub.add(this.paginator.page.subscribe(() => this.loadListData()));
+        this.dataSub.add(this.paginator.page.subscribe(() => this.loadListData()));
       }
     }
   }
@@ -91,7 +103,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
    * Se refreshAll è true ricarica tutta la lista, altrimenti ricarica solo l'elemento
    * @param res DatRefreshItem<T> oggetto contenente le info da valutare per il refresh. 
    */
-  refreshFromService(res: DataRefreshItem<T>) {
+  refreshFromService(res: DataRefreshItem) {
     if(res && res.IdentifierName === this.LIST_NAME){
       if(this.refreshAll || (res.ElementUpdatedId == null && res.ElementUpdated == null)){
         //si ricarica tutta la lista se refreshAll è true o se non abbiamo info sul detail aggiornato

@@ -1,15 +1,16 @@
-import { ApiActionsType } from './../../api-datasource/api-datasource';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { OnInit, Input, ViewChild } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Input, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { GenericComponent } from '../generic-component/generic.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+
+import { AuthenticationService } from '../../services/authentication.service';
 import { DataRefreshService } from '../../services/data-refresh.service';
 import { UserMessageService } from '../../services/user-message.service';
-import { AuthenticationService } from '../../services/authentication.service';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { GenericComponent } from '../generic-component/generic.component';
+import { ApiActionsType } from './../../api-datasource/api-datasource';
 
 
 export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
@@ -26,6 +27,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   private _element: T = {} as T;
   
   evaualteRouteParent: boolean = false; //da sovrascrivere a true se si vuole ricavare l'ID da route.parent
+  closeDetailOnSave: boolean = true;//se true, chiude automaticamente il detail al salvataggio (se aperto in una modal)
   
   public get element(): T {
     return this._element;
@@ -205,7 +207,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     if(this.dataRefreshService != null){
       this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.DeleteAction, oldId, null, this.onUpdateRefreshAllPages);
     } 
-    this.closeDetail();   
+    this.closeDetail();
   }
 
   protected reload(data: T): void {
@@ -229,6 +231,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.resetForm();
     if(this.dataRefreshService != null){
       this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
+    }
+    if(this.closeDetailOnSave){
+      this.closeDetail();
     }
   }
 

@@ -1,25 +1,27 @@
-import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
-import { AfterViewInit, Output, EventEmitter, Input, ViewChild, HostListener } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { MatTableDataSource } from '@angular/material/table';
-import { GenericComponent } from '../generic-component/generic.component';
-import { DataRefreshService, DataRefreshItem, DATA_REFRESH_SERVICE_TAG } from '../../services/data-refresh.service';
-import { UserMessageService } from '../../services/user-message.service';
-import { AuthenticationService } from '../../services/authentication.service';
-import { MatSort } from '@angular/material/sort';
+import { EventEmitter, HostListener, Input, Output, Type, ViewChild, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { merge, Subscription } from 'rxjs';
 
+import { AuthenticationService } from '../../services/authentication.service';
+import { DATA_REFRESH_SERVICE_TAG, DataRefreshItem, DataRefreshService } from '../../services/data-refresh.service';
+import { UserMessageService } from '../../services/user-message.service';
+import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail-dialog.component';
+import { GenericComponent } from '../generic-component/generic.component';
+import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 
-export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements AfterViewInit {
 
-  abstract displayedColumns: string[];
+export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
+
   abstract pageTitle: string;
 
-  currentPath: string;
+  protected currentPath: string;
 
-  isLoadingResults: boolean = false;
+  isLoadingResults: boolean;
   listError: boolean = false;
   @Input() dataSource: T[] | MatTableDataSource<T>;
   selectedElement: T;
@@ -27,21 +29,27 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected dataSub: Subscription;
 
   protected refreshAll: boolean = true; //booleano per decidere se ricaricare tutta la lista al momento di un aggiornamento di un item
+  protected detailTitle: string = "Dettaglio";
+  protected detailSubTitle: string = null;
+  protected detailComponentType: Type<any>;
+  protected openDetailOnClick: boolean = true;
+  protected detailDialogLoadFromServer: boolean = false;
 
   constructor(protected httpClient: HttpClient,
     protected dataRefreshService: DataRefreshService,
     protected userMessageService: UserMessageService,
     protected router: Router,
-    authService: AuthenticationService<LoginInfo>) {
-      super(httpClient, userMessageService, authService);
+    authService: AuthenticationService<LoginInfo>,
+    public dialog: MatDialog) {
+      super(httpClient, userMessageService, authService);     
       this.currentPath = this.router.url;
       this.sub.add(this.router.events.subscribe((val) => {
         this.onRouteChanged(val);
       }));
-      if(this.dataSource == null && this.loadDataOnLoad){
+      /*if(this.dataSource == null && this.loadDataOnLoad){
         //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
         this.isLoadingResults = true;
-      }      
+      }*/
   }
 
   protected onRouteChanged(val: import("@angular/router").Event) {
@@ -54,7 +62,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.selectedElement = null;
   }
   
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     if(this.dataSource == null && this.loadDataOnLoad){
       //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
       this.loadListData();
@@ -256,7 +264,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     }));
   }
   
-  prepareLoadParameters(): HttpParams {
+  protected prepareLoadParameters(): HttpParams {
     let params = new HttpParams();
     if(this.sort && this.sort.active){
       params = params.set("sort", `${this.sort.active}`);
@@ -272,7 +280,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     return params;
   }
 
-  onListLoaded(data: T[]){
+  protected onListLoaded(data: T[]){
     this.dataSource = data;    
   }
 
@@ -284,9 +292,10 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       this.selectedElement = null;
     }
     this.onSelectElement.emit(this.selectedElement);
-    if(this.subscribeRoute){
-      this.router.navigate([this.currentPath, this.apiDatasource.apiIdExtractor(this.selectedElement)]);
+    if(this.openDetailOnClick && this.selectedElement != null){
+      this.openDetail(item);
     }
+    
   }
 
   prepareRoute(outlet: RouterOutlet) {
@@ -299,6 +308,64 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
    */
   applyFilter(event: Event): void{
     
+  }
+
+  /**
+   * metodo per aprire un detail per inserire un nuovo elemento
+   */
+  addNewClicked(){
+    if(this.isAuthorizedToModify()){
+      this.selectedElement = null;
+      this.openDetail(null);
+    }
+  }
+  
+  openDetail(el: T) {
+    if (this.subscribeRoute) {
+      this.router.navigate([this.currentPath, el ? this.apiDatasource.apiIdExtractor(el) : 'new']);
+    } else {
+      this.openDetailDialog(el);
+    }
+  }
+
+  /**
+   * Apre dialog con detail component al suo interno
+   * @param el element da aprire nel dialog
+   */
+  protected openDetailDialog(el: T = {} as T){
+    const dialogData: DetailDialogData<T> = this.getDetailDialogData(el);    
+    let dialogRef = this.dialog.open(DetailDialogComponent, {
+      data: dialogData
+    });
+    this.sub.add(dialogRef.afterClosed().subscribe( (result: T) => { 
+      this.loadListData();  
+    })); 
+  }
+
+  /**
+   * 
+   * @param el element da caricare nel dialog (deve avere almeno id affinchè si possa caricare i dati dal server)
+   * @param metaData Object che può contenere vari attributi da valorizzare per il
+   */
+  protected getDetailDialogData(el: T = {} as T): DetailDialogData<T> {
+    if(this.detailComponentType == null){
+      throw Error("ListComponent: detailComponentType non instanziato");
+    }
+    const dialogData: DetailDialogData<T> = {
+      detailComponent: this.detailComponentType,
+      element: el,
+      loadRemoteData: this.detailDialogLoadFromServer,
+      title: this.detailTitle,
+      subTitle: this.detailSubTitle,
+      meta: this.getDetailMetaData(el)
+    }
+    return dialogData;
+  }
+
+  protected getDetailMetaData(el: T): Object {
+    return {
+      subscribeRoute: false,
+    } 
   }
 
 }

@@ -9,9 +9,10 @@ export const CURRENT_USER_UPDATED = 'current-user-updated';
 
 export abstract class AbstractAppComponent<LoginInfo> implements OnInit, OnDestroy{
 
-    private snackbarSubscription: Subscription;
+    protected snackbarSubscription: Subscription;
 
-    constructor(protected router: Router, 
+    constructor(
+      protected router: Router, 
       protected authService: AuthenticationService<LoginInfo>,
       protected userMessageService: UserMessageService,
       protected _snackBar: MatSnackBar){
@@ -24,9 +25,9 @@ export abstract class AbstractAppComponent<LoginInfo> implements OnInit, OnDestr
       });
     }
 
-    onMessageReceived(data: UserMessageData) {
+    protected onMessageReceived(data: UserMessageData) {
         if(data != null){
-            if(data.error){
+            if(data.errorMessage || data.error){
                 this.openSnackBar(data.errorMessage || data.error || 'Errore!', "Errore");
             }else if(data.messageType == MessageType.Delete){
                 this.openSnackBar( ( (data.element && data.element.Description != null && data.element.Description != '' ) ? '"' + data.element.Description + '"' : 'Elemento') + ' cancellato con successo!', "Cancellato");
@@ -102,7 +103,7 @@ export abstract class AbstractAppComponent<LoginInfo> implements OnInit, OnDestr
      * aggiunge l'utente alle cache temporaneamente (utile per quando si ricarica la pagina)
      * l'AuthenticationService si occuperà di rimuovere questa localStorage a caricamento avvenuto
      */
-    private addUserToCache(){
+    protected addUserToCache(){
       const userSaved = localStorage.getItem(CURRENT_USER);
       if(userSaved == null){
         const user = this.authService.currentLoginInfoValue;

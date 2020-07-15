@@ -11,7 +11,6 @@ export enum ApiActionsType {
 }
 
 export class ApiDatasource<T> {
-  requestUrl: string;
   //httpHeaders: HttpHeaders;
   private idExtractor: ((arg0: any) => any) = (element) => element.ID;
 
@@ -20,11 +19,10 @@ export class ApiDatasource<T> {
   }
   
   constructor(protected _httpClient: HttpClient, 
-    protected path: string, 
+    public requestUrl: string, 
     protected userMessageService: UserMessageService,
     idExtractor?: ((arg0: any) => any)
     ) {
-    this.requestUrl = this.path;
     /*this.httpHeaders = new HttpHeaders({
       'Content-Type': 'application/json; charset=utf-8;',
       'access-control-allow-origin': '*',

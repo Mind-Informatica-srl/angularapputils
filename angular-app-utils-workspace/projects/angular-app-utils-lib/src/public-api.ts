@@ -20,6 +20,7 @@ export * from './lib/services/authentication.service';
 export * from './lib/adapters/aau-date-adapter';
 
 //components
+export * from './lib/components/app/abstract-app.component';
 export * from './lib/components/confirm-dialog/confirm-dialog.component';
 export * from './lib/components/prompt-dialog/prompt-dialog.component';
 export * from './lib/components/date-time-picker/date-time-picker.component';
@@ -28,6 +29,7 @@ export * from './lib/components/generic-component/generic.component';
 export * from './lib/components/grid-list/grid-list.component';
 export * from './lib/components/list/list.component';
 export * from './lib/components/reset-password-dialog/reset-password-dialog.component';
+export * from './lib/components/detail-dialog/detail-dialog.component';
 
 //utils
 export * from './lib/utils/italian-mat-paginator-intl';

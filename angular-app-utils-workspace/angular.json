@@ -42,6 +42,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "angular-app-utils-lib"
+    }
+  },
+  "defaultProject": "angular-app-utils-lib",
+  "cli": {
+    "analytics": false
+  }
 }

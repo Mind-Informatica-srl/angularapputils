@@ -5,6 +5,8 @@ import { ApiActionsType } from '../../api-datasource/api-datasource';
 
 export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, LoginInfo> {
   
+  abstract displayedColumns: string[];
+
   setDataSourceAttributes() {
     if(this.tableDataSource != null) {
       //this.tableDataSource.paginator = this.paginator;
@@ -16,8 +18,8 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     return this.dataSource as MatTableDataSource<T>;
   }
 
-  ngAfterViewInit(): void {
-    super.ngAfterViewInit();    
+  ngOnInit(): void {
+    super.ngOnInit();    
     if(this.tableDataSource != null){
       this.tableDataSource.sort = this.sort;
     }

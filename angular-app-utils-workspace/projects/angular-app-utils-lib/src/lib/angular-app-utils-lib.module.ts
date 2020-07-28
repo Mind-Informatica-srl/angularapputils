@@ -8,9 +8,7 @@ import { AauDateAdapter } from './adapters/aau-date-adapter';
 import { DateAdapter } from '@angular/material/core';
 import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
-
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -28,6 +26,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { ItalianMatPaginatorIntl } from './utils/italian-mat-paginator-intl';
+import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.component';
 
 
 @NgModule({
@@ -36,7 +35,8 @@ import { ItalianMatPaginatorIntl } from './utils/italian-mat-paginator-intl';
     DateTimePickerComponent,
     ConfirmDialogComponent,
     PromptDialogComponent,
-    ResetPasswordDialogComponent
+    ResetPasswordDialogComponent,
+    DetailDialogComponent   
   ],
   imports: [
     CommonModule,
@@ -69,12 +69,14 @@ import { ItalianMatPaginatorIntl } from './utils/italian-mat-paginator-intl';
     DateTimePickerComponent,
     ConfirmDialogComponent,
     PromptDialogComponent,
-    ResetPasswordDialogComponent
+    ResetPasswordDialogComponent,
+    DetailDialogComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
     PromptDialogComponent,
-    ResetPasswordDialogComponent
+    ResetPasswordDialogComponent,
+    DetailDialogComponent
   ],
 })
 export class AngularAppUtilsLibModule { }

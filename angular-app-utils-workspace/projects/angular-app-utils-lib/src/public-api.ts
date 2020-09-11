@@ -30,6 +30,8 @@ export * from './lib/components/grid-list/grid-list.component';
 export * from './lib/components/list/list.component';
 export * from './lib/components/reset-password-dialog/reset-password-dialog.component';
 export * from './lib/components/detail-dialog/detail-dialog.component';
+export * from './lib/components/forgot-password-dialog/forgot-password-dialog.component';
+
 
 //utils
 export * from './lib/utils/italian-mat-paginator-intl';

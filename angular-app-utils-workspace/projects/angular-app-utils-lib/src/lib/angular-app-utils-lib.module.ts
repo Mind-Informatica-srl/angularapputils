@@ -1,3 +1,4 @@
+import { ForgotPasswordDialogComponent } from './components/forgot-password-dialog/forgot-password-dialog.component';
 import { ResetPasswordDialogComponent } from './components/reset-password-dialog/reset-password-dialog.component';
 import { PromptDialogComponent } from './components/prompt-dialog/prompt-dialog.component';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
@@ -36,11 +37,12 @@ import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.
     ConfirmDialogComponent,
     PromptDialogComponent,
     ResetPasswordDialogComponent,
-    DetailDialogComponent   
+    ForgotPasswordDialogComponent,
+    DetailDialogComponent
   ],
   imports: [
     CommonModule,
-    FormsModule, 
+    FormsModule,
     ReactiveFormsModule,
     NgxMaterialTimepickerModule.setLocale("it-IT"),
     LayoutModule,
@@ -70,13 +72,15 @@ import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.
     ConfirmDialogComponent,
     PromptDialogComponent,
     ResetPasswordDialogComponent,
+    ForgotPasswordDialogComponent,
     DetailDialogComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
     PromptDialogComponent,
     ResetPasswordDialogComponent,
-    DetailDialogComponent
+    DetailDialogComponent,
+    ForgotPasswordDialogComponent
   ],
 })
 export class AngularAppUtilsLibModule { }

@@ -1,3 +1,4 @@
+import { TitleService } from './../../services/title.service';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Input, OnInit, ViewChild } from '@angular/core';
@@ -25,17 +26,17 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   //attributo che viene settato a tru nel momento di un salvataggio/cancellazione
   saving: boolean = false;
   private _element: T = {} as T;
-  
-  evaualteRouteParent: boolean = false; //da sovrascrivere a true se si vuole ricavare l'ID da route.parent
+
+  evaluateRouteParent: boolean = false; //da sovrascrivere a true se si vuole ricavare l'ID da route.parent
   closeDetailOnSave: boolean = true;//se true, chiude automaticamente il detail al salvataggio (se aperto in una modal)
   validateErrorMessage: string;
   reloadListOnSaveError: boolean = false;
-  
+
   public get element(): T {
     return this._element;
   }
 
-  get inserted(): boolean{
+  get inserted(): boolean {
     return this.idExtractor(this.element) == null;
   }
 
@@ -50,7 +51,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.onElementChanged();
   }
 
-  openAlertModal(): void{
+  openAlertModal(): void {
     /*let dialogRef = this.dialog.open(ChangeElementDialogComponent, {
       width: '80%'      
     });
@@ -66,7 +67,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   isLoadingResults: boolean = true;
   dataError: boolean = false;
   containerDialogRef: MatDialogRef<any> = null;//ref del dialog in cui può essere contenuto il detail
-  
+
   constructor(
     httpClient: HttpClient,
     protected route: ActivatedRoute,
@@ -75,27 +76,33 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     userMessageService: UserMessageService,
     protected location: Location,
     public dialog: MatDialog,
-    authService: AuthenticationService<LoginInfo>) {
-      super(httpClient, userMessageService, authService);
-     }
+    authService: AuthenticationService<LoginInfo>,
+    titleService: TitleService) {
+    super(httpClient, userMessageService, authService, titleService);
+  }
 
   ngOnInit(): void {
-    if(this.subscribeRoute){
+    if (this.subscribeRoute) {
       this.sub.add(this.route.params.subscribe(params => {
         const id = params["Id"];
-        if(id == "new"){
+        if (id == "new") {
           this.prepareForNewItem();
         } else {
-          if(this.evaualteRouteParent){
-            this.loadData(this.route.parent.snapshot.params["Id"]);
-          }else{
+          if (this.evaluateRouteParent) {
+            const parentId = this.route.parent.snapshot.params["Id"];
+            if (parentId == 'new') {
+              this.prepareForNewItem();
+            } else {
+              this.loadData(parentId);
+            }
+          } else {
             this.loadData(id);
           }
         }
       }));
-    }else {
+    } else {
       this.prepareForNewItem();
-    } 
+    }
   }
 
   private _showOnlyPreview: boolean = false;
@@ -111,9 +118,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   prepareForNewItem(): void {
-    if(this.element == null){
+    if (this.element == null) {
       this.element = {} as T;
-    }else{
+    } else {
       this.resetForm();
     }
   }
@@ -122,8 +129,8 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.isLoadingResults = true;
     this.dataError = false;
     this.sub.add(this.apiDatasource.getElement(id).subscribe((data) => {
-      this.onLoadedData(data);      
-    },(error) => {
+      this.onLoadedData(data);
+    }, (error) => {
       this.onLoadingDataError(error);
     }));
   }
@@ -139,23 +146,24 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.element = data;
     this.isLoadingResults = false;
   }
-  
-  protected onElementChanged(): void{
+
+  protected onElementChanged(): void {
     this.resetForm();
+    this.updateTitle(this.descriptionExtractor(this.element));
   }
 
   save() {
-    if(this.validate()){
+    if (this.validate()) {
       this.saving = true;
-      if(this.inserted){
+      if (this.inserted) {
         this.sub.add(this.apiDatasource.insert(this.element).subscribe((data) => {
           console.log('elemento inserito');
           this.onItemSaved(data, ApiActionsType.AddAction);
           this.reload(data);
         }, (err) => {
-          this.onSaveError(err);          
+          this.onSaveError(err);
         }));
-      }else{
+      } else {
         this.sub.add(this.apiDatasource.update(this.element).subscribe((data) => {
           console.log('elemento salvato');
           this.onItemSaved(data, ApiActionsType.UpdateAction);
@@ -164,7 +172,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
           console.error('errore salvataggio elemento', err);
         }));
       }
-    }else{
+    } else {
       this.userMessageService.message({
         errorMessage: this.validateErrorMessage,
         messageType: MessageType.Error
@@ -176,7 +184,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * prima di eseguire la delete, si chiede all'utente conferma dell'azione
    */
   delete() {
-    if(this.isAuthorizedToDelete()){
+    if (this.isAuthorizedToDelete()) {
       let dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: {
           title: this.deleteDialogTitle != null ? this.deleteDialogTitle : "Richiesta eliminazione",
@@ -185,29 +193,29 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
           showNegativeButton: true
         }
       });
-      this.sub.add(dialogRef.afterClosed().subscribe( (result: boolean) => {
+      this.sub.add(dialogRef.afterClosed().subscribe((result: boolean) => {
         console.log('Confirm dialog closed', result);
-        if(result){
+        if (result) {
           this.deleteAction();
         }
       }));
-    }else{
+    } else {
       this.userMessageService.message({
         errorMessage: "Utente non autorizzato",
         messageType: MessageType.Error
       })
     }
   }
-  
+
   isAuthorizedToDelete() {
     return this.isAuthorizedToModify();
   }
 
-  protected deleteAction(){
-    if(this.inserted){
+  protected deleteAction() {
+    if (this.inserted) {
       //se non esiste id dell'elemento significa che stiamo eliminando un elemento appena generato, ma non salvato su server
       this.closeDetail();
-    }else{
+    } else {
       const oldId = this.idExtractor(this.element);
       this.saving = true;
       this.sub.add(this.apiDatasource.delete(this.element).subscribe((data) => {
@@ -220,9 +228,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   onItemDeleted(oldId: string | number) {
-    if(this.dataRefreshService != null){
+    if (this.dataRefreshService != null) {
       this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.DeleteAction, oldId, null, this.onUpdateRefreshAllPages);
-    } 
+    }
     this.closeDetail();
   }
 
@@ -245,10 +253,10 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   protected onItemSaved(data: T, action: ApiActionsType): void {
     this.resetForm();
-    if(this.dataRefreshService != null){
+    if (this.dataRefreshService != null) {
       this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
     }
-    if(this.closeDetailOnSave){
+    if (this.closeDetailOnSave) {
       this.closeDetail();
     }
   }
@@ -262,17 +270,17 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   protected onSaveError(err: any, id?: string | number): void {
     console.error('Errore salvataggio', err);
     this.saving = false;
-    if(this.reloadListOnSaveError){
+    if (this.reloadListOnSaveError) {
       this.reloadList(id);
     }
   }
 
-  protected resetForm(){
-    if(this.form){
+  protected resetForm() {
+    if (this.form) {
       this.form.control.markAsPristine();
-      if(this.isAuthorizedToModify() && !this.showOnlyPreview){
+      if (this.isAuthorizedToModify() && !this.showOnlyPreview) {
         this.form.control.enable();
-      }else{
+      } else {
         this.form.control.disable();
       }
     }
@@ -285,19 +293,19 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   protected validate(): boolean {
     this.validateErrorMessage = null;
     let ret = this.isAuthorizedToModify();
-    if(!ret){
+    if (!ret) {
       this.validateErrorMessage = "Utente non autorizzato";
     }
     return ret;
   }
 
-  closeDetail(): void{
+  closeDetail(): void {
     if (this.subscribeRoute) {
       const index = this.router.url.lastIndexOf("/");
-      const path = this.router.url.substring(0, index);      
+      const path = this.router.url.substring(0, index);
       this.router.navigate([path]);
       //this.location.back();
-    }else if(this.containerDialogRef){
+    } else if (this.containerDialogRef) {
       this.containerDialogRef.close();
     }
   }
@@ -306,12 +314,12 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 
-  goToPreviousPage(){
+  goToPreviousPage() {
     this.location.back();
   }
 
   //ricarica la lista legata al detail
-  reloadList(id?: string | number, el?: T){
+  reloadList(id?: string | number, el?: T) {
     this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.UpdateAction, id, el, false);
   }
 

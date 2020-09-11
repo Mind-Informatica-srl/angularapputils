@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { UserMessageService, MessageType } from '../services/user-message.service';
@@ -13,23 +13,27 @@ export enum ApiActionsType {
 export class ApiDatasource<T> {
   //httpHeaders: HttpHeaders;
   private idExtractor: ((arg0: any) => any) = (element) => element.ID;
+  httpHeaders: HttpHeaders;
 
-  get apiIdExtractor(){
+  get apiIdExtractor() {
     return this.idExtractor;
   }
-  
-  constructor(protected _httpClient: HttpClient, 
-    public requestUrl: string, 
+
+  constructor(protected _httpClient: HttpClient,
+    public requestUrl: string,
     protected userMessageService: UserMessageService,
     idExtractor?: ((arg0: any) => any)
-    ) {
+  ) {
     /*this.httpHeaders = new HttpHeaders({
       'Content-Type': 'application/json; charset=utf-8;',
       'access-control-allow-origin': '*',
     })*/
-    if(idExtractor != null) {
+    if (idExtractor != null) {
       this.idExtractor = idExtractor
     }
+    this.httpHeaders = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
   }
 
   /**
@@ -45,27 +49,40 @@ export class ApiDatasource<T> {
    */
   getFilteredElements(params: HttpParams): Observable<T[] | ApiPaginatorListResponse<T>> {
     return this._httpClient.get<T[] | ApiPaginatorListResponse<T>>(this.requestUrl, { params })
-    .pipe(
-      catchError(err => {
-        return this.onError(null, err);
-      })
-    );
+      .pipe(
+        catchError(err => {
+          return this.onError(null, err);
+        })
+      );
   }
 
   getElement(id: any, params?: HttpParams): Observable<T> {
     const url = `${this.requestUrl}/${id}`;
     return this._httpClient.get<T>(url, { params })
-    .pipe(
-      catchError(err => {
-        return this.onError(null, err);
-      })
-    );
+      .pipe(
+        catchError(err => {
+          return this.onError(null, err);
+        })
+      );
   }
 
-  update(element: T): Observable<T>{
+  getHttpHeadersForUpdate(): HttpHeaders {
+    return this.httpHeaders;
+  }
+
+  getHttpHeadersForInsert(): HttpHeaders {
+    return this.httpHeaders;
+  }
+
+  getHttpHeadersForDelete(): HttpHeaders {
+    return this.httpHeaders;
+  }
+
+  update(element: T): Observable<T> {
     const id = this.idExtractor(element);
     const url = `${this.requestUrl}/${id}`;
-    return this._httpClient.put<T>(url, JSON.stringify(element)/*, {headers: this.httpHeaders}*/).pipe(
+    const headers = this.getHttpHeadersForUpdate();
+    return this._httpClient.put<T>(url, JSON.stringify(element), { headers: headers }).pipe(
       catchError(err => {
         return this.onError(element, err);
       })
@@ -80,8 +97,9 @@ export class ApiDatasource<T> {
     );
   }
 
-  insert(element: T): Observable<T>{
-    return this._httpClient.post<T>(this.requestUrl, element/*, {headers: this.httpHeaders}*/).pipe(
+  insert(element: T): Observable<T> {
+    const headers = this.getHttpHeadersForInsert();
+    return this._httpClient.post<T>(this.requestUrl, element, { headers: headers }).pipe(
       catchError(err => {
         return this.onError(element, err);
       })
@@ -96,10 +114,11 @@ export class ApiDatasource<T> {
     );
   }
 
-  delete(element: T): Observable<any>{
+  delete(element: T): Observable<any> {
     const id = this.idExtractor(element);
     const url = `${this.requestUrl}/${id}`;
-    return this._httpClient.delete(url/*, {headers: this.httpHeaders}*/).pipe(
+    const headers = this.getHttpHeadersForDelete();
+    return this._httpClient.delete(url, { headers: headers }).pipe(
       catchError(err => {
         return this.onError(element, err);
       })
@@ -114,7 +133,7 @@ export class ApiDatasource<T> {
     );
   }
 
-  protected onError(element: T, err: any){
+  protected onError(element: T, err: any) {
     this.userMessageService.message({
       element: element,
       error: err,
@@ -125,7 +144,7 @@ export class ApiDatasource<T> {
     return throwError(err);
   }
 
-  public static handleError(error: any) {   
+  public static handleError(error: any) {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error('An error occurred:', error.error.message);

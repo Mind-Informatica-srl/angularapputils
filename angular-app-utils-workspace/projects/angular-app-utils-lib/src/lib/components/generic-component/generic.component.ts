@@ -1,3 +1,4 @@
+import { TitleService } from './../../services/title.service';
 import { Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ApiDatasource } from '../../api-datasource/api-datasource';
@@ -7,10 +8,10 @@ import { UserMessageService } from '../../services/user-message.service';
 
 export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
 
-    /**
-   * indica se la navigazione tra lista e dettaglio segue la route o meno. Di default è true
-   * Nel caso sia false, va settato element passandolo come input nel component
-   */
+  /**
+ * indica se la navigazione tra lista e dettaglio segue la route o meno. Di default è true
+ * Nel caso sia false, va settato element passandolo come input nel component
+ */
   @Input() subscribeRoute: boolean = true;
   @Input() loadDataOnLoad: boolean = true;
   private _apiDatasource: ApiDatasource<T> | null;
@@ -27,36 +28,52 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
   /**
    * ricava la chiave primaria di element (di default è ID)
    */
-  protected idExtractor: ((arg0: any) => any) = (el) => el.ID;
+  protected idExtractor: ((arg0: any) => any) = (el) => el?.ID;
+  protected descriptionExtractor: ((arg0: any) => any) = (el) => el?.Descrizione;
 
   protected sub: Subscription = new Subscription();
+
+  /**
+   * solo se true, aggiorna il titleService nel metodo updateTitle
+   */
+  protected updateTitleService = false;
 
   constructor(
     protected httpClient: HttpClient,
     protected userMessageService: UserMessageService,
-    protected authService: AuthenticationService<LoginInfo>) {
- }
+    protected authService: AuthenticationService<LoginInfo>,
+    protected titleService: TitleService) {
+  }
 
-  ngOnDestroy(){
+  ngOnDestroy() {
     this.sub.unsubscribe();
+    if (this.updateTitleService) {
+      this.titleService.updateTitle(null);
+    }
   }
 
   protected get apiDatasource(): ApiDatasource<T> {
-    if(!this._apiDatasource){
+    if (!this._apiDatasource) {
       this._apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
     }
     return this._apiDatasource;
   }
 
   protected set apiDatasource(val: ApiDatasource<T>) {
-      this._apiDatasource = val;
+    this._apiDatasource = val;
   }
 
   /**
    * Metodo per stabilire se si è autorizzati a modificare i dati
    */
-  isAuthorizedToModify(){
+  isAuthorizedToModify() {
     return this.authService.isAuthorized(this.contenuti_modifica);
   }
-  
+
+  protected updateTitle(title: string) {
+    if (this.updateTitleService) {
+      this.titleService.updateTitle(title);
+    }
+  }
+
 }

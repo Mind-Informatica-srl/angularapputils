@@ -1,3 +1,4 @@
+import { TitleService } from './../../services/title.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { EventEmitter, HostListener, Input, Output, Type, ViewChild, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -42,8 +43,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     protected userMessageService: UserMessageService,
     protected router: Router,
     authService: AuthenticationService<LoginInfo>,
-    public dialog: MatDialog) {
-    super(httpClient, userMessageService, authService);
+    public dialog: MatDialog,
+    titleService: TitleService) {
+    super(httpClient, userMessageService, authService, titleService);
     this.currentPath = this.router.url;
     this.sub.add(this.router.events.subscribe((val) => {
       this.onRouteChanged(val);
@@ -57,6 +59,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected onRouteChanged(val: import("@angular/router").Event) {
     if (val instanceof NavigationEnd && val.url.endsWith(this.currentPath)) {
       this.onNavigationEnded(val);
+      if (this.pageTitle && this.pageTitle != '') {
+        this.titleService.updateTitle(this.pageTitle);
+      }
     }
   }
 
@@ -72,6 +77,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem) => {
       this.refreshFromService(res);
     }));
+    if (this.pageTitle && this.pageTitle != '') {
+      this.titleService.updateTitle(this.pageTitle);
+    }
     //this.setupPaginatorAndSort();
   }
 

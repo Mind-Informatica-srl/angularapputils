@@ -19,7 +19,7 @@ export abstract class AuthenticationService<LoginInfo> {
 
     constructor(protected http: HttpClient, protected apiUrl: string) {
         this.currentLoginInfoSubject = new BehaviorSubject<LoginInfo>(JSON.parse(localStorage.getItem(CURRENT_USER)));
-        if(localStorage.getItem(CURRENT_USER_TO_DELETE)){
+        if (localStorage.getItem(CURRENT_USER_TO_DELETE)) {
             this.removeUserFromCache();
         }
         this.currentLoginInfo = this.currentLoginInfoSubject.asObservable();
@@ -28,8 +28,8 @@ export abstract class AuthenticationService<LoginInfo> {
 
     abstract getContenutiUtente(): any[];
 
-    
-    protected prepareHttpHeaders(): HttpHeaders{
+
+    protected prepareHttpHeaders(): HttpHeaders {
         return new HttpHeaders({
             'Content-Type': 'application/json; charset=utf-8;',
             'access-control-allow-origin': '*',
@@ -48,7 +48,7 @@ export abstract class AuthenticationService<LoginInfo> {
     public isAuthorized(codContenuti: string[], searchAll: boolean = false): boolean {
         if (codContenuti != null && codContenuti.length > 0 && this.currentLoginInfoValue != null) {
             const contenutiUtente = this.getContenutiUtente();
-            if(contenutiUtente == null){
+            if (contenutiUtente == null) {
                 return false;
             }
             if (searchAll) {
@@ -68,21 +68,21 @@ export abstract class AuthenticationService<LoginInfo> {
      * @param password propria password personale
      */
     askForOTP(username: string, password: string, retry: boolean = true): Observable<LoginInfo | boolean> {
-        let params = { 
-            Username: username, 
-            Password: password            
+        let params = {
+            Username: username,
+            Password: password
         };
         const token = localStorage.getItem(TOKEN_OTP + '_' + username);
         //se ad un precedente login era stato impostato il browser come sicuro
-        if(token!= null && token != "#"){
-          params["SafePlace"] = true;
-          params["TempSecret"] = token;
+        if (token != null && token != "#") {
+            params["SafePlace"] = true;
+            params["TempSecret"] = token;
         }
         return this.http.post<LoginInfo>(`${this.apiUrl}login/otp`, params, { headers: this.httpHeaders })
             .pipe(
                 catchError(err => {
                     console.error(err);
-                    if(retry && err.includes("codice temporaneo non valido") && token != null && token != ''){
+                    if (retry && err.includes("codice temporaneo non valido") && token != null && token != '') {
                         localStorage.removeItem(TOKEN_OTP + '_' + username);
                         return this.askForOTP(username, password, false);
                         //return throwError("codice temporaneo scaduto");
@@ -90,7 +90,7 @@ export abstract class AuthenticationService<LoginInfo> {
                     return throwError(err);
                 })
             );
-    }   
+    }
 
     /**
      * Metodo per fare login al gestionale con la one-time-password ricevuta
@@ -145,9 +145,20 @@ export abstract class AuthenticationService<LoginInfo> {
     }
 
     //rimuove l'utente dalle cache
-    private removeUserFromCache(){
+    private removeUserFromCache() {
         localStorage.removeItem(CURRENT_USER);
         localStorage.removeItem(CURRENT_USER_TO_DELETE);
+    }
+
+    login(username: string, password: string, remember: boolean) {
+        return this.http.post<LoginInfo>(`${this.apiUrl}login`, { username, password })
+            .pipe(map(user => {
+                if (remember) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                }
+                this.updateUser(user);
+                return user;
+            }));
     }
 
 }

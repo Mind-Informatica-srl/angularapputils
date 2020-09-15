@@ -28,8 +28,8 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
   /**
    * ricava la chiave primaria di element (di default è ID)
    */
-  protected idExtractor: ((arg0: any) => any) = (el) => el?.ID;
-  protected descriptionExtractor: ((arg0: any) => any) = (el) => el?.Descrizione;
+  idExtractor: ((arg0: any) => any) = (el) => el?.ID;
+  descriptionExtractor: ((arg0: any) => any) = (el) => el?.Descrizione;
 
   protected sub: Subscription = new Subscription();
 

@@ -1,0 +1,58 @@
+/* You can add global styles to this file, and also import other style files */
+@import './theme';
+
+html, body { height: 100%; }
+body { 
+    margin: 0; 
+    font-family: "Ubuntu", "Helvetica Neue", sans-serif; 
+    font-weight: 400!important;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+mat-divider{
+    margin-top: 20px!important;
+    margin-bottom: 20px!important;
+}
+
+//classe per imprimere una rotazione ad un elemento
+.rotate-icon {
+  animation: rotate 1s infinite;
+}
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.my-radio-group-row {
+    display: flex;
+    flex-direction: row;
+    margin: 15px 0;
+}
+.my-radio-group-column {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+.my-radio-button {
+    margin: 5px!important;
+}
+
+.d-none {
+    display: none;
+}
+
+.gradient-color, .mat-header-row, .mat-paginator{
+    background: mat-color($tc-primary)!important;
+    /*background: mat-color($tc-accent)!important;  // fallback for old browsers 
+    background: -webkit-linear-gradient(to bottom, mat-color($tc-light-blue), mat-color($tc-primary))!important;  // Chrome 10-25, Safari 5.1-6 
+    background: linear-gradient(to bottom, mat-color($tc-light-blue), mat-color($tc-primary))!important; // W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ 
+    */
+    button, th, mat-header-cell, .mat-sort-header-indicator, .mat-sort-header-stem  {
+        color: white!important;
+    }
+}
+
+.mat-gray-color{
+    background-color: mat-color($gray-color)!important;
+}

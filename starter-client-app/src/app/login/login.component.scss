@@ -1,0 +1,32 @@
+@import '../../theme.scss';
+
+.loginContainer{
+    min-height: 100vh;
+    min-width: 100vw;
+    background-color: mat-color($tc-primary, 300);
+    /*background: url('../../assets/img/app_device.png');
+    background-size: contain;
+    background-attachment: fixed;
+    min-width: 60vw;
+    background-repeat: center no-repeat;*/
+}
+.columnLogin {
+    padding: 50px;
+}
+.loginInfo {
+    font-size: large;
+    text-align: center;
+    
+}
+
+.box{position:relative;top:0;opacity:1;float:left;padding:60px 50px 40px 50px;background:#fff;border-radius:10px;transform:scale(1);-webkit-transform:scale(1);-ms-transform:scale(1);z-index:5;max-width:330px;}
+.box:before{content:"";width:100%;height:30px;border-radius:10px;position:absolute;top:-10px;background:rgba(255, 255, 255, .6);left:0;transform:scale(.95);-webkit-transform:scale(.95);-ms-transform:scale(.95);z-index:-1;}
+
+img {
+    width: 100%;
+    max-width: 600px;
+}
+
+.mat-form-field{
+    width: 100%;
+}

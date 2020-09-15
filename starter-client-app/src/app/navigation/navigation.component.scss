@@ -1,0 +1,73 @@
+@import '../../theme';
+
+$toolbar-height: 10vh;
+$toolbar-min-height: 50px;
+
+/*.menu {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}*/
+.companyName{
+  font-size: 150%;
+  overflow: hidden;
+}
+
+.mat-toolbar{
+  height: $toolbar-height;
+  min-height: $toolbar-min-height;
+  font-weight: 700;
+}
+
+.mat-toolbar img {
+  height: $toolbar-height - 1vh;
+}
+
+.navbar-title {
+  text-align: center;
+  overflow-x: hidden;
+}
+
+div {
+  overflow: inherit;
+}
+
+.mat-sidenav-container{
+  min-height: 100vh - $toolbar-height !important;
+}
+
+a{
+  text-decoration: none;
+  white-space: normal;
+}
+
+button{
+  min-width: min-content;
+}
+
+.nav-spacer {
+  flex: 1 1 auto;
+  text-align: center;
+}
+
+/*
+.mat-drawer-container{
+  background-image: url('../../assets/img/Technology3.png'), url('../../assets/img/sfondo.jpg');
+  background-position: left bottom, center;
+  background-repeat: no-repeat, no-repeat;
+  background-size: contain, cover;
+}
+*/
+
+.sidenav-btn {
+  text-align: left;
+}
+
+.sidenav-icon {
+  margin-right: 15%;
+  margin-left: 10%;
+}
+
+.buttons-container {
+  text-align: right;
+}

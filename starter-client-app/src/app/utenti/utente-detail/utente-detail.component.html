@@ -1,0 +1,64 @@
+<mat-card class="block" [ngClass]="{'fullDetail': !showOnlyPreview}">
+  <mat-card-header>
+    <mat-icon>person_pin</mat-icon>
+    <mat-card-title-group>
+      <mat-card-title>
+        Dettaglio Utente
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ descriptionExtractor(element) }}
+      </mat-card-subtitle>
+    </mat-card-title-group>
+    <div fxFlex></div>
+    <button mat-icon-button matTooltip="Chiudi dettaglio" (click)="closeDetail()">
+      <mat-icon>clear</mat-icon>
+    </button>
+  </mat-card-header>
+  <mat-card-content class="contentDetail">
+    <mat-progress-spinner *ngIf="saving || isLoadingResults" class="loading-shade" color="accent" mode="indeterminate">
+    </mat-progress-spinner>
+    <form name="clienteForm" #f="ngForm" autocomplete="off">
+      <div fxLayout="row" fxLayoutGap="20px">
+        <mat-form-field fxFlex="70">
+          <mat-label for="Nome" title="Nome">Nome</mat-label>
+          <input matInput type="text" name="Nome" [(ngModel)]="element.Nome">
+        </mat-form-field>
+        <mat-form-field fxFlex="70">
+          <mat-label for="Cognome" title="Cognome">Cognome</mat-label>
+          <input matInput type="text" name="Cognome" [(ngModel)]="element.Cognome">
+        </mat-form-field>
+
+      </div>
+      <mat-form-field>
+        <mat-label for="Username" title="Username">Email</mat-label>
+        <input matInput type="email" name="Username" placeholder="example@email.com" [(ngModel)]="element.Username"
+          [readonly]="!inserted">
+      </mat-form-field>
+
+      <ng-container *ngIf="!showOnlyPreview">
+        <mat-form-field>
+          <mat-label>Ruolo</mat-label>
+          <mat-select [(ngModel)]="element.RuoloId" name="RuoloId">
+            <mat-option disabled>
+              Scegliere un ruolo
+            </mat-option>
+            <mat-option *ngFor="let ruolo of ruoli" [value]="ruolo.Id">
+              {{ ruolo.Nome }}
+            </mat-option>
+
+          </mat-select>
+        </mat-form-field>
+
+      </ng-container>
+
+    </form>
+  </mat-card-content>
+  <mat-card-actions *ngIf="!showOnlyPreview && isAuthorizedToModify()">
+    <ng-container *ngIf="subscribeRoute">
+      <button mat-raised-button color="accent" (click)="save()" class="block-h"
+        [disabled]="saving || !f.form.valid">Salva</button>
+      <button mat-raised-button color="warn" (click)="delete()" class="block-h"
+        [disabled]="saving || isLoadingResults">Elimina</button>
+    </ng-container>
+  </mat-card-actions>
+</mat-card>

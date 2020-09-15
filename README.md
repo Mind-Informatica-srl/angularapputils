@@ -1,3 +1,4 @@
+# Nella cartella starter-client-app c'è un progetto angular per avviare nuovi progetti
 
 # Importazione della libreria in un progetto angular
 

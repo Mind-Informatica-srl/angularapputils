@@ -1,0 +1,61 @@
+<div class="listComponentContainer" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="20px">
+  <div fxFlex>
+    <div class="overlay" *ngIf="isLoadingResults">
+      <div class="center">
+        <mat-progress-spinner style="margin:0 auto;" class="loading-shade" color="accent" mode="indeterminate">
+        </mat-progress-spinner>
+      </div>
+    </div>
+    <div style="max-height: 80vh;overflow: auto;" class="table-container">
+      <table mat-table [dataSource]="tableDataSource" matSort multiTemplateDataRows>
+        <ng-container matColumnDef="Nome">
+          <th mat-header-cell *matHeaderCellDef> Nome </th>
+          <td mat-cell *matCellDef="let element"> {{element.Nome}} </td>
+        </ng-container>
+        <ng-container matColumnDef="Descrizione">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Descrizione </th>
+          <td mat-cell *matCellDef="let element"> {{ element.Descrizione }} </td>
+        </ng-container>
+        <ng-container matColumnDef="disclaimer">
+          <td mat-footer-cell *matFooterCellDef colspan="2">
+            <span *ngIf="listError">Errore caricamento dati</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="search">
+          <th mat-header-cell *matHeaderCellDef colspan="1">
+            <mat-form-field fxFlex class="block-h grid-filter-field">
+              <mat-label>Cerca...</mat-label>
+              <input matInput (keyup)="applyFilter($event)" autocomplete="off">
+              <mat-icon matSuffix [inline]="true" style="color: white;">search</mat-icon>
+            </mat-form-field>
+
+          </th>
+        </ng-container>
+        <ng-container matColumnDef="plus-btn">
+          <th mat-header-cell *matHeaderCellDef colspan="1" class="grid-plus-btn">
+            <button mat-raised-button color="accent" (click)="addNewClicked()" class="block-h"
+              *ngIf="isAuthorizedToModify()">
+              <mat-icon matTooltip="Create a new role">add</mat-icon><span fxShow="true" fxHide.lt-sm="true"> NUOVO
+                RUOLO</span>
+            </button>
+          </th>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['search','plus-btn']" class="commands-header-row"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="titles-header-row"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="grid-element-row"
+          [class.grid-expanded-row]="selectedElement === row" (click)="onRowClicked(row)"></tr>
+        <ng-container>
+          <tr mat-footer-row *matFooterRowDef="['disclaimer']" class="footer-row"></tr>
+        </ng-container>
+      </table>
+    </div>
+    <mat-paginator [length]="resultsLength" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]" color="primary">
+    </mat-paginator>
+
+  </div>
+  <div fxFlex [@routeAnimations]="prepareRoute(o)">
+    <router-outlet #o="outlet"></router-outlet>
+  </div>
+</div>

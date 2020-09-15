@@ -1,0 +1,56 @@
+<mat-card class="block">
+    <mat-card-header>
+        <mat-icon>settings</mat-icon>
+        <mat-card-title-group>
+            <mat-card-title>
+                Dettaglio Ruolo
+            </mat-card-title>
+            <mat-card-subtitle>
+                {{ element.Nome }}
+            </mat-card-subtitle>
+        </mat-card-title-group>
+        <div fxFlex></div>
+        <button mat-icon-button matTooltip="Chiudi dettaglio" (click)="closeDetail()">
+            <mat-icon>clear</mat-icon>
+        </button>
+    </mat-card-header>
+
+    <mat-card-content class="contentDetail">
+        <div class="overlay" *ngIf="saving || isLoadingResults">
+            <div class="center">
+                <mat-progress-spinner class="loading-shade" color="accent" mode="indeterminate">
+                </mat-progress-spinner>
+            </div>
+        </div>
+
+        <form name="ruoloForm" #f="ngForm" autocomplete="off">
+
+            <mat-form-field class="block-h">
+                <mat-label>Name</mat-label>
+                <input matInput type="text" class="form-control" id="Nome" name="Nome" [(ngModel)]="element.Nome"
+                    required>
+            </mat-form-field>
+            <mat-form-field class="block-h">
+                <mat-label>Descrizione</mat-label>
+                <input matInput type="text" class="form-control" id="Descrizione" name="Descrizione"
+                    [(ngModel)]="element.Descrizione" required>
+            </mat-form-field>
+
+            <div *ngIf="element">
+                <h3 style="font-weight: 700;">Permessi</h3>
+                <div id="checkbox-div" *ngFor="let contenuto of contenuti">
+                    <mat-checkbox value="{{ contenuto.CodContenuto }}" (change)="onContenutoClicked($event)"
+                        [checked]="isContenutoChecked(contenuto.CodContenuto)">
+                        {{ contenuto.Nome }}</mat-checkbox>
+                </div>
+            </div>
+
+        </form>
+    </mat-card-content>
+    <mat-card-actions *ngIf="isAuthorizedToModify()">
+        <button mat-raised-button color="accent" (click)="save()" class="block-h"
+            [disabled]="saving || !f.form.valid">Save</button>
+        <button mat-raised-button color="warn" (click)="delete()" class="block-h"
+            [disabled]="saving || isLoadingResults">Delete</button>
+    </mat-card-actions>
+</mat-card>

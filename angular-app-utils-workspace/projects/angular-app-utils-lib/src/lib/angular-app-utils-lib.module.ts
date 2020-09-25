@@ -73,7 +73,8 @@ import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.
     PromptDialogComponent,
     ResetPasswordDialogComponent,
     ForgotPasswordDialogComponent,
-    DetailDialogComponent
+    DetailDialogComponent,
+    NgxMaterialTimepickerModule
   ],
   entryComponents: [
     ConfirmDialogComponent,

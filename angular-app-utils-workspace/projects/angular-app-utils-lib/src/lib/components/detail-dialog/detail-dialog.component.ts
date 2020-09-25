@@ -1,5 +1,7 @@
-import { OnInit, Type, ViewChild, ViewContainerRef, Inject, ComponentFactoryResolver, ComponentRef, Component } from '@angular/core';
+import { HostListener } from '@angular/core';
+import { OnInit, Type, ViewChild, ViewContainerRef, Inject, ComponentFactoryResolver, ComponentRef, Component, OnDestroy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { DetailComponent } from '../detail/detail.component';
 
 /**
@@ -14,6 +16,8 @@ import { DetailComponent } from '../detail/detail.component';
  * subTitle?: string, eventuale sottotitolo del dialog
  * 
  * meta?: Object  parametri aggiuntivi del detail component che vengono istanziati in setupDetailComponent del DetailDialogComponent
+ * 
+ * disableCloseOnClickOutside se true, disabilita la chiusura della modal se si clicca fuori da essa
  */
 export interface DetailDialogData<T> {
 
@@ -34,19 +38,21 @@ export interface DetailDialogData<T> {
   templateUrl: './detail-dialog.component.html',
   styleUrls: ['./detail-dialog.component.scss']
 })
-export class DetailDialogComponent implements OnInit {
+export class DetailDialogComponent implements OnInit, OnDestroy {
 
   _detailComponentRef: ComponentRef<any>;
   title: string = "Dettaglio selezionato";
   subTitle: string = null;
-  
+
+  protected sub: Subscription = new Subscription();
+
   //detailTemplate: TemplateRef<any>;
 
-  get detailComponent(): DetailComponent<any, any>{
-    try{
+  get detailComponent(): DetailComponent<any, any> {
+    try {
       return this._detailComponentRef.instance as any as DetailComponent<any, any>;
-    }catch(ex){
-      console.log(ex);      
+    } catch (ex) {
+      console.log(ex);
       return null;
     }
   }
@@ -54,25 +60,30 @@ export class DetailDialogComponent implements OnInit {
   //@ViewChild('detailHost') _detailComponent: TemplateRef<any>;
 
   //@ViewChild(AdDirective, {static: true}) adHost: AdDirective;
-  @ViewChild('detailHost', {static: true, read: ViewContainerRef}) detailHost: ViewContainerRef;
+  @ViewChild('detailHost', { static: true, read: ViewContainerRef }) detailHost: ViewContainerRef;
 
   constructor(public dialogRef: MatDialogRef<any>,
-    @Inject(MAT_DIALOG_DATA) public data: DetailDialogData<any>, 
+    @Inject(MAT_DIALOG_DATA) public data: DetailDialogData<any>,
     protected componentFactoryResolver: ComponentFactoryResolver) {
-      if(data.title){
-        this.title = data.title
-      }
-      if(data.subTitle){
-        this.subTitle = data.subTitle
-      }
+    if (data.title) {
+      this.title = data.title
+    }
+    if (data.subTitle) {
+      this.subTitle = data.subTitle
+    }
+    this.dialogRef.disableClose = true;
   }
 
-  onNoClick(){
+  onNoClick() {
     this.closeDialog();
   }
 
   closeDialog() {
-    this.dialogRef.close();
+    if (this._detailComponentRef && this._detailComponentRef.instance && this._detailComponentRef.instance.closeDetail) {
+      this._detailComponentRef.instance.closeDetail();
+    } else {
+      this.dialogRef.close();
+    }
   }
 
   /**
@@ -87,35 +98,56 @@ export class DetailDialogComponent implements OnInit {
 
   ngOnInit() {
     this.loadDetailComponents();
+    this.sub.add(this.dialogRef.backdropClick().subscribe(_ => {
+      this.closeDialog();
+    }));
+    // this.sub.add(this.dialogRef.beforeClosed().subscribe(res => {
+    //   this.closeDialog();
+    //   return false;
+    // }));
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
   loadDetailComponents() {
     this.detailHost.clear();
     const factory = this.componentFactoryResolver.resolveComponentFactory(this.data.detailComponent);
     this._detailComponentRef = this.detailHost.createComponent(factory);
-    this.setupDetailComponent();    
+    this.setupDetailComponent();
     this._detailComponentRef.changeDetectorRef.detectChanges();
   }
 
-  setupDetailComponent(){
+  setupDetailComponent() {
     let comp = this._detailComponentRef;
-    if(comp && comp.instance){      
-      if(this.data.meta){
+    if (comp && comp.instance) {
+      if (this.data.meta) {
         for (let attribute of Object.keys(this.data.meta)) {
           comp.instance[attribute] = this.data.meta[attribute];
         }
       }
-      if(this.data.element){//element è null per esempio in caso di insert
+      if (this.data.element) {//element è null per esempio in caso di insert
         const elementId = comp.instance.idExtractor(this.data.element);
-        if(this.data.loadRemoteData && comp.instance.loadData && elementId){
+        if (this.data.loadRemoteData && comp.instance.loadData && elementId) {
           comp.instance.loadData(elementId);
         } else {
           comp.instance.element = this.data.element;
         }
       }
       //si aggiunge il riferimento a dialogRef nel detail (utile per es per chiudere il dialog direttamente dal detail)
-      comp.instance.containerDialogRef = this.dialogRef; 
+      comp.instance.containerDialogRef = this.dialogRef;
     }
+  }
+
+  @HostListener('window:keyup.esc') onKeyUp() {
+    console.log('keyup.esc detail-dialog:');
+    this.closeDialog();
+  }
+
+  @HostListener("window:beforeunload", ["$event"]) unloadDialogHandler(event: Event) {
+    console.log('beforeunload detail-dialog:', event);
+    event.returnValue = false;
   }
 
 }

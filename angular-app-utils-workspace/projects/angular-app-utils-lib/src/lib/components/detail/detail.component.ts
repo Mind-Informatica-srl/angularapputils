@@ -86,12 +86,12 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       this.sub.add(this.route.params.subscribe(params => {
         const id = params["Id"];
         if (id == "new") {
-          this.prepareForNewItem();
+          this.prepareForm();
         } else {
           if (this.evaluateRouteParent) {
             const parentId = this.route.parent.snapshot.params["Id"];
             if (parentId == 'new') {
-              this.prepareForNewItem();
+              this.prepareForm();
             } else {
               this.loadData(parentId);
             }
@@ -101,7 +101,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         }
       }));
     } else {
-      this.prepareForNewItem();
+      this.prepareForm();
     }
   }
 
@@ -117,12 +117,16 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.subscribeRoute = !val;
   }
 
-  prepareForNewItem(): void {
+  prepareForm() {
     if (this.element == null) {
-      this.element = {} as T;
+      this.prepareForNewItem();
     } else {
       this.resetForm();
     }
+  }
+
+  prepareForNewItem(): void {
+    this.element = {} as T;
   }
 
   loadData(id: number | string) {
@@ -149,6 +153,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   protected onElementChanged(): void {
     this.resetForm();
+    this.originalElement = this.element;
     this.updateTitle(this.descriptionExtractor(this.element));
   }
 
@@ -167,6 +172,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         this.sub.add(this.apiDatasource.update(this.element).subscribe((data) => {
           console.log('elemento salvato');
           this.onItemSaved(data, ApiActionsType.UpdateAction);
+          this.refreshElement(data);
         }, (err) => {
           this.onSaveError(err, this.idExtractor(this.element));
           console.error('errore salvataggio elemento', err);
@@ -214,12 +220,14 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   protected deleteAction() {
     if (this.inserted) {
       //se non esiste id dell'elemento significa che stiamo eliminando un elemento appena generato, ma non salvato su server
-      this.closeDetail();
+      this.originalElement = null;
+      this.closeDetail(true);
     } else {
       const oldId = this.idExtractor(this.element);
       this.saving = true;
       this.sub.add(this.apiDatasource.delete(this.element).subscribe((data) => {
         console.log('elemento eliminato');
+        this.originalElement = null;
         this.onItemDeleted(oldId);
       }, (err) => {
         this.onSaveError(err, oldId);
@@ -231,7 +239,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     if (this.dataRefreshService != null) {
       this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.DeleteAction, oldId, null, this.onUpdateRefreshAllPages);
     }
-    this.closeDetail();
+    this.closeDetail(true);
   }
 
   protected reload(data: T): void {
@@ -249,6 +257,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     for (let attribut in data) {
       this.element[attribut] = data[attribut];
     }
+    this.originalElement = this.element;
   }
 
   protected onItemSaved(data: T, action: ApiActionsType): void {
@@ -257,7 +266,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
     }
     if (this.closeDetailOnSave) {
-      this.closeDetail();
+      this.closeDetail(true);
     }
   }
 
@@ -299,7 +308,36 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     return ret;
   }
 
-  closeDetail(): void {
+  canCloseDetail(): Promise<boolean> {
+
+    let dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: this.deleteDialogTitle != null ? this.deleteDialogTitle : "Attenzione",
+        message: this.deleteDialogMessage != null ? this.deleteDialogMessage : "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?",
+        action: MessageType.Warning,
+        showNegativeButton: true
+      }
+    });
+    return dialogRef.afterClosed().toPromise();
+
+  }
+
+  /**
+   * metodo chiamato per chiudere il detail
+   * si resta in attesa della risposta dell'utente qualora ci sia la form con dati modificati
+   * @param forceClose se true, non chiede permesso per chiudere e forza la chiusura del detail
+   */
+  async closeDetail(forceClose: boolean = false) {
+    if (!forceClose && this.isElementChanged) {
+      let res = await this.canCloseDetail();
+      if (!res) {
+        return;
+      }
+    }
+    this.closeDetailAction();
+  }
+
+  closeDetailAction() {
     if (this.subscribeRoute) {
       const index = this.router.url.lastIndexOf("/");
       const path = this.router.url.substring(0, index);
@@ -322,5 +360,47 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   reloadList(id?: string | number, el?: T) {
     this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.UpdateAction, id, el, false);
   }
+
+  get isElementChanged(): boolean {
+    const keys = Object.keys(this.element);
+    for (let i = 0; i < keys.length; i++) {
+      let res = this.isElementPropertyChanged(keys[i]);
+      if (res) {
+        console.log('isElementChanged', keys[i]);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  protected _originalElement: T;
+
+  /**
+   * ritorna true se la proprietà passata ha valore diverso in element e _originalElement
+   * @param prop proprietà da confrontare
+   */
+  isElementPropertyChanged(prop: string): boolean {
+    return this.originalElement[prop] !== this.element[prop];
+  }
+
+  get originalElement(): T {
+    if (!this._originalElement) {
+      this._originalElement = {} as T;
+    }
+    return this._originalElement;
+  }
+
+  // Copia in _originalElement i valori di obj
+  set originalElement(obj: T) {
+    this._originalElement = Object.assign({}, obj);
+  }
+
+  /*
+  @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
+    if(this.isElementChanged()){
+      event.returnValue = false;//se si vuole mostrare all'utente il messaggio del browser che chiede conferma per chiudere la pagina
+    }
+  }
+  */
 
 }

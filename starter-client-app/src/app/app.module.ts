@@ -11,6 +11,11 @@ import { AngularAppUtilsLibModule } from 'angular-app-utils-lib';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './shared/shared.module';
 
+//per usare DatePipe localizzato
+import localeIt from '@angular/common/locales/it';
+import { registerLocaleData } from '@angular/common';
+registerLocaleData(localeIt);
+
 @NgModule({
   declarations: [
     AppComponent,

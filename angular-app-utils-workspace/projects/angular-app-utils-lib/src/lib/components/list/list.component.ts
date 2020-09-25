@@ -77,7 +77,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem) => {
       this.refreshFromService(res);
     }));
-    if (this.pageTitle && this.pageTitle != '') {
+    if (this.pageTitle) {
       this.titleService.updateTitle(this.pageTitle);
     }
     //this.setupPaginatorAndSort();

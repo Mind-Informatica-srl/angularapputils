@@ -16,21 +16,39 @@ import { ApiActionsType } from './../../api-datasource/api-datasource';
 
 export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
 
-  //viewChild della form. Ci serve per avbilitare/disabilitare i bottoni di salvataggio (vedi onItemSaved)
+  /**
+   * viewChild della form. Ci serve per avbilitare/disabilitare i bottoni di salvataggio (vedi onItemSaved)
+   */
   @ViewChild(NgForm, { static: true }) form: NgForm;
-  //titolo della finestra modale che chiede conferma per la cancellazione di un elemento
+  /**
+   * titolo della finestra modale che chiede conferma per la cancellazione di un elemento
+   */
   protected deleteDialogTitle: string;
-  //messaggio della finestra modale che chiede conferma per la cancellazione di un elemento
+  /**
+   * messaggio della finestra modale che chiede conferma per la cancellazione di un elemento
+   */
   protected deleteDialogMessage: string;
 
-  //attributo che viene settato a tru nel momento di un salvataggio/cancellazione
+  /**
+   * attributo che viene settato a tru nel momento di un salvataggio/cancellazione
+   */
   saving: boolean = false;
   private _element: T = {} as T;
 
-  evaluateRouteParent: boolean = false; //da sovrascrivere a true se si vuole ricavare l'ID da route.parent
-  closeDetailOnSave: boolean = true;//se true, chiude automaticamente il detail al salvataggio (se aperto in una modal)
+  /**
+   * da sovrascrivere a true se si vuole ricavare l'ID da route.parent
+   */
+  evaluateRouteParent: boolean = false;
+  /**
+   * se true, chiude automaticamente il detail al salvataggio
+   */
+  closeDetailOnSave: boolean = false;
   validateErrorMessage: string;
   reloadListOnSaveError: boolean = false;
+  /**
+   * true se il component è caricato in una window/tab a parte
+   */
+  loadInWindow: boolean = false;
 
   public get element(): T {
     return this._element;
@@ -40,7 +58,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     return this.idExtractor(this.element) == null;
   }
 
-  //Al salvataggio di un item, dice se notificare a tutte le tab aperte il cambiamento 
+  /**
+   * Al salvataggio di un item, dice se notificare a tutte le tab aperte il cambiamento 
+   */
   protected onUpdateRefreshAllPages: boolean = true;
   /**
    * se subscribeRoute è false va passato element come input;
@@ -51,22 +71,12 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.onElementChanged();
   }
 
-  openAlertModal(): void {
-    /*let dialogRef = this.dialog.open(ChangeElementDialogComponent, {
-      width: '80%'      
-    });
-    this.sub.add(dialogRef.afterClosed().subscribe( (result: boolean) => {
-      console.log('alert dialog closed', result);
-      if(result){
-        
-      }
-    })); */
-    confirm("Abbandonare le modifiche non salvate?")
-  }
-
   isLoadingResults: boolean = true;
   dataError: boolean = false;
-  containerDialogRef: MatDialogRef<any> = null;//ref del dialog in cui può essere contenuto il detail
+  /**
+   * ref del dialog in cui può essere contenuto il detail
+   */
+  containerDialogRef: MatDialogRef<any> = null;
 
   constructor(
     httpClient: HttpClient,
@@ -79,6 +89,14 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     authService: AuthenticationService<LoginInfo>,
     titleService: TitleService) {
     super(httpClient, userMessageService, authService, titleService);
+    this.setAttribute();
+  }
+
+  /**
+   * Metodo chiamato nel costruttore per poter settare eventuali attributi
+   */
+  setAttribute() {
+
   }
 
   ngOnInit(): void {
@@ -106,12 +124,16 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   private _showOnlyPreview: boolean = false;
-  //indica se stiamo mostrando solo una preview del detail
+  /**
+   * indica se stiamo mostrando solo una preview del detail
+   */
   get showOnlyPreview(): boolean {
     return this._showOnlyPreview;
   }
 
-  //se si vuole mostrare solo un anteprima, siamo del dettaglio di una grid per esempio; subscribeRoute quindi dovrà essere l'opposto
+  /**
+   * se si vuole mostrare solo un anteprima, siamo del dettaglio di una grid per esempio; subscribeRoute quindi dovrà essere l'opposto
+   */
   @Input() set showOnlyPreview(val: boolean) {
     this._showOnlyPreview = val;
     this.subscribeRoute = !val;
@@ -164,7 +186,6 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         this.sub.add(this.apiDatasource.insert(this.element).subscribe((data) => {
           console.log('elemento inserito');
           this.onItemSaved(data, ApiActionsType.AddAction);
-          this.reload(data);
         }, (err) => {
           this.onSaveError(err);
         }));
@@ -172,7 +193,6 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         this.sub.add(this.apiDatasource.update(this.element).subscribe((data) => {
           console.log('elemento salvato');
           this.onItemSaved(data, ApiActionsType.UpdateAction);
-          this.refreshElement(data);
         }, (err) => {
           this.onSaveError(err, this.idExtractor(this.element));
           console.error('errore salvataggio elemento', err);
@@ -252,7 +272,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }
   }
 
-  //si sovrascrivono gli attributi di element (chiamato dopo il metodo save)
+  /**
+   * si sovrascrivono gli attributi di element (chiamato dopo il metodo save)
+   */
   protected refreshElement(data: T): void {
     for (let attribut in data) {
       this.element[attribut] = data[attribut];
@@ -264,6 +286,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.resetForm();
     if (this.dataRefreshService != null) {
       this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
+    }
+    if (action == ApiActionsType.AddAction) {
+      this.reload(data);
+    } else if (action == ApiActionsType.UpdateAction) {
+      this.refreshElement(data);
     }
     if (this.closeDetailOnSave) {
       this.closeDetail(true);
@@ -322,6 +349,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   }
 
+
   /**
    * metodo chiamato per chiudere il detail
    * si resta in attesa della risposta dell'utente qualora ci sia la form con dati modificati
@@ -338,7 +366,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   closeDetailAction() {
-    if (this.subscribeRoute) {
+    if (this.loadInWindow) {
+      open(window.location.href, '_self').close();
+    } else if (this.subscribeRoute) {
       const index = this.router.url.lastIndexOf("/");
       const path = this.router.url.substring(0, index);
       this.router.navigate([path]);
@@ -356,7 +386,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.location.back();
   }
 
-  //ricarica la lista legata al detail
+  /**
+   * ricarica la lista legata al detail
+   */
   reloadList(id?: string | number, el?: T) {
     this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.UpdateAction, id, el, false);
   }
@@ -373,6 +405,9 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     return false;
   }
 
+  /**
+   * elemento di "backup" per confronare le modifiche effettuate prima di un eventuale salvataggio
+   */
   protected _originalElement: T;
 
   /**
@@ -390,17 +425,37 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     return this._originalElement;
   }
 
-  // Copia in _originalElement i valori di obj
+  /**
+   *  Copia in _originalElement i valori di obj
+   */
   set originalElement(obj: T) {
     this._originalElement = Object.assign({}, obj);
   }
 
-  /*
-  @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
-    if(this.isElementChanged()){
+  /**
+   * Serve eventualmente per impedire che si chiuda il detail contenuto in una window se non si è salvato
+   * Chiamare questo metodo tramite un HostListener
+   * 
+   * Esempio:
+   * @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
+   * 
+   *   this.unloadDetailHandler(event);
+   * 
+   * }
+   * 
+   * @param event event passato dal HostListener
+   */
+  unloadDetailHandler(event: Event) {
+    if (this.isElementChanged) {
       event.returnValue = false;//se si vuole mostrare all'utente il messaggio del browser che chiede conferma per chiudere la pagina
     }
   }
-  */
+
+  /**
+   * Reimposta element a originalElement
+   */
+  annullaModifiche() {
+    this.element = this.originalElement
+  }
 
 }

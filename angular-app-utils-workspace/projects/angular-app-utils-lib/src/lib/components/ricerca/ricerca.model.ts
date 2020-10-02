@@ -27,7 +27,7 @@ export interface FilterField {
     ApiUrl?: string;
     IDField?: string;
     DescriptionField?: string;
-    list?: SimpleModel[];
+    list?: any[];
     actualFilterMap?: (fieldName: string, operator: string, value: any) => string;
 
 }

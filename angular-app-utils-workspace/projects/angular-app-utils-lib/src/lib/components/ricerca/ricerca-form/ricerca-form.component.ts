@@ -54,7 +54,7 @@ export class RicercaFormComponent implements OnInit {
    * Avvia ricerca con i campi selezionati
    */
   search() {
-    console.log('search', this.selectedFilters);
+    //console.log('search', this.selectedFilters);
     //const param = this.prepareQueryParams();
     //console.log('search param', param);
     this.onFilterChanged.emit('');

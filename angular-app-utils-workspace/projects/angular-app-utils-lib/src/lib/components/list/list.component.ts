@@ -458,10 +458,20 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   }
 
   /**
+   * se true, ordina filterFields per il campo Label
+   */
+  protected orderFilterFields: boolean = true;
+
+  /**
    * setta l'attributo fields di searchForm
    */
   setFormFilterFields() {
     if (this.searchForm) {
+      if (this.orderFilterFields) {
+        this.filterFields = this.filterFields.sort((a, b) => {
+          return ('' + a.Label).localeCompare(b.Label);
+        });
+      }
       this.searchForm.fields = this.filterFields;
     }
   }

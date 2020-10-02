@@ -54,18 +54,18 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
     this.idField = this.field.IDField ? this.field.IDField : 'ID';
     switch (this.field.Type) {
       case FilterFieldType.RadioNumber:
-        this.selectedOperatore = 'equalnumber';
         this.initializeList();
-        this.fieldRadioValue = this.field.NumberValue != null ? this.field.NumberValue : 0;
+        this.selectedOperatore = 'equalnumber';
+        this.fieldRadioValue = this.field.StringValue != null ? parseFloat(this.field.StringValue) : 0;
         break;
       case FilterFieldType.RadioBoolean:
-        this.selectedOperatore = 'equalboolean';
         this.setBooleanFields();
+        this.selectedOperatore = 'equalboolean';
         this.fieldRadioValue = this.field.StringValue != null ? this.field.StringValue : 'true';
         break;
       default:
-        this.selectedOperatore = 'equal';
         this.initializeList();
+        this.selectedOperatore = 'equal';
         this.fieldRadioValue = this.field.StringValue != null ? this.field.StringValue : '';
         break;
     }

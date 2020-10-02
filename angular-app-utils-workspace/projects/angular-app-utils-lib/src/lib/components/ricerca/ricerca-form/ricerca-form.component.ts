@@ -79,7 +79,7 @@ export class RicercaFormComponent implements OnInit {
   }
 
   onChangeValue(event: RicercaFieldChange) {
-    console.log(event);
+    //console.log(event);
   }
 
   /**

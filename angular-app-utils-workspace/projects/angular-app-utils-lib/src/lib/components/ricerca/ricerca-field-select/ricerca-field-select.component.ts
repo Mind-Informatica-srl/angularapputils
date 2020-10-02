@@ -114,7 +114,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
     super.ngOnInit();
     this.initializeAttributes();
 
-    if (this.field.Type == FilterFieldType.DynamicSelect) {
+    if (this.field.Type == FilterFieldType.DynamicSelect || this.field.Type == FilterFieldType.DynamicSelectNumber) {
       if (!this.field.ApiUrl) {
         console.error('RicercaFieldSelectComponent: ApiUrl non definito');
       }
@@ -145,7 +145,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
       ).subscribe(res => {
         this.filteredList = res;
       }));
-    } else if (this.field.Type == FilterFieldType.StaticSelect) {
+    } else if (this.field.Type == FilterFieldType.StaticSelect || this.field.Type == FilterFieldType.StaticSelectNumber) {
       //caso StaticSelect
       if (!this.field.list) {
         throw new Error('RicercaFieldSelectComponent: list non definito');
@@ -179,16 +179,21 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
   }
 
   initializeAttributes() {
-    if (this.field.NumberValue != null) {
-      this.fieldSelectValue = this.field.NumberValue;
+    if (this.field.Type == FilterFieldType.DynamicSelectNumber || this.field.Type == FilterFieldType.StaticSelectNumber) {
+      if (this.field.StringValue != null) {
+        try {
+          this.fieldSelectValue = parseFloat(this.field.StringValue)
+        } catch (ex) {
+          console.error(ex);
+        }
+      }
       this.selectedOperatore = 'equalnumber';
-    } else if (this.field.StringValue != null) {
-      this.fieldSelectValue = this.field.StringValue;
+    } else {
+      if (this.field.StringValue != null) {
+        this.fieldSelectValue = this.field.StringValue;
+      }
       this.operatori = this._operatoriString;
       this.selectedOperatore = 'equal';
-    } else {
-      this.fieldSelectValue = 0;
-      this.selectedOperatore = 'equalnumber';
     }
     this.descriptionField = this.field.DescriptionField ? this.field.DescriptionField : 'Description';
     this.idField = this.field.IDField ? this.field.IDField : 'ID';
@@ -219,7 +224,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
     const valueChanged = value !== this._listSelectFilterValue;
     if (valueChanged) {
       this._listSelectFilterValue = value;
-      if ((value != null && value != '') || this.field.Type != FilterFieldType.DynamicSelect) {
+      if ((value != null && value != '') || (this.field.Type != FilterFieldType.DynamicSelect && this.field.Type != FilterFieldType.DynamicSelectNumber)) {
         //si avvia ricerca se value è definito, oppure se abbiamo il caso di una select statica
         this.listSelectChange.emit(value);
       } else {

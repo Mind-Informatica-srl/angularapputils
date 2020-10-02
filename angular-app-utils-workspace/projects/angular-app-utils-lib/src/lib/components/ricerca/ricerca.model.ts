@@ -8,6 +8,8 @@ export enum FilterFieldType {
     Number,
     StaticSelect,
     DynamicSelect,
+    StaticSelectNumber,
+    DynamicSelectNumber,
     RadioString,
     RadioNumber,
     RadioBoolean
@@ -19,8 +21,8 @@ export interface FilterField {
     Label: string;
     Type: FilterFieldType;
     StringValue?: string;
-    DateValue?: Date;
-    NumberValue?: number;
+    //DateValue?: Date;
+    //NumberValue?: number;
     UniqueId?: string;
     ApiUrl?: string;
     IDField?: string;

@@ -54,6 +54,16 @@
                             </ng-template>
                         </ng-container>
 
+                        <ng-container *ngSwitchCase="FilterFieldType.DynamicSelectNumber">
+                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                            </ng-template>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="FilterFieldType.StaticSelectNumber">
+                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                            </ng-template>
+                        </ng-container>
+
                         <ng-container *ngSwitchCase="FilterFieldType.RadioString">
                             <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
                             </ng-template>

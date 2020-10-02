@@ -28,6 +28,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { ItalianMatPaginatorIntl } from './utils/italian-mat-paginator-intl';
 import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.component';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+
+import { RicercaFieldDateComponent } from './components/ricerca/ricerca-field-date/ricerca-field-date.component';
+import { RicercaFieldNumberComponent } from './components/ricerca/ricerca-field-number/ricerca-field-number.component';
+import { RicercaFieldRadioComponent } from './components/ricerca/ricerca-field-radio/ricerca-field-radio.component';
+import { RicercaFieldSelectComponent } from './components/ricerca/ricerca-field-select/ricerca-field-select.component';
+import { RicercaFieldStringComponent } from './components/ricerca/ricerca-field-string/ricerca-field-string.component';
+import { RicercaFormComponent } from './components/ricerca/ricerca-form/ricerca-form.component';
 
 
 @NgModule({
@@ -38,7 +49,13 @@ import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.
     PromptDialogComponent,
     ResetPasswordDialogComponent,
     ForgotPasswordDialogComponent,
-    DetailDialogComponent
+    DetailDialogComponent,
+    RicercaFormComponent,
+    RicercaFieldStringComponent,
+    RicercaFieldNumberComponent,
+    RicercaFieldDateComponent,
+    RicercaFieldSelectComponent,
+    RicercaFieldRadioComponent
   ],
   imports: [
     CommonModule,
@@ -60,7 +77,11 @@ import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.
     MatInputModule,
     MatFormFieldModule,
     MatButtonModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatExpansionModule,
+    MatMenuModule,
+    MatSelectModule,
+    MatRadioModule
   ],
   providers: [
     { provide: DateAdapter, useClass: AauDateAdapter },
@@ -74,7 +95,13 @@ import { DetailDialogComponent } from './components/detail-dialog/detail-dialog.
     ResetPasswordDialogComponent,
     ForgotPasswordDialogComponent,
     DetailDialogComponent,
-    NgxMaterialTimepickerModule
+    NgxMaterialTimepickerModule,
+    RicercaFormComponent,
+    RicercaFieldStringComponent,
+    RicercaFieldNumberComponent,
+    RicercaFieldDateComponent,
+    RicercaFieldSelectComponent,
+    RicercaFieldRadioComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

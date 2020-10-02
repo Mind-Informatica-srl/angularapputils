@@ -31,7 +31,15 @@ export * from './lib/components/list/list.component';
 export * from './lib/components/reset-password-dialog/reset-password-dialog.component';
 export * from './lib/components/detail-dialog/detail-dialog.component';
 export * from './lib/components/forgot-password-dialog/forgot-password-dialog.component';
+export * from './lib/components/ricerca/ricerca-form/ricerca-form.component';
+export * from './lib/components/ricerca/ricerca-field-string/ricerca-field-string.component';
+export * from './lib/components/ricerca/ricerca-field-select/ricerca-field-select.component';
+export * from './lib/components/ricerca/ricerca-field-radio/ricerca-field-radio.component';
+export * from './lib/components/ricerca/ricerca-field-number/ricerca-field-number.component';
+export * from './lib/components/ricerca/ricerca-field-date/ricerca-field-date.component';
 
+export * from './lib/components/ricerca/ricerca.model';
+export * from './lib/components/ricerca/ricerca-field-abstract.component';
 
 //utils
 export * from './lib/utils/italian-mat-paginator-intl';

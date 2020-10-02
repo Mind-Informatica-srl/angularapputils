@@ -1,0 +1,119 @@
+<mat-accordion>
+    <mat-expansion-panel class="mat-elevation-z8 filter-accordion">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <div>Filtro Avanzato<b *ngIf="selectedFilters.length > 0"> Attivo</b></div>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div>
+            <button mat-button [matMenuTriggerFor]="filterMenu">
+                <mat-icon>add</mat-icon> AGGIUNGI FILTRO
+            </button>
+            <mat-menu #filterMenu="matMenu">
+                <ng-container *ngIf="fields.length > 0">
+                    <button *ngFor="let item of fields" mat-menu-item (click)="addFilterField(item)">{{item.Label}}
+                    </button>
+                </ng-container>
+            </mat-menu>
+        </div>
+
+        <div>
+            <form>
+                <ng-container *ngFor="let item of selectedFilters">
+                    <ng-container [ngSwitch]="item.Type">
+                        <ng-container *ngSwitchCase="FilterFieldType.Number">
+                            <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
+                                <app-ricerca-field-number fxFlex [field]="item" [name]="item.UniqueId"
+                                    [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
+                                </app-ricerca-field-number>
+                                <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="FilterFieldType.Date">
+                            <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
+                                <app-ricerca-field-date fxFlex [field]="item" [name]="item.UniqueId"
+                                    [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
+                                </app-ricerca-field-date>
+                                <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="FilterFieldType.DynamicSelect">
+                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                            </ng-template>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="FilterFieldType.StaticSelect">
+                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                            </ng-template>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="FilterFieldType.RadioString">
+                            <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
+                            </ng-template>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="FilterFieldType.RadioNumber">
+                            <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
+                            </ng-template>
+                        </ng-container>
+
+                        <ng-container *ngSwitchCase="FilterFieldType.RadioBoolean">
+                            <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
+                            </ng-template>
+                        </ng-container>
+
+                        <ng-container *ngSwitchDefault>
+                            <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
+                                <app-ricerca-field-string fxFlex [field]="item" [name]="item.UniqueId"
+                                    [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
+                                </app-ricerca-field-string>
+                                <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </div>
+                        </ng-container>
+
+                    </ng-container>
+                </ng-container>
+            </form>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px" style="margin-top: 10px;">
+            <button mat-button (click)="search()">
+                <mat-icon>search</mat-icon> CERCA
+            </button>
+            <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">
+                <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
+            </button>
+        </div>
+
+    </mat-expansion-panel>
+</mat-accordion>
+
+<ng-template #selectTemplate let-item="item">
+    <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
+        <app-ricerca-field-select fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
+            (onChangeValue)="onChangeValue($event)">
+        </app-ricerca-field-select>
+        <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #radioTemplate let-item="item">
+    <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
+        <app-ricerca-field-radio fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
+            (onChangeValue)="onChangeValue($event)">
+        </app-ricerca-field-radio>
+        <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+</ng-template>

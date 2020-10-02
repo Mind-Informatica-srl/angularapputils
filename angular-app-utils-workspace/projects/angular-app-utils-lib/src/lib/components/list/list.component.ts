@@ -14,6 +14,8 @@ import { UserMessageService } from '../../services/user-message.service';
 import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail-dialog.component';
 import { GenericComponent } from '../generic-component/generic.component';
 import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
+import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.component';
+import { FilterField } from '../ricerca/ricerca.model';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
@@ -37,6 +39,10 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected openDetailOnClick: boolean = true;
   protected detailDialogLoadFromServer: boolean = false;
   protected inSelectorDialog: boolean = false;
+  /**
+ * component di ricerca (se presente nel template HTML)
+ */
+  protected searchForm: RicercaFormComponent = null;
 
   constructor(protected httpClient: HttpClient,
     protected dataRefreshService: DataRefreshService,
@@ -287,6 +293,12 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     if (this.dataSource && this.dataSource.filter) {
       params = params.set("filter", `${this.dataSource.filter}`);
     }
+    if (this.searchForm) {
+      const q = this.searchForm.prepareQueryParams();
+      if (q != null && q != '') {
+        params = params.set('q', q);
+      }
+    }
     return params;
   }
 
@@ -423,5 +435,35 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   // ************** FINE GESTIONE CLICK E DOPPIO CLICK **************
 
 
+  protected filterFields: FilterField[] = [];
+
+  /**
+    * setter per il component di ricerca 'RicercaFormComponent'
+    */
+  @ViewChild(RicercaFormComponent) set ricerca(rf: RicercaFormComponent) {
+    if (rf) {
+      this.searchForm = rf;
+      this.setFormFilterSettings();
+    }
+  }
+
+  /**
+   * imposta i gli attributi e le subscription per il form di ricerca
+   */
+  setFormFilterSettings() {
+    this.setFormFilterFields();
+    this.sub.add(this.searchForm.onFilterChanged.subscribe((_: string) => {
+      this.loadListData();
+    }));
+  }
+
+  /**
+   * setta l'attributo fields di searchForm
+   */
+  setFormFilterFields() {
+    if (this.searchForm) {
+      this.searchForm.fields = this.filterFields;
+    }
+  }
 
 }

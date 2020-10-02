@@ -1,0 +1,19 @@
+<div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px" style="width: 90%;">
+    <mat-label fxFlex="30" style="text-align: right;">{{ field.Label }}</mat-label>
+
+    <mat-form-field fxFlex="25">
+        <mat-label>Operatore</mat-label>
+        <mat-select [(ngModel)]="selectedOperatore" (selectionChange)="onOperatoreChange($event)">
+            <mat-option *ngFor="let op of operatori" [value]="op.Value">
+                {{op.Label}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <ng-container *ngIf="!hideValueInput">
+        <mat-form-field fxFlex>
+            <mat-label>Valore</mat-label>
+            <input #inputRef="matInput" matInput type="number" [name]="inputName" [(ngModel)]="fieldNumberValue">
+        </mat-form-field>
+    </ng-container>
+</div>

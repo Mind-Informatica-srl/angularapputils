@@ -7,7 +7,7 @@ import { FilterField, FilterFieldType, RicercaFieldChange } from '../ricerca.mod
  * Component per la ricerca avanzata
  */
 @Component({
-  selector: 'app-ricerca-form',
+  selector: 'aaul-ricerca-form',
   templateUrl: './ricerca-form.component.html',
   styleUrls: ['./ricerca-form.component.scss']
 })
@@ -21,7 +21,7 @@ export class RicercaFormComponent implements OnInit {
   /**
    * campi selezionati per la ricerca
    */
-  selectedFilters: FilterField[] = [];
+  @Input() selectedFilters: FilterField[] = [];
 
   @Output() onFilterChanged = new EventEmitter<string>();
 

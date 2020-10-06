@@ -4,7 +4,7 @@ import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { RicercaFieldAbstractComponent } from '../ricerca-field-abstract.component';
 
 @Component({
-  selector: 'app-ricerca-field-radio',
+  selector: 'aaul-ricerca-field-radio',
   templateUrl: './ricerca-field-radio.component.html',
   styleUrls: ['./ricerca-field-radio.component.scss'],
   providers: [

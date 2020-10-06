@@ -4,7 +4,7 @@ import { RicercaFieldAbstractComponent } from '../ricerca-field-abstract.compone
 
 
 @Component({
-  selector: 'app-ricerca-field-number',
+  selector: 'aaul-ricerca-field-number',
   templateUrl: './ricerca-field-number.component.html',
   styleUrls: ['./ricerca-field-number.component.scss'],
   providers: [

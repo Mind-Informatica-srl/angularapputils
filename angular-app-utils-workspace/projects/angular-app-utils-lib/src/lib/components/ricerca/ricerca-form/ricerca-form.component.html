@@ -31,9 +31,9 @@
                     <ng-container [ngSwitch]="item.Type">
                         <ng-container *ngSwitchCase="FilterFieldType.Number">
                             <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                <app-ricerca-field-number fxFlex [field]="item" [name]="item.UniqueId"
+                                <aaul-ricerca-field-number fxFlex [field]="item" [name]="item.UniqueId"
                                     [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                </app-ricerca-field-number>
+                                </aaul-ricerca-field-number>
                                 <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
                                     <mat-icon>delete</mat-icon>
                                 </button>
@@ -42,9 +42,9 @@
 
                         <ng-container *ngSwitchCase="FilterFieldType.Date">
                             <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                <app-ricerca-field-date fxFlex [field]="item" [name]="item.UniqueId"
+                                <aaul-ricerca-field-date fxFlex [field]="item" [name]="item.UniqueId"
                                     [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                </app-ricerca-field-date>
+                                </aaul-ricerca-field-date>
                                 <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
                                     <mat-icon>delete</mat-icon>
                                 </button>
@@ -88,9 +88,9 @@
 
                         <ng-container *ngSwitchDefault>
                             <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                <app-ricerca-field-string fxFlex [field]="item" [name]="item.UniqueId"
+                                <aaul-ricerca-field-string fxFlex [field]="item" [name]="item.UniqueId"
                                     [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                </app-ricerca-field-string>
+                                </aaul-ricerca-field-string>
                                 <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
                                     <mat-icon>delete</mat-icon>
                                 </button>
@@ -115,9 +115,9 @@
 
 <ng-template #selectTemplate let-item="item">
     <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-        <app-ricerca-field-select fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
+        <aaul-ricerca-field-select fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
             (onChangeValue)="onChangeValue($event)">
-        </app-ricerca-field-select>
+        </aaul-ricerca-field-select>
         <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
             <mat-icon>delete</mat-icon>
         </button>
@@ -126,9 +126,9 @@
 
 <ng-template #radioTemplate let-item="item">
     <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-        <app-ricerca-field-radio fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
+        <aaul-ricerca-field-radio fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
             (onChangeValue)="onChangeValue($event)">
-        </app-ricerca-field-radio>
+        </aaul-ricerca-field-radio>
         <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
             <mat-icon>delete</mat-icon>
         </button>

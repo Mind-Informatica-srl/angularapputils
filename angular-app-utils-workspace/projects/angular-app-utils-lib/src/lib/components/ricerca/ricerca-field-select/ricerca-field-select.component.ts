@@ -12,7 +12,7 @@ import { ApiDatasource } from '../../../api-datasource/api-datasource';
 
 
 @Component({
-  selector: 'app-ricerca-field-select',
+  selector: 'aaul-ricerca-field-select',
   templateUrl: './ricerca-field-select.component.html',
   styleUrls: ['./ricerca-field-select.component.scss'],
   providers: [

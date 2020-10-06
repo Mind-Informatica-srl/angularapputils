@@ -54,7 +54,10 @@ export class RicercaFieldNumberComponent extends RicercaFieldAbstractComponent {
 
   ngOnInit() {
     super.ngOnInit();
-    this.selectedOperatore = 'equalnumber';
+    this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalnumber';
+    if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
+      this.hideValueInput = true;
+    }
     try {
       this.fieldNumberValue = this.field.StringValue != null ? parseFloat(this.field.StringValue) : 0;
     } catch (ex) {

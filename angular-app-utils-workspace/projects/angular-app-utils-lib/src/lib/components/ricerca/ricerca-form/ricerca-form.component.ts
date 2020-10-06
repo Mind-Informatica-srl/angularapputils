@@ -38,7 +38,7 @@ export class RicercaFormComponent implements OnInit {
    * aggiunge alla form un nuovo campo di ricerca tra quelli presenti in fields
    * @param item campo di ricerca
    */
-  addFilterField(item: FilterField) {
+  public addFilterField(item: FilterField) {
     try {
       this.menuTrigger.closeMenu();
     } catch (ex) {

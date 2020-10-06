@@ -13,9 +13,11 @@ import { DATA_REFRESH_SERVICE_TAG, DataRefreshItem, DataRefreshService } from '.
 import { UserMessageService } from '../../services/user-message.service';
 import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail-dialog.component';
 import { GenericComponent } from '../generic-component/generic.component';
-import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
+import { ApiActionsType, ApiDatasource, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.component';
-import { FilterField } from '../ricerca/ricerca.model';
+import { FilterField, Filtro, FiltroCampo } from '../ricerca/ricerca.model';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { PromptDialogData, PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
@@ -43,6 +45,16 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
  * component di ricerca (se presente nel template HTML)
  */
   protected searchForm: RicercaFormComponent = null;
+  protected filtroDatasource: ApiDatasource<Filtro>;
+  /**
+   * stringa per interrogare il server per i criteri di ricerca salvati
+   * se non è definito, non si instanzia filtroDatasource
+   */
+  searchApiUrl: string = null;
+  /**
+   * ricerche ottenute dal server. Definite se searchApiUrl è non null
+   */
+  savedFilters: Filtro[] = [];
 
   constructor(protected httpClient: HttpClient,
     protected dataRefreshService: DataRefreshService,
@@ -76,6 +88,10 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   }
 
   ngOnInit(): void {
+    if (this.searchApiUrl) {
+      this.filtroDatasource = new ApiDatasource(this.httpClient, this.searchApiUrl, this.userMessageService);
+      this.loadSavedFilters();
+    }
     if (this.dataSource == null && this.loadDataOnLoad) {
       //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
       this.loadListData();
@@ -86,6 +102,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     if (this.pageTitle) {
       this.titleService.updateTitle(this.pageTitle);
     }
+
     //this.setupPaginatorAndSort();
   }
 
@@ -476,6 +493,134 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       }
       this.searchForm.fields = this.filterFields;
     }
+  }
+
+
+
+
+  loadSavedFilters() {
+    const utenteId = this.authService.userId;
+    const params = new HttpParams().set('UtenteID', utenteId.toString()).set('Sezione', this.LIST_NAME);
+    this.sub.add(this.filtroDatasource.getFilteredElements(params).subscribe((res: Filtro[]) => {
+      if (res) {
+        this.savedFilters = res;
+      } else {
+        this.savedFilters = [];
+      }
+    }));
+  }
+
+  /**
+   * salva una ricerca su db
+   * 
+   * @param campiRicerca elenco dei campi da salvare
+   */
+  salvaRicerca(campiRicerca: FilterField[]) {
+    console.log(campiRicerca);
+    const promptData: PromptDialogData = {
+      title: 'Salva ricerca',
+      message: 'Inserisci un nome per la ricerca',
+      inputLabel: 'Nome',
+      showNegativeButton: true,
+      inputRequired: true
+    }
+    let dialogRef = this.dialog.open(PromptDialogComponent, { data: promptData });
+    this.sub.add(dialogRef.afterClosed().subscribe((nomeRicerca: string) => {
+      console.log('Confirm dialog closed');
+      if (nomeRicerca) {
+        const ricerca = {
+          Nome: nomeRicerca,
+          Sezione: this.LIST_NAME,
+          UtenteID: this.authService.userId,
+          FiltroCampi: campiRicerca.map(el => {
+            return {
+              Name: el.Name,
+              StringValue: el.ActualValueString,
+              DefaultOperator: el.ActualOperator,
+              ChildrenReference: el.parentReference
+            } as FiltroCampo
+          })
+        } as Filtro;
+        this.filtroDatasource.insert(ricerca).subscribe(res => {
+          this.savedFilters.push(res);
+        });
+      }
+    }));
+  }
+
+  /**
+   * metodo chiamato alla selezione di un filtro salvato.
+   * recupera i singoli filtri cercando il filterFields e associa i valori di default
+   * riempie la form di ricerca con quanto ottenuto
+   * 
+   * @param filtro filtro selezionato
+   */
+  onSavedSearchClicked(filtro: Filtro) {
+    if (filtro.FiltroCampi != null) {
+      for (let i = 0; i < filtro.FiltroCampi.length; i++) {
+        const campo = filtro.FiltroCampi[i];
+        const item: FilterField = this.getItemMenu(campo.Name, campo.ChildrenReference);
+        if (item) {
+          item.ActualOperator = campo.DefaultOperator;
+          item.StringValue = campo.StringValue;
+          this.searchForm.selectedFilters = [];
+          this.searchForm.addFilterField(item);
+        }
+      }
+    }
+  }
+
+  /**
+   * metodo per ottenere il FilterField corrispondente a nomeCampo e childrenRefString
+   * 
+   * @param nomeCampo nome del campo da cercare in filterFields e children
+   * @param childrenRefString stringa childrenRef per filtrare i risultati nei children
+   * @param fields campi in cui cercare di default è filterFields
+   */
+  getItemMenu(nomeCampo: string, childrenRefString: string, fields: FilterField[] = this.filterFields): FilterField {
+    if (childrenRefString != null && childrenRefString != '') {
+      const index = childrenRefString.indexOf('.');
+      let childRef: string;
+      let nextChildrenRef: string;
+      if (index > -1) {
+        childRef = childrenRefString.substring(0, index);
+        nextChildrenRef = childrenRefString.substring(index + 1);
+      } else {
+        childRef = childrenRefString;
+        nextChildrenRef = null;
+      }
+      let item = fields.find(el => {
+        return el.childrenReference == childRef;
+      });
+      if (item) {
+        return this.getItemMenu(nomeCampo, nextChildrenRef, item.children);
+      }
+      return null;
+    }
+    return fields.find(el => el.Name == nomeCampo && el.childrenReference == childrenRefString);
+  }
+
+  /**
+   * metodo per cancellare una ricerca salvata
+   * @param filtro filtro da cancellare
+   */
+  deleteSavedSearch(filtro: Filtro) {
+    let deleteDialog = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: `Elimina Ricerca`,
+        message: `<p>Si desidera eliminare la ricerca ${filtro.Nome}?</p>`,
+        showNegativeButton: true
+      }
+    });
+    this.sub.add(deleteDialog.afterClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        const i = this.savedFilters.findIndex(el => el.ID == filtro.ID);
+        this.filtroDatasource.delete(filtro).subscribe(res => {
+          this.savedFilters.splice(i, 1);
+        });
+      }
+    }));
+
   }
 
 }

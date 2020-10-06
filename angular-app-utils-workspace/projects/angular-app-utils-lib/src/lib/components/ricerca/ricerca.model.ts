@@ -42,6 +42,14 @@ export interface FilterField {
      */
     StringValue?: string;
     /**
+     * valore che usa il salvataggio delle ricerche
+     */
+    ActualValueString?: string;
+    /**
+     * valore in string adell'operatore di default selezionato
+     */
+    ActualOperator?: string;
+    /**
      * campo settato automaticamente al fine di avere tag html con name univoco
      */
     UniqueId?: string;
@@ -132,3 +140,32 @@ export interface SimpleModel {
 
 //     onClick?(): void;
 // }
+
+
+/**
+ * interfaccia utile per salvare su db
+ */
+export interface Filtro {
+
+    ID?: number;
+    Nome: string;
+    Sezione: string;
+    UtenteID: number;
+    CreatedAt?: Date;
+    UpdatedAt?: Date;
+    FiltroCampi?: FiltroCampo[];
+
+}
+
+export interface FiltroCampo {
+
+    ID?: number;
+    FiltroID?: number;
+    Name: string;
+    StringValue?: string;
+    DefaultOperator?: string;
+    ChildrenReference?: string;
+    CreatedAt?: Date;
+    UpdatedAt?: Date;
+
+}

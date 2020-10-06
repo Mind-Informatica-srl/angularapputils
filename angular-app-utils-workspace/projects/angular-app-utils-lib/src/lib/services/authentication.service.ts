@@ -40,6 +40,13 @@ export abstract class AuthenticationService<LoginInfo> {
         return this.currentLoginInfoSubject.value;
     }
 
+    public get userId(): number | string {
+        if (this.currentLoginInfoValue != null) {
+            return this.currentLoginInfoValue['ID'];
+        }
+        return null;
+    }
+
     /**
      * metodo per stabilire se l'utente loggato ha i contenuti con codici in codContenuti
      * @param codContenuti array di codici contenuto

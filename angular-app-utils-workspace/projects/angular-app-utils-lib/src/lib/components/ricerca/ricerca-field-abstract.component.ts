@@ -42,6 +42,7 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
 
     set fieldStringValue(val: string) {
         this._fieldStringValue = val;
+        this.field.ActualValueString = val;
         this.refreshValue();
     }
 
@@ -51,6 +52,7 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
 
     set selectedOperatore(val: string) {
         this._selectedOperatore = val;
+        this.field.ActualOperator = val;
         this.refreshValue();
     }
 

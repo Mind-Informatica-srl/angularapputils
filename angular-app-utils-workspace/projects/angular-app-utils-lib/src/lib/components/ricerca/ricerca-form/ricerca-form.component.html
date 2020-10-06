@@ -6,7 +6,7 @@
             </mat-panel-title>
         </mat-expansion-panel-header>
 
-        <div>
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px" style="width: 100%;">
             <ng-container *ngIf="fields && fields.length > 0">
                 <button mat-button [matMenuTriggerFor]="menuFields.childMenu" #menuTrigger="matMenuTrigger">
                     <mat-icon>add</mat-icon> AGGIUNGI FILTRO
@@ -14,15 +14,8 @@
                 <aaul-ricerca-menu #menuFields [items]="fields" (onMenuItemClick)="addFilterField($event)">
                 </aaul-ricerca-menu>
             </ng-container>
-            <!-- <button mat-button [matMenuTriggerFor]="filterMenu">
-                <mat-icon>add</mat-icon> AGGIUNGI FILTRO
-            </button>
-            <mat-menu #filterMenu="matMenu">
-                <ng-container *ngIf="fields.length > 0">
-                    <button *ngFor="let item of fields" mat-menu-item (click)="addFilterField(item)">{{item.Label}}
-                    </button>
-                </ng-container>
-            </mat-menu> -->
+            <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo header)-->
+            <ng-content select="[header]"></ng-content>
         </div>
 
         <div>
@@ -108,6 +101,11 @@
             <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">
                 <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
             </button>
+            <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
+            <ng-container *ngIf="selectedFilters.length > 0">
+                <ng-content select="[action]"></ng-content>
+            </ng-container>
+
         </div>
 
     </mat-expansion-panel>

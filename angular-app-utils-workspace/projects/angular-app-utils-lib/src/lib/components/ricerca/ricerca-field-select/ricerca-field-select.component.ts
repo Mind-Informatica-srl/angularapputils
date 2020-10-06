@@ -187,13 +187,19 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
           console.error(ex);
         }
       }
-      this.selectedOperatore = 'equalnumber';
+      this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalnumber';
+      if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
+        this.hideValueInput = true;
+      }
     } else {
       if (this.field.StringValue != null) {
         this.fieldSelectValue = this.field.StringValue;
       }
       this.operatori = this._operatoriString;
-      this.selectedOperatore = 'equal';
+      this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equal';
+      if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
+        this.hideValueInput = true;
+      }
     }
     this.descriptionField = this.field.DescriptionField ? this.field.DescriptionField : 'Description';
     this.idField = this.field.IDField ? this.field.IDField : 'ID';

@@ -55,17 +55,26 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
     switch (this.field.Type) {
       case FilterFieldType.RadioNumber:
         this.initializeList();
-        this.selectedOperatore = 'equalnumber';
+        this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalnumber';
+        if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
+          this.hideValueInput = true;
+        }
         this.fieldRadioValue = this.field.StringValue != null ? parseFloat(this.field.StringValue) : 0;
         break;
       case FilterFieldType.RadioBoolean:
         this.setBooleanFields();
-        this.selectedOperatore = 'equalboolean';
+        this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalboolean';
+        if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
+          this.hideValueInput = true;
+        }
         this.fieldRadioValue = this.field.StringValue != null ? this.field.StringValue : 'true';
         break;
       default:
         this.initializeList();
-        this.selectedOperatore = 'equal';
+        this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equal';
+        if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
+          this.hideValueInput = true;
+        }
         this.fieldRadioValue = this.field.StringValue != null ? this.field.StringValue : '';
         break;
     }

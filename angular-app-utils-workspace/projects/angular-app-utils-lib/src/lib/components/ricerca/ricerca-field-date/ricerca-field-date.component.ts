@@ -54,7 +54,10 @@ export class RicercaFieldDateComponent extends RicercaFieldAbstractComponent {
 
   ngOnInit() {
     super.ngOnInit();
-    this.selectedOperatore = 'equaldate';
+    this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equaldate';
+    if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
+      this.hideValueInput = true;
+    }
     try {
       this.fieldDateValue = this.field.StringValue != null ? new Date(Date.parse(this.field.StringValue)) : new Date();
     } catch (error) {

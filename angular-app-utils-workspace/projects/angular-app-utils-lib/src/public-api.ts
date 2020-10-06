@@ -37,6 +37,7 @@ export * from './lib/components/ricerca/ricerca-field-select/ricerca-field-selec
 export * from './lib/components/ricerca/ricerca-field-radio/ricerca-field-radio.component';
 export * from './lib/components/ricerca/ricerca-field-number/ricerca-field-number.component';
 export * from './lib/components/ricerca/ricerca-field-date/ricerca-field-date.component';
+export * from './lib/components/ricerca/ricerca-menu/ricerca-menu.component';
 
 export * from './lib/components/ricerca/ricerca.model';
 export * from './lib/components/ricerca/ricerca-field-abstract.component';

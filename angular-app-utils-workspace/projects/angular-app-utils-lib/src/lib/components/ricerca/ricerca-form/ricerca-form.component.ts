@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { MatMenuTrigger } from '@angular/material/menu';
 import { FilterField, FilterFieldType, RicercaFieldChange } from '../ricerca.model';
 
 
@@ -26,6 +27,8 @@ export class RicercaFormComponent implements OnInit {
 
   FilterFieldType = FilterFieldType;
 
+  @ViewChild('menuTrigger') public menuTrigger: MatMenuTrigger;
+
   constructor() { }
 
   ngOnInit(): void {
@@ -36,6 +39,11 @@ export class RicercaFormComponent implements OnInit {
    * @param item campo di ricerca
    */
   addFilterField(item: FilterField) {
+    try {
+      this.menuTrigger.closeMenu();
+    } catch (ex) {
+      console.log(ex);
+    }
     let field = {
       ...item,
       UniqueId: item.Name + '_' + new Date().getTime().toString()

@@ -1,0 +1,37 @@
+<mat-menu #childMenu>
+    <ng-container *ngFor="let item of items">
+        <button *ngIf="!item.children; else branch" mat-menu-item (click)="onClick(item)">
+            <mat-icon *ngIf="item.iconName != null">{{ item.iconName }}</mat-icon>
+            <span>{{getMenuItemLabel(item.Label)}}</span>
+        </button>
+        <ng-template #branch>
+            <button mat-menu-item [matMenuTriggerFor]="innerPanel.childMenu" (click)="onClick(item)">
+                <mat-icon *ngIf="item.iconName != null">{{ item.iconName }}</mat-icon>
+                <span>{{getMenuItemLabel(item.Label)}}</span>
+            </button>
+            <aaul-ricerca-menu #innerPanel [items]="item.children" (onMenuItemClick)="onClick($event)">
+            </aaul-ricerca-menu>
+        </ng-template>
+    </ng-container>
+</mat-menu>
+
+<!-- <mat-menu #childMenu="matMenu">
+    <ng-container *ngIf="items && items.length">
+        <span *ngFor="let child of items">
+            <span *ngIf="child.children && child.children.length > 0">
+                <button mat-menu-item [matMenuTriggerFor]="menu.childMenu">
+                    <mat-icon *ngIf="child.iconName != null">{{ child.iconName }}</mat-icon>
+                    <span>{{ child.Label }}</span>
+                </button>
+                <aaul-ricerca-menu #menu [items]="getFieldChildren(child)" (onMenuItemClick)="onClick($event)">
+                </aaul-ricerca-menu>
+            </span>
+            <span *ngIf="!child.children || child.children.length === 0">
+                <button mat-menu-item (click)="onClick(child);">
+                    <mat-icon *ngIf="child.iconName != null">{{ child.iconName }}</mat-icon>
+                    <span>{{ child.Label }}</span>
+                </button>
+            </span>
+        </span>
+    </ng-container>
+</mat-menu> -->

@@ -443,7 +443,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   @ViewChild(RicercaFormComponent) set ricerca(rf: RicercaFormComponent) {
     if (rf) {
       this.searchForm = rf;
-      this.setFormFilterSettings();
+      setTimeout(() => {
+        this.setFormFilterSettings();//TODO rimuovere timeout e correggere Expression has changed after it was checked
+      }, 1000);
     }
   }
 

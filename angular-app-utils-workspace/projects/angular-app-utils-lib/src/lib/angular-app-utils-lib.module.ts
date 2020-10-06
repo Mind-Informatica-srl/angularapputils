@@ -39,6 +39,7 @@ import { RicercaFieldRadioComponent } from './components/ricerca/ricerca-field-r
 import { RicercaFieldSelectComponent } from './components/ricerca/ricerca-field-select/ricerca-field-select.component';
 import { RicercaFieldStringComponent } from './components/ricerca/ricerca-field-string/ricerca-field-string.component';
 import { RicercaFormComponent } from './components/ricerca/ricerca-form/ricerca-form.component';
+import { RicercaMenuComponent } from './components/ricerca/ricerca-menu/ricerca-menu.component';
 
 
 @NgModule({
@@ -55,7 +56,8 @@ import { RicercaFormComponent } from './components/ricerca/ricerca-form/ricerca-
     RicercaFieldNumberComponent,
     RicercaFieldDateComponent,
     RicercaFieldSelectComponent,
-    RicercaFieldRadioComponent
+    RicercaFieldRadioComponent,
+    RicercaMenuComponent
   ],
   imports: [
     CommonModule,
@@ -101,7 +103,8 @@ import { RicercaFormComponent } from './components/ricerca/ricerca-form/ricerca-
     RicercaFieldNumberComponent,
     RicercaFieldDateComponent,
     RicercaFieldSelectComponent,
-    RicercaFieldRadioComponent
+    RicercaFieldRadioComponent,
+    RicercaMenuComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

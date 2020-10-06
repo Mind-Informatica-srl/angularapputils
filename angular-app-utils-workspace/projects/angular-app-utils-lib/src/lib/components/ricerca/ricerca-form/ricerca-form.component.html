@@ -7,7 +7,14 @@
         </mat-expansion-panel-header>
 
         <div>
-            <button mat-button [matMenuTriggerFor]="filterMenu">
+            <ng-container *ngIf="fields && fields.length > 0">
+                <button mat-button [matMenuTriggerFor]="menuFields.childMenu" #menuTrigger="matMenuTrigger">
+                    <mat-icon>add</mat-icon> AGGIUNGI FILTRO
+                </button>
+                <aaul-ricerca-menu #menuFields [items]="fields" (onMenuItemClick)="addFilterField($event)">
+                </aaul-ricerca-menu>
+            </ng-container>
+            <!-- <button mat-button [matMenuTriggerFor]="filterMenu">
                 <mat-icon>add</mat-icon> AGGIUNGI FILTRO
             </button>
             <mat-menu #filterMenu="matMenu">
@@ -15,7 +22,7 @@
                     <button *ngFor="let item of fields" mat-menu-item (click)="addFilterField(item)">{{item.Label}}
                     </button>
                 </ng-container>
-            </mat-menu>
+            </mat-menu> -->
         </div>
 
         <div>

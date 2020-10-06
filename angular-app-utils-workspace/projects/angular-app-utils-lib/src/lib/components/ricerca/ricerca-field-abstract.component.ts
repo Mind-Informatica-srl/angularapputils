@@ -113,7 +113,8 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
             if (this.field.actualFilterMap) {
                 this.value = this.field.actualFilterMap(this.field.Name, this.selectedOperatore, this.fieldStringValue);
             } else {
-                this.value = this.field.Name + '.' + this.selectedOperatore + '=' + this.fieldStringValue;
+                const name = this.field.parentReference != null ? (this.field.parentReference + '.' + this.field.Name) : this.field.Name;
+                this.value = name + '.' + this.selectedOperatore + '=' + this.fieldStringValue;
             }
         }
     }

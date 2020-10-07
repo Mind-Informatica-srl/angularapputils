@@ -104,12 +104,14 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       this.sub.add(this.route.params.subscribe(params => {
         const id = params["Id"];
         if (id == "new") {
-          this.prepareForm();
+          this.prepareForNewItem();
+          this.resetForm();
         } else {
           if (this.evaluateRouteParent) {
             const parentId = this.route.parent.snapshot.params["Id"];
             if (parentId == 'new') {
-              this.prepareForm();
+              this.prepareForNewItem();
+              this.resetForm();
             } else {
               this.loadData(parentId);
             }
@@ -119,7 +121,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         }
       }));
     } else {
-      this.prepareForm();
+      this.prepareFormAndItem();
     }
   }
 
@@ -139,12 +141,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.subscribeRoute = !val;
   }
 
-  prepareForm() {
+  prepareFormAndItem() {
     if (this.element == null) {
       this.prepareForNewItem();
-    } else {
-      this.resetForm();
     }
+    this.resetForm();
   }
 
   prepareForNewItem(): void {
@@ -349,6 +350,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   }
 
+  protected forceCloseWindow: boolean = false;
 
   /**
    * metodo chiamato per chiudere il detail
@@ -362,6 +364,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         return;
       }
     }
+    this.forceCloseWindow = forceClose;
     this.closeDetailAction();
   }
 
@@ -435,6 +438,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   /**
    * Serve eventualmente per impedire che si chiuda il detail contenuto in una window se non si è salvato
    * Chiamare questo metodo tramite un HostListener
+   * se this.forceCloseWindow è true, chiude forzatamente la window
    * 
    * Esempio:
    * @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
@@ -446,7 +450,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * @param event event passato dal HostListener
    */
   unloadDetailHandler(event: Event) {
-    if (this.isElementChanged) {
+    if (!this.forceCloseWindow && this.isElementChanged) {
       event.returnValue = false;//se si vuole mostrare all'utente il messaggio del browser che chiede conferma per chiudere la pagina
     }
   }

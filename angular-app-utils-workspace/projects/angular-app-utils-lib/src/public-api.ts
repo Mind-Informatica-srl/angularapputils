@@ -41,6 +41,7 @@ export * from './lib/components/ricerca/ricerca-menu/ricerca-menu.component';
 
 export * from './lib/components/ricerca/ricerca.model';
 export * from './lib/components/ricerca/ricerca-field-abstract.component';
+export * from './lib/components/ricerca/ricerca-form-abstract.component';
 
 //utils
 export * from './lib/utils/italian-mat-paginator-intl';

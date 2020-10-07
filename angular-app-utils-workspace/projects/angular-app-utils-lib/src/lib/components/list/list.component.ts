@@ -7,17 +7,14 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { merge, Subscription } from 'rxjs';
-
 import { AuthenticationService } from '../../services/authentication.service';
 import { DATA_REFRESH_SERVICE_TAG, DataRefreshItem, DataRefreshService } from '../../services/data-refresh.service';
 import { UserMessageService } from '../../services/user-message.service';
 import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail-dialog.component';
 import { GenericComponent } from '../generic-component/generic.component';
-import { ApiActionsType, ApiDatasource, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
+import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.component';
-import { FilterField, Filtro, FiltroCampo } from '../ricerca/ricerca.model';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { PromptDialogData, PromptDialogComponent } from '../prompt-dialog/prompt-dialog.component';
+import { FilterField } from '../ricerca/ricerca.model';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
@@ -460,8 +457,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
    */
   setFormFilterSettings() {
     this.searchForm.sezione = this.LIST_NAME;
-    this.searchForm.searchApiUrl = this.searchApiUrl;
+    this.searchForm.userId = this.authService.userId;
     this.searchForm.canSaveSearch = this.canSaveSearch;
+    this.searchForm.searchApiUrl = this.searchApiUrl;
     this.setFormFilterFields();
     this.sub.add(this.searchForm.onFilterChanged.subscribe((_: string) => {
       this.loadListData();

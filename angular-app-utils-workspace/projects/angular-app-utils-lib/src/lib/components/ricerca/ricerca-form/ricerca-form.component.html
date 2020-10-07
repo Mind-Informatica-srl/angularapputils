@@ -15,23 +15,25 @@
                 </aaul-ricerca-menu>
             </ng-container>
             <ng-container *ngIf="canSaveSearch">
-                <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu">
-                    <mat-icon>start_border</mat-icon> RICERCHE SALVATE
-                </button>
-                <mat-menu #ricercheSalvateMenu="matMenu">
-                    <ng-container *ngFor="let item of savedFilters">
-                        <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
-                            <button mat-menu-item (click)="onSavedSearchClicked(item)"
-                                matTooltip="Apri ricerca salvata">
-                                <span>{{item.Nome}}</span>
-                            </button>
-                            <mat-icon (click)="onDeleteSearchClicked(item)" matTooltip="Cancella ricerca salvata"
-                                style="padding-right:10px;">search_off
-                            </mat-icon>
-                        </div>
-                    </ng-container>
+                <span>
+                    <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu">
+                        <mat-icon>start_border</mat-icon> RICERCHE SALVATE
+                    </button>
+                    <mat-menu #ricercheSalvateMenu="matMenu">
+                        <ng-container *ngFor="let item of savedFilters">
+                            <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+                                <button mat-menu-item (click)="onSavedSearchClicked(item)"
+                                    matTooltip="Apri ricerca salvata">
+                                    <span>{{item.Nome}}</span>
+                                </button>
+                                <mat-icon (click)="onDeleteSearchClicked(item)" matTooltip="Cancella ricerca salvata"
+                                    style="padding-right:10px;">search_off
+                                </mat-icon>
+                            </div>
+                        </ng-container>
 
-                </mat-menu>
+                    </mat-menu>
+                </span>
             </ng-container>
             <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo header)-->
             <ng-content select="[header]"></ng-content>
@@ -122,7 +124,7 @@
                 <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
             </button>
             <ng-container *ngIf="canSaveSearch && selectedFilters.length > 0">
-                <button action mat-button (click)="onSalvaRicercaClicked(ricercaForm.selectedFilters)">
+                <button action mat-button (click)="onSalvaRicercaClicked(selectedFilters)">
                     <mat-icon>save</mat-icon> Salva Ricerca
                 </button>
             </ng-container>

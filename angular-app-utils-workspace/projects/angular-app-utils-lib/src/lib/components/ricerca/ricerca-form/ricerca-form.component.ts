@@ -1,14 +1,9 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatMenuTrigger } from '@angular/material/menu';
-import { Subscription } from 'rxjs';
-import { ApiDatasource } from '../../../api-datasource/api-datasource';
-import { AuthenticationService } from '../../../services/authentication.service';
 import { UserMessageService } from '../../../services/user-message.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
-import { PromptDialogComponent, PromptDialogData } from '../../prompt-dialog/prompt-dialog.component';
-import { FilterField, FilterFieldType, Filtro, FiltroCampo, RicercaFieldChange } from '../ricerca.model';
+import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.model';
 import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
 
 /**
@@ -19,66 +14,20 @@ import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component
   templateUrl: './ricerca-form.component.html',
   styleUrls: ['./ricerca-form.component.scss']
 })
-export class RicercaFormComponent extends RicercaFormAbstractComponent {
-
-  /**
-   * campi disponibili per la ricerca
-   */
-  @Input() fields: FilterField[] = [];
-
-  /**
-   * campi selezionati per la ricerca
-   */
-  @Input() selectedFilters: FilterField[] = [];
-
-  @Output() onFilterChanged = new EventEmitter<string>();
+export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterField, Filtro> {
 
   FilterFieldType = FilterFieldType;
 
-  @ViewChild('menuTrigger') public menuTrigger: MatMenuTrigger;
-
-  @Input() canSaveSearch: boolean = false;
-
   @Input() sezione: string = '';
-
-  protected filtroDatasource: ApiDatasource<Filtro>;
-
-  protected sub: Subscription = new Subscription();
-  /**
-   * stringa per interrogare il server per i criteri di ricerca salvati
-   * se non è definito, non si instanzia filtroDatasource
-   */
-  @Input() set searchApiUrl(val: string) {
-    if (val) {
-      this.filtroDatasource = new ApiDatasource(this.httpClient, val, this.userMessageService);
-      this.loadSavedFilters();
-    }
-  }
-  /**
-   * ricerche ottenute dal server. Definite se searchApiUrl è non null
-   */
-  savedFilters: Filtro[] = [];
+  @Input() userId: string | number;
 
   constructor(httpClient: HttpClient,
     userMessageService: UserMessageService,
-    authService: AuthenticationService<any>,
     public dialog: MatDialog) {
-    super(httpClient, userMessageService, authService, dialog);
+    super(httpClient, userMessageService, dialog);
   }
 
-  ngOnInit(): void {
-  }
-
-  ngOnDestroy() {
-    if (this.sub) {
-      this.sub.unsubscribe();
-    }
-  }
-
-  /**
-   * aggiunge alla form un nuovo campo di ricerca tra quelli presenti in fields
-   * @param item campo di ricerca
-   */
+  //da classe astratta
   public addFilterField(item: FilterField) {
     try {
       this.menuTrigger.closeMenu();
@@ -92,26 +41,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent {
     this.selectedFilters.push(field);
   }
 
-  /**
-   * Svuota il filtro
-   */
-  clean() {
-    this.selectedFilters = [];
-  }
-
-  /**
-   * Avvia ricerca con i campi selezionati
-   */
-  search() {
-    //console.log('search', this.selectedFilters);
-    //const param = this.prepareQueryParams();
-    //console.log('search param', param);
-    this.onFilterChanged.emit('');
-  }
-
-  /**
-   * Prepara la query per il filtro
-   */
+  //da classe astratta
   prepareQueryParams(): string {
     let res = '';
     for (let i = 0; i < this.selectedFilters.length; i++) {
@@ -127,74 +57,24 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent {
     return res;
   }
 
-  onChangeValue(event: RicercaFieldChange) {
-    //console.log(event);
-  }
-
-  /**
-   * rimuove un singolo item di ricerca dalla form
-   * @param uniqueId 
-   */
+  //da classe astratta
   removeField(uniqueId: string) {
     this.selectedFilters = this.selectedFilters.filter(el => el.UniqueId != uniqueId);
   }
 
+  //da classe astratta
   loadSavedFilterParams() {
-    const utenteId = this.authService.userId;
-    return new HttpParams().set('UtenteID', utenteId.toString()).set('Sezione', this.sezione);
+    let params = super.loadSavedFilterParams();
+    const utenteId = this.userId;
+    return params.set('UtenteID', utenteId.toString()).set('Sezione', this.sezione);
   }
 
-  loadSavedFilters() {
-    const params = this.loadSavedFilterParams();
-    this.sub.add(this.filtroDatasource.getFilteredElements(params).subscribe((res: Filtro[]) => {
-      if (res) {
-        this.savedFilters = res;
-      } else {
-        this.savedFilters = [];
-      }
-    }));
-  }
-
-  onSalvaRicercaClicked(campiRicerca: FilterField[]) {
-    this.salvaRicerca(campiRicerca);
-  }
-
-  /**
-   * salva una ricerca su db
-   * 
-   * mostra una modal che chiede un nome per salvare il criterio di ricerca
-   * invia la richiesta di insert al server
-   * 
-   * @param campiRicerca elenco dei campi da salvare
-   * @param modalTitle titolo della modal
-   * @param modalMessage messaggio della modal
-   * @param modalInputName label dell'input della modal
-   */
-  salvaRicerca(campiRicerca: FilterField[], modalTitle: string = 'Salva ricerca', modalMessage: string = 'Inserisci un nome per la ricerca', modalInputName: string = 'Nome') {
-    console.log(campiRicerca);
-    const promptData: PromptDialogData = {
-      title: modalTitle,
-      message: modalMessage,
-      inputLabel: modalInputName,
-      showNegativeButton: true,
-      inputRequired: true
-    }
-    let dialogRef = this.dialog.open(PromptDialogComponent, { data: promptData });
-    this.sub.add(dialogRef.afterClosed().subscribe((nomeRicerca: string) => {
-      if (nomeRicerca) {
-        const ricerca = this.prepareSearchToBeSaved(nomeRicerca, campiRicerca);
-        this.filtroDatasource.insert(ricerca).subscribe(res => {
-          this.onSavedSearchInserted(res);
-        });
-      }
-    }));
-  }
-
+  //da classe astratta
   prepareSearchToBeSaved(nomeRicerca: string, campiRicerca: FilterField[]): any {
     return {
       Nome: nomeRicerca,
       Sezione: this.sezione,
-      UtenteID: this.authService.userId,
+      UtenteID: this.userId,
       FiltroCampi: campiRicerca.map(el => {
         return {
           Name: el.Name,
@@ -206,17 +86,12 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent {
     } as Filtro;
   }
 
+  //da classe astratta
   onSavedSearchInserted(res: any) {
     this.savedFilters.push(res);
   }
 
-  /**
-   * metodo chiamato alla selezione di un filtro salvato.
-   * recupera i singoli filtri cercando il filterFields e associa i valori di default
-   * riempie la form di ricerca con quanto ottenuto
-   * 
-   * @param filtro filtro selezionato
-   */
+  //da classe astratta
   onSavedSearchClicked(filtro: Filtro) {
     if (filtro.FiltroCampi != null) {
       for (let i = 0; i < filtro.FiltroCampi.length; i++) {
@@ -292,7 +167,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent {
     }));
   }
 
-  onSavedSearchDeleted(res: any, idItem) {
+  onSavedSearchDeleted(res: any, idItem: any) {
     const i = this.savedFilters.findIndex(el => el.ID == idItem);
     this.savedFilters.splice(i, 1);
   }

@@ -124,7 +124,7 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
 
   set fieldRadioValue(val: string | number) {
     this._fieldRadioValue = val;
-    this.fieldStringValue = this.fieldRadioValue.toString();
+    this.fieldStringValue = this.fieldRadioValue != null ? this.fieldRadioValue.toString() : '';
   }
 
   //si sovrascrive in quanto in questo caso non deve fare niente

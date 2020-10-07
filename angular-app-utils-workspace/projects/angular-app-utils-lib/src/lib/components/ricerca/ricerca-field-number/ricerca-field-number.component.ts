@@ -76,7 +76,7 @@ export class RicercaFieldNumberComponent extends RicercaFieldAbstractComponent {
 
   set fieldNumberValue(val: number) {
     this._fieldNumberValue = val;
-    this.fieldStringValue = this.fieldNumberValue.toString();
+    this.fieldStringValue = this.fieldNumberValue != null ? this.fieldNumberValue.toString() : '';
   }
 
 }

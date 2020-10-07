@@ -79,7 +79,7 @@ export class RicercaFieldDateComponent extends RicercaFieldAbstractComponent {
       //val.setHours(0, 0, 0, 0);
       let userTimezoneOffset = val.getTimezoneOffset() * 60000;
       this._fieldDateValue = new Date(val.getTime() - userTimezoneOffset);//si rimuove il timezone
-      this.fieldStringValue = this.fieldDateValue.toISOString();//si converte la data in stringa: 2020-10-01T22:00:00.000Z
+      this.fieldStringValue = this.fieldDateValue != null ? this.fieldDateValue.toISOString() : '';//si converte la data in stringa: 2020-10-01T22:00:00.000Z
     }
   }
 

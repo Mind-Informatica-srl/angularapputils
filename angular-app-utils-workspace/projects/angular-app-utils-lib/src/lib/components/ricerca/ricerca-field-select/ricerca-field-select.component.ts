@@ -239,7 +239,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
 
   set fieldSelectValue(val: number | string) {
     this._fieldSelectValue = val;
-    this.fieldStringValue = this.fieldSelectValue.toString();
+    this.fieldStringValue = this.fieldSelectValue != null ? this.fieldSelectValue.toString() : '';
   }
 
   private _listSelectFilterValue: string;

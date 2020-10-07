@@ -117,7 +117,7 @@
             </form>
         </div>
         <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px" style="margin-top: 10px;">
-            <button mat-button (click)="search()">
+            <button mat-button (click)="search()" [disabled]="isSearching">
                 <mat-icon>search</mat-icon> CERCA
             </button>
             <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">

@@ -162,6 +162,7 @@ export interface FiltroCampo {
     ID?: number;
     FiltroID?: number;
     Name: string;
+    Label: string;
     StringValue?: string;
     DefaultOperator?: string;
     ChildrenReference?: string;

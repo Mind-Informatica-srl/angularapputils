@@ -34,16 +34,27 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
     protected filtroDatasource: ApiDatasource<S>;
 
     protected sub: Subscription = new Subscription();
+    private _searchApiUrl: string = null;
     /**
      * stringa per interrogare il server per i criteri di ricerca salvati
      * se non è definito, non si instanzia filtroDatasource
      */
     @Input() set searchApiUrl(val: string) {
-        if (val) {
-            this.filtroDatasource = new ApiDatasource(this.httpClient, val, this.userMessageService);
-            this.loadSavedFilters();
+        if (val && val != this.searchApiUrl) {
+            this._searchApiUrl = val;
+            this.initializeDatasource();
         }
     }
+
+    get searchApiUrl(): string {
+        return this._searchApiUrl;
+    }
+
+    initializeDatasource() {
+        this.filtroDatasource = new ApiDatasource(this.httpClient, this.searchApiUrl, this.userMessageService);
+        this.loadSavedFilters();
+    }
+
     /**
      * ricerche ottenute dal server. Definite se searchApiUrl è non null
      */

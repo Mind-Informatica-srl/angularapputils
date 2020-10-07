@@ -20,6 +20,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
 
   @Input() sezione: string = '';
   @Input() userId: string | number;
+  @Input() isSearching: boolean = false;
 
   constructor(httpClient: HttpClient,
     userMessageService: UserMessageService,
@@ -78,6 +79,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
       FiltroCampi: campiRicerca.map(el => {
         return {
           Name: el.Name,
+          Label: el.Label,
           StringValue: el.ActualValueString,
           DefaultOperator: el.ActualOperator,
           ChildrenReference: el.parentReference
@@ -98,8 +100,10 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
         const campo = filtro.FiltroCampi[i];
         const item: FilterField = this.getItemMenu(campo.Name, campo.ChildrenReference);
         if (item) {
+          item.Label = campo.Label;
           item.ActualOperator = campo.DefaultOperator;
           item.StringValue = campo.StringValue;
+          item.parentReference = campo.ChildrenReference;
           this.selectedFilters = [];
           this.addFilterField(item);
         }

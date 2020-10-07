@@ -462,7 +462,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.searchForm.searchApiUrl = this.searchApiUrl;
     this.setFormFilterFields();
     this.sub.add(this.searchForm.onFilterChanged.subscribe((_: string) => {
-      this.loadListData();
+      if (!this.isLoadingResults) {
+        this.loadListData();
+      }
     }));
   }
 

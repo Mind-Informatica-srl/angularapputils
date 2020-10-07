@@ -158,9 +158,15 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
         //si valuta se c'è ApiUrl: in tal caso si caricano i dati dal server subito all'inizio
         if (this.field.ApiUrl) {
           const listDatasource = new ApiDatasource(this.httpClient, this.field.ApiUrl, this.userMessageService);
+          this.searching = true;
+          this.searchFailed = false;
           this.sub.add(listDatasource.getElements().subscribe((res: any[]) => {
-            this.searchFailed = false;
+            this.searching = false;
             this.list = this.mapList(res);
+          }, err => {
+            console.error(err);
+            this.searching = false;
+            this.searchFailed = true;
           }));
         } else {
           //altrimenti si solleva errore
@@ -171,6 +177,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
       }
       this.sub.add(this.listSelectChange.subscribe((term: string) => {
         this.searching = true;
+        this.searchFailed = false;
         this.filteredList = this.list.filter(el => el.Description.toLowerCase().includes(term.toLowerCase()));
         this.searching = false;
       }));

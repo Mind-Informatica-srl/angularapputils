@@ -94,13 +94,20 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
    * si sovrascrive con this._operatoriString
    */
   operatori = this._operatoriNumber;
-
+  protected _list: SimpleModel[] = [];
   /**
    * lista totale (utile per StaticSelect)
    * 
    * nel caso di una StaticSelect, va passato l'attributo opzionale 'list' in field
    */
-  list: SimpleModel[] = [];
+  set list(val: SimpleModel[]) {
+    this._list = val;
+    this.filteredList = val;
+  }
+
+  get list(): SimpleModel[] {
+    return this._list;
+  }
   /**
    * lista filtrata in base all'input di filtro sopra la select
    */
@@ -148,11 +155,20 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
     } else if (this.field.Type == FilterFieldType.StaticSelect || this.field.Type == FilterFieldType.StaticSelectNumber) {
       //caso StaticSelect
       if (!this.field.list) {
-        throw new Error('RicercaFieldSelectComponent: list non definito');
+        //si valuta se c'è ApiUrl: in tal caso si caricano i dati dal server subito all'inizio
+        if (this.field.ApiUrl) {
+          const listDatasource = new ApiDatasource(this.httpClient, this.field.ApiUrl, this.userMessageService);
+          this.sub.add(listDatasource.getElements().subscribe((res: any[]) => {
+            this.searchFailed = false;
+            this.list = this.mapList(res);
+          }));
+        } else {
+          //altrimenti si solleva errore
+          throw new Error('RicercaFieldSelectComponent: list e ApiUrl non definiti');
+        }
+      } else {
+        this.list = this.mapList(this.field.list);
       }
-      this.list = this.mapList(this.field.list);
-      this.filteredList = this.list;
-
       this.sub.add(this.listSelectChange.subscribe((term: string) => {
         this.searching = true;
         this.filteredList = this.list.filter(el => el.Description.toLowerCase().includes(term.toLowerCase()));

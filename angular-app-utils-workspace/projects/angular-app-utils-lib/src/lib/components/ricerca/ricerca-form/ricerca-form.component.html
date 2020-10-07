@@ -14,7 +14,7 @@
                 <aaul-ricerca-menu #menuFields [items]="fields" (onMenuItemClick)="addFilterField($event)">
                 </aaul-ricerca-menu>
             </ng-container>
-            <ng-container *ngIf="canSaveSearch">
+            <ng-container *ngIf="searchApiUrl || (savedFilters != null && savedFilters.length > 0)">
                 <span>
                     <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu">
                         <mat-icon>start_border</mat-icon> RICERCHE SALVATE
@@ -123,7 +123,7 @@
             <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">
                 <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
             </button>
-            <ng-container *ngIf="canSaveSearch && selectedFilters.length > 0">
+            <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
                 <button action mat-button (click)="onSalvaRicercaClicked(selectedFilters)">
                     <mat-icon>save</mat-icon> Salva Ricerca
                 </button>

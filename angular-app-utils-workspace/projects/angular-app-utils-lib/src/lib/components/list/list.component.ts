@@ -44,7 +44,6 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected searchForm: RicercaFormComponent = null;
 
   protected searchApiUrl: string = null;
-  protected canSaveSearch: boolean = false;
 
   constructor(protected httpClient: HttpClient,
     protected dataRefreshService: DataRefreshService,
@@ -458,7 +457,6 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   setFormFilterSettings() {
     this.searchForm.sezione = this.LIST_NAME;
     this.searchForm.userId = this.authService.userId;
-    this.searchForm.canSaveSearch = this.canSaveSearch;
     this.searchForm.searchApiUrl = this.searchApiUrl;
     this.setFormFilterFields();
     this.sub.add(this.searchForm.onFilterChanged.subscribe((_: string) => {

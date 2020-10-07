@@ -29,8 +29,6 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
 
     @ViewChild('menuTrigger') public menuTrigger: MatMenuTrigger;
 
-    @Input() canSaveSearch: boolean = false;
-
     protected filtroDatasource: ApiDatasource<S>;
 
     protected sub: Subscription = new Subscription();

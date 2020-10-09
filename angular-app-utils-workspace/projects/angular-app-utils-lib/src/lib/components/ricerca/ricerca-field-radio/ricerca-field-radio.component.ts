@@ -106,8 +106,23 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
    */
   mapList(l: any[]): SimpleModel[] {
     return l.map(el => {
+      let valueId: string;
+      if (this.idField.includes('#')) {
+        const ids = this.idField.split('#');
+        for (let i = 0; i < ids.length; i++) {
+          const idVal = ids[i];
+          if (valueId) {
+            valueId += "#";
+          } else {
+            valueId = "";
+          }
+          valueId += el[idVal];
+        }
+      } else {
+        valueId = el[this.idField];
+      }
       return {
-        ID: el[this.idField],
+        ID: valueId,
         Description: el[this.descriptionField]
       } as SimpleModel
     });

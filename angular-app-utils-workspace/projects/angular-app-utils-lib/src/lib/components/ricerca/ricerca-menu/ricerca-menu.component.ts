@@ -48,7 +48,7 @@ export class RicercaMenuComponent implements OnInit {
       return field.children.map(el => {
         return {
           ...el,
-          Label: "(" + field.Label + ") " + el.Label,
+          Label: field.Label + "->" + el.Label,
           parentReference: field.parentReference != null ? (field.parentReference + '.' + field.childrenReference) : field.childrenReference
         }
       });

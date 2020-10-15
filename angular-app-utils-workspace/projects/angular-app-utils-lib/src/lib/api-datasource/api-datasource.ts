@@ -160,9 +160,8 @@ export class ApiDatasource<T> {
       'Qualcosa è andato storto; riprovare più tardi.');
   }
 
-  printElements(format: string, columns: string[], params: HttpParams): Observable<any> {
-    const headers = this.getHttpHeadersForPrint(format);
-    params = params.set('s', columns.toString());
+  printElements(format: string, columns: string[], titles: string[], params: HttpParams): Observable<any> {
+    //params = params.set('s', columns.toString());
     let printFormat;
     switch (format) {
       case 'csv':
@@ -178,6 +177,7 @@ export class ApiDatasource<T> {
         printFormat = 'json';
         break;
     }
+    const headers = this.getHttpHeadersForPrint(printFormat, columns, titles);
     return this._httpClient.get(this.requestUrl, { headers: headers, params: params, responseType: printFormat }).pipe(
       catchError(err => {
         return this.onError(null, err);
@@ -196,9 +196,11 @@ export class ApiDatasource<T> {
     }
   }
 
-  protected getHttpHeadersForPrint(format: string): HttpHeaders {
+  protected getHttpHeadersForPrint(format: string, columns: string[], titles: string[]): HttpHeaders {
     return new HttpHeaders({
-      'Print': this.getPrintFormat(format)
+      'Print': format,
+      'Titles': titles,
+      's': columns
     });
   }
 

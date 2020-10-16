@@ -1,35 +1,37 @@
 <div mat-dialog-title *ngIf="title" [innerHtml]="title"></div>
 
-<div mat-dialog-content>
+<div mat-dialog-content [ngClass]="{'font-larger':fontLarger}">
     <div [innerHtml]="message">
-    </div> 
+    </div>
     <form name="dialogInputForm" #f="ngForm" autocomplete="off">
         <mat-form-field>
           <mat-label for="dialogInput">{{inputLabel}}</mat-label>
           <input
             *ngIf="!textArea; else textareaTemplate"
             matInput
-            id="dialogInput" 
-            name="dialogInput" 
+            id="dialogInput"
+            name="dialogInput"
             #dialogInput
             [required]="inputRequired"
             [(ngModel)]="value"
+            [type]="type"
+            cdkFocusInitial
           >
           <ng-template #textareaTemplate>
-            <textarea             
+            <textarea
             matInput
             cdkTextareaAutosize
             #autosize="cdkTextareaAutosize"
             cdkAutosizeMinRows="1"
             cdkAutosizeMaxRows="5"
-            id="dialogInput" 
-            name="dialogInput" 
+            id="dialogInput"
+            name="dialogInput"
             #dialogInput
             [required]="inputRequired"
             [(ngModel)]="value"
             ></textarea>
           </ng-template>
-                    
+
           <mat-hint *ngIf="!inputRequired">Facoltativo</mat-hint>
         </mat-form-field>
     </form>

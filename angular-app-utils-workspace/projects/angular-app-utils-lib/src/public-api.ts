@@ -43,5 +43,12 @@ export * from './lib/components/ricerca/ricerca.model';
 export * from './lib/components/ricerca/ricerca-field-abstract.component';
 export * from './lib/components/ricerca/ricerca-form-abstract.component';
 
+export * from './lib/components/html-container-dialog/html-container-dialog.component';
+
+export * from './lib/components/stampa/stampa.model';
+export * from './lib/components/stampa/stampa-form-abstract.component';
+export * from './lib/components/stampa/stampa-form/stampa-form.component';
+export * from './lib/components/stampa/stampa-modal/stampa-modal.component';
+
 //utils
 export * from './lib/utils/italian-mat-paginator-intl';

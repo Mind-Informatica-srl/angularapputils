@@ -15,6 +15,10 @@ import { GenericComponent } from '../generic-component/generic.component';
 import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.component';
 import { FilterField } from '../ricerca/ricerca.model';
+import { HtmlContainerDialogComponent } from '../html-container-dialog/html-container-dialog.component';
+import { StampaDialogData, StampaModalComponent } from '../stampa/stampa-modal/stampa-modal.component';
+import { CampoStampaInterface, StampaFormConfig, StampaModalResponse } from '../stampa/stampa.model';
+import * as FileSaver from 'file-saver';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
@@ -438,6 +442,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
 
 
   protected filterFields: FilterField[] = [];
+  protected printFields: CampoStampaInterface[] = [];
 
   /**
     * setter per il component di ricerca 'RicercaFormComponent'
@@ -482,6 +487,107 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
         });
       }
       this.searchForm.fields = this.filterFields;
+    }
+  }
+
+  protected printApiUrl: string;
+
+
+  print(columns: string[], format: string, headers: string[]) {
+    let params = this.prepareLoadParameters();
+    format = this.getPrintFormat(format);
+    this.apiDatasource.printElements(columns, headers, params, format, format == 'text' ? 'text' : 'json').subscribe((data: any) => {
+      console.log(data);
+      if (format == 'text') {
+        this.downloadCsv(data);
+      } else if (format == 'blob') {
+        this.showPdf(data)
+      }
+    }, error => {
+      console.error(error);
+
+    });
+  }
+
+  get csvTitle(): string {
+    return this.pageTitle != null ? (this.pageTitle + '.csv') : 'export.csv';
+  }
+  downloadCsv(data: any) {
+    const blob = new Blob([data], { type: 'text/csv' });
+    FileSaver.saveAs(blob, this.csvTitle);
+  }
+
+  showPdf(res: any) {
+    if (res.Error) {
+      this.userMessageService.message({
+        errorMessage: res.Error,
+        error: res.Error
+      });
+    } else {
+      let dialogRef = this.dialog.open(HtmlContainerDialogComponent, {
+        //width: '50%',
+        data: {
+          htmlTitle: res.Response.Title,
+          htmlBody: res.Response.Body,
+          htmlOkButton: 'Stampa',
+          styleString: res.Response.Style
+        }
+      });
+      // this.sub.add(dialogRef.afterOpened().subscribe(() => {
+      //   dialogRef.componentInstance.print();
+      // }));
+    }
+  }
+
+  protected preparePrintDialogParams(): StampaDialogData {
+    return {
+      config: {
+        Sezione: this.LIST_NAME,
+        UtenteID: this.authService.userId,
+        ColumnNames: this.printFields,
+        LayoutApiUrl: this.printApiUrl,
+      } as StampaFormConfig
+    }
+  }
+
+  private _orderPrintFileds: boolean = true;
+
+  protected orderPrintFiled() {
+    if (this._orderPrintFileds && this.printFields) {
+      this.printFields = this.printFields.sort((a, b) => {
+        return ('' + a.Description).localeCompare(b.Description);
+      });
+      this._orderPrintFileds = false;//si mette a false per eseguire l'ordinamento solo la prima volta
+    }
+  }
+
+  openStampaDialog() {
+    this.orderPrintFiled();
+    const dialogData: StampaDialogData = this.preparePrintDialogParams();
+    let dialogRef = this.dialog.open(StampaModalComponent, {
+      data: dialogData
+    });
+    this.sub.add(dialogRef.afterClosed().subscribe((result: StampaModalResponse) => {
+      if (result) {
+        this.print(result.Campi, result.Formato, result.Headers);
+      }
+    }));
+  }
+
+  protected getPrintFormat(format: string): 'arraybuffer' | 'blob' | 'json' | 'text' {
+    switch (format) {
+      case 'csv':
+        return 'text';
+      case 'pdf':
+        return 'blob';
+      case 'text':
+        return 'text';
+      case 'blob':
+        return 'blob';
+      case 'arraybuffer':
+        return 'arraybuffer';
+      default:
+        return 'json';
     }
   }
 

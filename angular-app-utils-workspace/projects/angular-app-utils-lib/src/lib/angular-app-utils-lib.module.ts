@@ -32,6 +32,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatRadioModule } from '@angular/material/radio';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { RicercaFieldDateComponent } from './components/ricerca/ricerca-field-date/ricerca-field-date.component';
 import { RicercaFieldNumberComponent } from './components/ricerca/ricerca-field-number/ricerca-field-number.component';
@@ -40,6 +41,9 @@ import { RicercaFieldSelectComponent } from './components/ricerca/ricerca-field-
 import { RicercaFieldStringComponent } from './components/ricerca/ricerca-field-string/ricerca-field-string.component';
 import { RicercaFormComponent } from './components/ricerca/ricerca-form/ricerca-form.component';
 import { RicercaMenuComponent } from './components/ricerca/ricerca-menu/ricerca-menu.component';
+import { HtmlContainerDialogComponent } from './components/html-container-dialog/html-container-dialog.component';
+import { StampaFormComponent } from './components/stampa/stampa-form/stampa-form.component';
+import { StampaModalComponent } from './components/stampa/stampa-modal/stampa-modal.component';
 
 
 @NgModule({
@@ -57,7 +61,10 @@ import { RicercaMenuComponent } from './components/ricerca/ricerca-menu/ricerca-
     RicercaFieldDateComponent,
     RicercaFieldSelectComponent,
     RicercaFieldRadioComponent,
-    RicercaMenuComponent
+    RicercaMenuComponent,
+    HtmlContainerDialogComponent,
+    StampaModalComponent,
+    StampaFormComponent
   ],
   imports: [
     CommonModule,
@@ -83,7 +90,8 @@ import { RicercaMenuComponent } from './components/ricerca/ricerca-menu/ricerca-
     MatExpansionModule,
     MatMenuModule,
     MatSelectModule,
-    MatRadioModule
+    MatRadioModule,
+    DragDropModule
   ],
   providers: [
     { provide: DateAdapter, useClass: AauDateAdapter },
@@ -104,14 +112,19 @@ import { RicercaMenuComponent } from './components/ricerca/ricerca-menu/ricerca-
     RicercaFieldDateComponent,
     RicercaFieldSelectComponent,
     RicercaFieldRadioComponent,
-    RicercaMenuComponent
+    RicercaMenuComponent,
+    HtmlContainerDialogComponent,
+    StampaModalComponent,
+    StampaFormComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,
     PromptDialogComponent,
     ResetPasswordDialogComponent,
     DetailDialogComponent,
-    ForgotPasswordDialogComponent
+    ForgotPasswordDialogComponent,
+    HtmlContainerDialogComponent,
+    StampaFormComponent
   ],
 })
 export class AngularAppUtilsLibModule { }

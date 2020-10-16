@@ -1,0 +1,9 @@
+<ng-container #headerContainer></ng-container>
+<h1 mat-dialog-title #titleElement></h1>
+<div mat-dialog-content #bodyElement>
+
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="accent" [mat-dialog-close]="true" style="margin-right: 1%;">Chiudi</button>
+  <button mat-raised-button color="primary" (click)="print()" cdkFocusInitial>{{ data.htmlOkButton }}</button>
+</div>

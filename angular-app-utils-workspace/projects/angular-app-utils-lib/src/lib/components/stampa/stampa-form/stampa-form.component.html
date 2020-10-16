@@ -1,0 +1,77 @@
+<ng-container *ngIf="layoutApiUrl || (savedLayout != null && savedLayout.length > 0)">
+    <span>
+        <button header mat-button [matMenuTriggerFor]="layoutSalvatiMenu">
+            <mat-icon>start_border</mat-icon> LAYOUT SALVATI
+        </button>
+        <mat-menu #layoutSalvatiMenu="matMenu">
+            <ng-container *ngFor="let item of savedLayout">
+                <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+                    <button mat-menu-item (click)="onSavedLayoutSelected(item)"
+                        matTooltip="Apri layout di stampa salvato">
+                        <span>{{item.Nome}}</span>
+                    </button>
+                    <mat-icon (click)="onDeleteLayoutClicked(item)" matTooltip="Cancella layout di stampa salvato"
+                        style="padding-right:10px;cursor: pointer;">delete_outline
+                    </mat-icon>
+                </div>
+            </ng-container>
+
+        </mat-menu>
+    </span>
+</ng-container>
+
+<div>
+    <form>
+        <div cdkDropListGroup>
+            <div class="col-print-container">
+                <h2>Campi</h2>
+
+                <div cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="notSelectedColumns"
+                    class="col-print-list" cdkDropListSortingDisabled (cdkDropListDropped)="drop($event)">
+                    <div class="col-print-box" *ngFor="let item of notSelectedColumns" cdkDrag>
+                        {{ item.Description }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-print-container">
+                <h2>Selezionati</h2>
+
+                <div cdkDropList cdkDropListOrientation="horizontal" [cdkDropListData]="selectedColumns"
+                    class="col-print-list" (cdkDropListDropped)="drop($event)">
+                    <div class="col-print-box" *ngFor="let item of selectedColumns" cdkDrag>
+                        {{ item.Description }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<ng-container *ngIf="formats">
+    <mat-radio-group fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px" [(ngModel)]="selectedFormat"
+        name="selectedFormat" style="width: 100%;margin-top:20px;">
+        <mat-radio-button *ngFor="let format of formats" [value]="format">
+            {{format}}
+        </mat-radio-button>
+    </mat-radio-group>
+</ng-container>
+
+<div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px" style="margin-top: 10px;">
+    <button mat-button (click)="print()" [disabled]="isPrinting || selectedFormat == null">
+        <mat-icon>print</mat-icon> STAMPA
+    </button>
+
+    <ng-container *ngIf="layoutApiUrl && selectedColumns.length > 0">
+        <button action mat-button (click)="onSalvaLayoutClicked(selectedColumns)">
+            <mat-icon>save</mat-icon> SALVA LAYOUT
+        </button>
+    </ng-container>
+    <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
+    <ng-container>
+        <ng-content select="[action]"></ng-content>
+    </ng-container>
+
+</div>

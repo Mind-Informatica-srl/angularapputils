@@ -4,10 +4,14 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "debug": "ng serve --open",
+    "debug_https": "ng serve --open --ssl",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "update_angular_app_utils_lib": "rm -r node_modules/angular-app-utils-lib && npm update angular-app-utils-lib",
+    "update_aaul_and_debug": "npm run update_angular_app_utils_lib && npm run debug"
   },
   "private": true,
   "dependencies": {

@@ -21,7 +21,7 @@ export class ApiDatasource<T> {
 
   constructor(protected _httpClient: HttpClient,
     public requestUrl: string,
-    protected userMessageService: UserMessageService,
+    protected userMessageService?: UserMessageService,
     idExtractor?: ((arg0: any) => any)
   ) {
     /*this.httpHeaders = new HttpHeaders({
@@ -89,10 +89,12 @@ export class ApiDatasource<T> {
       //catchError(ApiDatasource.handleError)
     ).pipe(
       tap(res => {
-        this.userMessageService.message({
-          element: res,
-          messageType: MessageType.Update
-        });
+        if (this.userMessageService) {
+          this.userMessageService.message({
+            element: res,
+            messageType: MessageType.Update
+          });
+        }
       })
     );
   }
@@ -106,10 +108,12 @@ export class ApiDatasource<T> {
       //catchError(ApiDatasource.handleError)
     ).pipe(
       tap(res => {
-        this.userMessageService.message({
-          element: res,
-          messageType: MessageType.Insert
-        });
+        if (this.userMessageService) {
+          this.userMessageService.message({
+            element: res,
+            messageType: MessageType.Insert
+          });
+        }
       })
     );
   }
@@ -125,21 +129,25 @@ export class ApiDatasource<T> {
       //catchError(ApiDatasource.handleError)
     ).pipe(
       tap(res => {
-        this.userMessageService.message({
-          element: res,
-          messageType: MessageType.Delete
-        });
+        if (this.userMessageService) {
+          this.userMessageService.message({
+            element: res,
+            messageType: MessageType.Delete
+          });
+        }
       })
     );
   }
 
   protected onError(element: T, err: any) {
-    this.userMessageService.message({
-      element: element,
-      error: err,
-      errorMessage: typeof err == "string" ? err : null,
-      messageType: MessageType.Error
-    });
+    if (this.userMessageService) {
+      this.userMessageService.message({
+        element: element,
+        error: err,
+        errorMessage: typeof err == "string" ? err : null,
+        messageType: MessageType.Error
+      });
+    }
     ApiDatasource.handleError(err);
     return throwError(err);
   }

@@ -1,8 +1,8 @@
-import { Component, Inject, HostListener } from '@angular/core';
+import { Component, Inject, HostListener, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface PromptDialogData {
-  title: string;//titolo dialog
+  title?: string;//titolo dialog
   message: string;//sotto titolo
   inputLabel: string;//la label sopra l'input
   showNegativeButton?: boolean;//se false non mostra il pulsante annulla
@@ -11,6 +11,8 @@ export interface PromptDialogData {
   textArea?: boolean;//se true mette textArea invece che un input
   okLabel?: string;//label per pulsante di conferma
   annullaLabel?: string;//label per pulsante di annulla
+  type?: string;//type dell'input
+  fontLarger?: boolean;//stile css da dare al content
 }
 
 @Component({
@@ -32,9 +34,13 @@ export class PromptDialogComponent {
   textArea: boolean;
   okLabel: string = 'Ok';
   annullaLabel: string = 'Annulla';
-  
+  type: string = 'text';
+  fontLarger: boolean = false;
+
+  @ViewChild('dialogInput') dialogInput: ElementRef;
+
   constructor(public dialogRef: MatDialogRef<PromptDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: PromptDialogData) { 
+    @Inject(MAT_DIALOG_DATA) public data: PromptDialogData) {
       this.title = data.title;
       this.message = data.message;
       this.inputLabel = data.inputLabel;
@@ -51,11 +57,17 @@ export class PromptDialogComponent {
       if(this.inputRequired){
         this.dialogRef.disableClose = true;
       }
+      if(data.type) {
+        this.type = data.type;
+      }
+      if(data.fontLarger) {
+        this.fontLarger = data.fontLarger;
+      }
   }
 
   @HostListener('document:keydown.enter', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     event.preventDefault();
-    this.dialogRef.close(this.value);      
+    this.dialogRef.close(this.value);
   }
 
 }

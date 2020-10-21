@@ -70,7 +70,7 @@ export class RicercaMenuComponent implements OnInit {
    */
   getMenuItemLabel(value: string): string {
     if (value) {
-      const i = value.lastIndexOf(')');
+      const i = value.lastIndexOf('->');
       if (i > -1) {
         return value.substring(i + 2);
       }

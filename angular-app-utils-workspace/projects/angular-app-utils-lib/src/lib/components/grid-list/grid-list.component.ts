@@ -1,14 +1,15 @@
 import { ListComponent } from '../list/list.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { ApiActionsType } from '../../api-datasource/api-datasource';
+import { Input } from '@angular/core';
 
 
 export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, LoginInfo> {
-  
+
   abstract displayedColumns: string[];
 
   setDataSourceAttributes() {
-    if(this.tableDataSource != null) {
+    if (this.tableDataSource != null) {
       //this.tableDataSource.paginator = this.paginator;
       this.tableDataSource.sort = this.sort;
     }
@@ -18,34 +19,42 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     return this.dataSource as MatTableDataSource<T>;
   }
 
-  ngOnInit(): void {
-    super.ngOnInit();    
-    if(this.tableDataSource != null){
-      this.tableDataSource.sort = this.sort;
-    }
+  @Input() set list(data: T[]) {
+    this.setTableDataSourceFromArray(data);
   }
-  
-  onListLoaded(data: T[]){
-    if(this.tableDataSource == null){
+
+  protected setTableDataSourceFromArray(data: T[]) {
+    if (this.tableDataSource == null) {
       this.dataSource = new MatTableDataSource(data);
       this.setCustomSort();
-    }else{
+    } else {
       this.tableDataSource.data = data;
     }
     this.tableDataSource.sort = this.sort;
   }
 
+  ngOnInit(): void {
+    super.ngOnInit();
+    if (this.tableDataSource != null) {
+      this.tableDataSource.sort = this.sort;
+    }
+  }
+
+  onListLoaded(data: T[]) {
+    this.setTableDataSourceFromArray(data);
+  }
+
   protected setCustomSort(): void {
   }
 
-  applyFilter(event: Event): void{
+  applyFilter(event: Event): void {
     //non si chiama il super. Qui dataSource è di tipo MatTableDataSource e possiamo applicare il suo metodo "filter"
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
     /*if (this.tableDataSource.paginator) {
       this.tableDataSource.paginator.firstPage();
     }*/
-    if(this.paginator){
+    if (this.paginator) {
       this.paginator.firstPage();
     }
   }
@@ -56,8 +65,8 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
       return this.idExtractor(item) !== id;
     })
   }
-  
-  refreshItemRow(action: ApiActionsType, id: any, el: T){
+
+  refreshItemRow(action: ApiActionsType, id: any, el: T) {
     super.refreshItemRow(action, id, el);
     switch (action) {
       case ApiActionsType.AddAction:
@@ -65,7 +74,7 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
         break;
       case ApiActionsType.UpdateAction:
         this.tableDataSource.data = this.tableDataSource.data.map((item: T) => {
-          if(this.idExtractor(item) === this.idExtractor(el)){
+          if (this.idExtractor(item) === this.idExtractor(el)) {
             return el;
           }
           return item;
@@ -75,7 +84,7 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
         this.tableDataSource.data = this.tableDataSource.data.filter((item: T) => {
           return this.idExtractor(item) !== this.idExtractor(el);
         })
-        break;      
+        break;
       default:
         break;
     }

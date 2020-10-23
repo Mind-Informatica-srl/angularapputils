@@ -142,7 +142,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   prepareFormAndItem() {
-    if (this.element == null) {
+    if (this.element == null || this.idExtractor(this.element) == null) {
       this.prepareForNewItem();
     }
     this.resetForm();

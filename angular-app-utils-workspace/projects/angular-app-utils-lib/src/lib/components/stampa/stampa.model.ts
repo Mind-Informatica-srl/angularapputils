@@ -53,3 +53,20 @@ export interface StampaModalResponse {
     Headers?: string[];
 
 }
+
+export function getPrintFormat(format: string): 'arraybuffer' | 'blob' | 'json' | 'text' {
+    switch (format) {
+        case 'csv':
+            return 'text';
+        case 'pdf':
+            return 'blob';
+        case 'text':
+            return 'text';
+        case 'blob':
+            return 'blob';
+        case 'arraybuffer':
+            return 'arraybuffer';
+        default:
+            return 'json';
+    }
+}

@@ -17,7 +17,7 @@ import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.compo
 import { FilterField } from '../ricerca/ricerca.model';
 import { HtmlContainerDialogComponent } from '../html-container-dialog/html-container-dialog.component';
 import { StampaDialogData, StampaModalComponent } from '../stampa/stampa-modal/stampa-modal.component';
-import { CampoStampaInterface, StampaFormConfig, StampaModalResponse } from '../stampa/stampa.model';
+import { CampoStampaInterface, getPrintFormat, StampaFormConfig, StampaModalResponse } from '../stampa/stampa.model';
 import * as FileSaver from 'file-saver';
 
 
@@ -495,7 +495,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
 
   print(columns: string[], format: string, headers: string[]) {
     let params = this.prepareLoadParameters();
-    format = this.getPrintFormat(format);
+    format = getPrintFormat(format);
     this.apiDatasource.printElements(columns, headers, params, format, format == 'text' ? 'text' : 'json').subscribe((data: any) => {
       console.log(data);
       if (format == 'text') {
@@ -572,23 +572,6 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
         this.print(result.Campi, result.Formato, result.Headers);
       }
     }));
-  }
-
-  protected getPrintFormat(format: string): 'arraybuffer' | 'blob' | 'json' | 'text' {
-    switch (format) {
-      case 'csv':
-        return 'text';
-      case 'pdf':
-        return 'blob';
-      case 'text':
-        return 'text';
-      case 'blob':
-        return 'blob';
-      case 'arraybuffer':
-        return 'arraybuffer';
-      default:
-        return 'json';
-    }
   }
 
 }

@@ -187,6 +187,26 @@ export class ApiDatasource<T> {
     });
   }
 
+  /**
+   * Metodo per richiedere la stampa di un elemento in uno specifico formato
+   * 
+   * @param id id dell'elemento da stampare
+   * @param fields campi da stampare
+   * @param titles titoli dei campi
+   * @param params HttpParams per filtrare la richiesta
+   * @param format format di output richiesto (csv,pdf, etc..)
+   * @param responseType tipo di response atteso (json, text, blob,arraybuffer)
+   */
+  printElement(id: any, params?: HttpParams, format: string = 'text', responseType: any = 'json', fields?: string[], titles?: string[]): Observable<any> {
+    const headers = this.getHttpHeadersForPrint(format, fields, titles);
+    const url = `${this.requestUrl}/${id}`;
+    return this._httpClient.get(url, { headers: headers, params: params, responseType: responseType }).pipe(
+      catchError(err => {
+        return this.onError(null, err);
+      })
+    );
+  }
+
 }
 
 

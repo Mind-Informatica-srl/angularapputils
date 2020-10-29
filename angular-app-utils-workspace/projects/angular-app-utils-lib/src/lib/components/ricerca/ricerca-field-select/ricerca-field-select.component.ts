@@ -218,7 +218,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
 
   initializeAttributes() {
     if (this.field.Type == FilterFieldType.DynamicSelectNumber || this.field.Type == FilterFieldType.StaticSelectNumber) {
-      if (this.field.StringValue != null) {
+      if (this.field.StringValue != null && this.field.StringValue != '') {
         try {
           this.fieldSelectValue = parseFloat(this.field.StringValue)
         } catch (ex) {
@@ -230,7 +230,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
         this.hideValueInput = true;
       }
     } else {
-      if (this.field.StringValue != null) {
+      if (this.field.StringValue != null && this.field.StringValue != '') {
         this.fieldSelectValue = this.field.StringValue;
       }
       this.operatori = this._operatoriString;

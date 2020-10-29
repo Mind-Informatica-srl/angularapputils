@@ -59,7 +59,7 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
         if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
           this.hideValueInput = true;
         }
-        this.fieldRadioValue = this.field.StringValue != null ? parseFloat(this.field.StringValue) : 0;
+        this.fieldRadioValue = (this.field.StringValue != null && this.field.StringValue != '') ? parseFloat(this.field.StringValue) : 0;
         break;
       case FilterFieldType.RadioBoolean:
         this.setBooleanFields();
@@ -67,7 +67,7 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
         if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
           this.hideValueInput = true;
         }
-        this.fieldRadioValue = this.field.StringValue != null ? this.field.StringValue : 'true';
+        this.fieldRadioValue = (this.field.StringValue != null && this.field.StringValue != '') ? this.field.StringValue : 'true';
         break;
       default:
         this.initializeList();
@@ -75,7 +75,7 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
         if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
           this.hideValueInput = true;
         }
-        this.fieldRadioValue = this.field.StringValue != null ? this.field.StringValue : '';
+        this.fieldRadioValue = (this.field.StringValue != null && this.field.StringValue != '') ? this.field.StringValue : '';
         break;
     }
   }

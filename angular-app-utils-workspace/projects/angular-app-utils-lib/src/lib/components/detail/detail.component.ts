@@ -207,6 +207,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }
   }
 
+  saveAndClose() {
+    this.closeDetailOnSave = true;
+    this.save();
+  }
+
   /**
    * prima di eseguire la delete, si chiede all'utente conferma dell'azione
    */

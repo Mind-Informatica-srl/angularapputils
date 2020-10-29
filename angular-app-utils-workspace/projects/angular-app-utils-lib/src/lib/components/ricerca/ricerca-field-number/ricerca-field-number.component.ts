@@ -59,7 +59,7 @@ export class RicercaFieldNumberComponent extends RicercaFieldAbstractComponent {
       this.hideValueInput = true;
     }
     try {
-      this.fieldNumberValue = this.field.StringValue != null ? parseFloat(this.field.StringValue) : 0;
+      this.fieldNumberValue = (this.field.StringValue != null && this.field.StringValue != '') ? parseFloat(this.field.StringValue) : 0;
     } catch (ex) {
       console.error(ex);
     }

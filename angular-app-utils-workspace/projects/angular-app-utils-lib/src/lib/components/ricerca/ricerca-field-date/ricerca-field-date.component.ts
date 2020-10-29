@@ -59,7 +59,7 @@ export class RicercaFieldDateComponent extends RicercaFieldAbstractComponent {
       this.hideValueInput = true;
     }
     try {
-      this.fieldDateValue = this.field.StringValue != null ? new Date(Date.parse(this.field.StringValue)) : new Date();
+      this.fieldDateValue = (this.field.StringValue != null && this.field.StringValue != '') ? new Date(Date.parse(this.field.StringValue)) : new Date();
     } catch (error) {
       console.error(error);
     }

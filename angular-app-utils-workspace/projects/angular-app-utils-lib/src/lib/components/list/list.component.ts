@@ -545,9 +545,14 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
         Sezione: this.LIST_NAME,
         UtenteID: this.authService.userId,
         ColumnNames: this.printFields,
+        SelectedColumnNames: this.getDefaultSelectedPrintColumn(),
         LayoutApiUrl: this.printApiUrl,
       } as StampaFormConfig
     }
+  }
+
+  protected getDefaultSelectedPrintColumn(): CampoStampaInterface[] {
+    return [];
   }
 
   private _orderPrintFileds: boolean = true;

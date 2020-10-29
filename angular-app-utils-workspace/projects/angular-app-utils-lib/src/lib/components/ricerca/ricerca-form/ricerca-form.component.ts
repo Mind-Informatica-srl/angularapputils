@@ -39,6 +39,9 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
       ...item,
       UniqueId: item.Name + '_' + new Date().getTime().toString()
     } as FilterField;
+    if (!field.StringValue) {
+      field.StringValue = '';
+    }
     this.selectedFilters.push(field);
   }
 
@@ -96,6 +99,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
   //da classe astratta
   onSavedSearchClicked(filtro: Filtro) {
     if (filtro.FiltroCampi != null) {
+      this.selectedFilters = [];
       for (let i = 0; i < filtro.FiltroCampi.length; i++) {
         const campo = filtro.FiltroCampi[i];
         const item: FilterField = this.getItemMenu(campo.Name, campo.ChildrenReference);
@@ -104,7 +108,6 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
           item.ActualOperator = campo.DefaultOperator;
           item.StringValue = campo.StringValue;
           item.parentReference = campo.ChildrenReference;
-          this.selectedFilters = [];
           this.addFilterField(item);
         }
       }

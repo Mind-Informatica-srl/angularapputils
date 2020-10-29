@@ -34,6 +34,11 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
     protected sub: Subscription = new Subscription();
     private _searchApiUrl: string = null;
     /**
+     * se true quando si clicca il pulsante per pulire la form di ricerca, avvia un'altra ricerca senza filtri
+     * di default è true
+     */
+    @Input() searchOnClean: boolean = true;
+    /**
      * stringa per interrogare il server per i criteri di ricerca salvati
      * se non è definito, non si instanzia filtroDatasource
      */
@@ -93,6 +98,9 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
      */
     clean() {
         this.selectedFilters = [];
+        if (this.searchOnClean) {
+            this.search();
+        }
     }
 
     /**

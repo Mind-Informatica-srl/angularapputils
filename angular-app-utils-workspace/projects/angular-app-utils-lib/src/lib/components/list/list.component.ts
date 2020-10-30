@@ -8,7 +8,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { merge, Subscription } from 'rxjs';
 import { AuthenticationService } from '../../services/authentication.service';
-import { DATA_REFRESH_SERVICE_TAG, DataRefreshItem, DataRefreshService } from '../../services/data-refresh.service';
+import { DATA_REFRESH_SERVICE_TAG, DataRefreshItem, DataRefreshService, DATA_REFRESH_SERVICE_NEXT_TAG } from '../../services/data-refresh.service';
 import { UserMessageService } from '../../services/user-message.service';
 import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail-dialog.component';
 import { GenericComponent } from '../generic-component/generic.component';
@@ -88,11 +88,54 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.sub.add(this.dataRefreshService.refresh.subscribe((res: DataRefreshItem) => {
       this.refreshFromService(res);
     }));
+    this.sub.add(this.dataRefreshService.nextDetail.subscribe((res: DataRefreshItem) => {
+      this.goToNextDetail(res);
+    }));
     if (this.pageTitle) {
       this.titleService.updateTitle(this.pageTitle);
     }
 
     //this.setupPaginatorAndSort();
+  }
+
+  /**
+   * seleziona l'elemento successivo
+   * @param res DataRefreshItem
+   */
+  goToNextDetail(res: DataRefreshItem) {
+    if (res && res.IdentifierName == this.LIST_NAME) {
+      if (!res.ElementUpdatedId != null) {
+        const nextElement = this.getNextDetail(res.ElementUpdatedId);
+        if (nextElement) {
+          if (this.openDetailOnClick) {
+            this.onRowClicked(nextElement);
+          } else {
+            this.onRowDoubleClicked(nextElement);
+          }
+          // this.onItemSelected(nextElement);
+        }
+      }
+    }
+  }
+
+  get dataSourceArray(): T[] {
+    return (this.dataSource as T[]);
+  }
+
+  getNextDetail(oldId: any): T {
+    const d = this.dataSourceArray;
+    const oldIndex = d.findIndex(el => this.idExtractor(el) == oldId);
+    if (oldIndex > -1) {
+      //se abbiamo trovato oldIndex
+      let nextIndex: number;
+      if (oldIndex < d.length - 1) {
+        nextIndex = oldIndex + 1;
+      } else {
+        nextIndex = 0;
+      }
+      return d[nextIndex];
+    }
+    return null;
   }
 
   ngOnDestroy() {
@@ -119,11 +162,16 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
 
   @HostListener('window:storage', ['$event'])
   onStorageChange(ev: StorageEvent) {
-    if (ev.key && ev.key.startsWith(DATA_REFRESH_SERVICE_TAG)) {
-      /*console.log('onStorageChange', ev.key);
-      console.log('oldValue', ev.oldValue);        
-      console.log('newValue', ev.newValue);  */
-      this.refreshFromService(JSON.parse(ev.newValue))
+    if (ev.key) {
+      if (ev.key.startsWith(DATA_REFRESH_SERVICE_TAG)) {
+        /*console.log('onStorageChange', ev.key);
+        console.log('oldValue', ev.oldValue);        
+        console.log('newValue', ev.newValue);  */
+        this.refreshFromService(JSON.parse(ev.newValue))
+      }
+      if (ev.key.startsWith(DATA_REFRESH_SERVICE_NEXT_TAG)) {
+        this.goToNextDetail(JSON.parse(ev.newValue))
+      }
     }
   }
 

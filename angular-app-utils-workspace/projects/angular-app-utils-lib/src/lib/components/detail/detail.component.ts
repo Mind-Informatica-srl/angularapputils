@@ -288,10 +288,25 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.originalElement = this.element;
   }
 
+  goToNextDetail: boolean = false;
+
+  saveAndContinue() {
+    this.save();
+    this.goToNextDetail = true;
+  }
+
+  protected askNextDetail(oldId: any, oldElement: any, action: ApiActionsType = ApiActionsType.UpdateAction) {
+    this.dataRefreshService.askForNextDetail(this.LIST_NAME, action, this.idExtractor(oldId), oldElement, this.loadInWindow);
+    this.closeDetailOnSave = true;
+  }
+
   protected onItemSaved(data: T, action: ApiActionsType): void {
     this.resetForm();
     if (this.dataRefreshService != null) {
       this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
+      if (this.goToNextDetail) {
+        this.askNextDetail(this.idExtractor(data), data, action);
+      }
     }
     if (action == ApiActionsType.AddAction) {
       this.reload(data);

@@ -40,6 +40,10 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     }
   }
 
+  get dataSourceArray(): T[] {
+    return this.tableDataSource.data;
+  }
+
   onListLoaded(data: T[]) {
     this.setTableDataSourceFromArray(data);
   }

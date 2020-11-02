@@ -44,12 +44,8 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
   */
   idField: string;
 
-  ngOnInit() {
-    super.ngOnInit();
-    this.initializeAttributes();
-  }
-
-  initializeAttributes() {
+  onFieldSetted() {
+    super.onFieldSetted();
     this.descriptionField = this.field.DescriptionField ? this.field.DescriptionField : 'Description';
     this.idField = this.field.IDField ? this.field.IDField : 'ID';
     switch (this.field.Type) {

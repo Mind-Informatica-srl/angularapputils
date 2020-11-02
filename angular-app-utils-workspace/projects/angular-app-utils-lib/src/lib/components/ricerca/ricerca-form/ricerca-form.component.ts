@@ -7,7 +7,7 @@ import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.mo
 import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
 
 /**
- * Component per la ricerca avanzata
+ * Component per la ricerca avanzata con utente id e sezione
  */
 @Component({
   selector: 'aaul-ricerca-form',

@@ -52,8 +52,9 @@ export class RicercaFieldStringComponent extends RicercaFieldAbstractComponent {
     },
   ];
 
-  ngOnInit() {
-    super.ngOnInit();
+
+  onFieldSetted() {
+    super.onFieldSetted();
     this.fieldStringValue = (this.field.StringValue != null && this.field.StringValue != '') ? this.field.StringValue : '';
     this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'like';
     if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {

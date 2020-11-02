@@ -52,8 +52,8 @@ export class RicercaFieldDateComponent extends RicercaFieldAbstractComponent {
     },
   ];
 
-  ngOnInit() {
-    super.ngOnInit();
+  onFieldSetted() {
+    super.onFieldSetted();
     this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equaldate';
     if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
       this.hideValueInput = true;

@@ -1,9 +1,9 @@
 import { TitleService } from './../../services/title.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { EventEmitter, HostListener, Input, Output, Type, ViewChild, OnInit } from '@angular/core';
+import { EventEmitter, HostListener, Input, Output, Type, ViewChild, OnInit, AfterViewInit, ViewContainerRef, ComponentFactoryResolver, ComponentRef } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, SortDirection } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { merge, Subscription } from 'rxjs';
@@ -14,14 +14,14 @@ import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail
 import { GenericComponent } from '../generic-component/generic.component';
 import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.component';
-import { FilterField } from '../ricerca/ricerca.model';
+import { FilterField, Filtro } from '../ricerca/ricerca.model';
 import { HtmlContainerDialogComponent } from '../html-container-dialog/html-container-dialog.component';
 import { StampaDialogData, StampaModalComponent } from '../stampa/stampa-modal/stampa-modal.component';
 import { CampoStampaInterface, getPrintFormat, StampaFormConfig, StampaModalResponse } from '../stampa/stampa.model';
 import * as FileSaver from 'file-saver';
 
 
-export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
+export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit, AfterViewInit {
 
   abstract pageTitle: string;
 
@@ -35,6 +35,12 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   @Output() onDoubleSelectElement = new EventEmitter<T>();
   protected dataSub: Subscription;
 
+  @Input() firstPageIndex: number = 0;
+  @Input() rowsPerPage: number = 0;
+  @Input() searchCreteria: Filtro;
+  @Input() sortBy: string;
+  @Input() sortDirection: SortDirection;
+
   protected refreshAll: boolean = true; //booleano per decidere se ricaricare tutta la lista al momento di un aggiornamento di un item
   protected detailTitle: string = "Dettaglio";
   protected detailSubTitle: string = null;
@@ -42,10 +48,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected openDetailOnClick: boolean = true;
   protected detailDialogLoadFromServer: boolean = false;
   protected inSelectorDialog: boolean = false;
-  /**
- * component di ricerca (se presente nel template HTML)
- */
-  protected searchForm: RicercaFormComponent = null;
+
 
   protected searchApiUrl: string = null;
 
@@ -55,7 +58,8 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     protected router: Router,
     authService: AuthenticationService<LoginInfo>,
     public dialog: MatDialog,
-    titleService: TitleService) {
+    titleService: TitleService,
+    protected componentFactoryResolver: ComponentFactoryResolver) {
     super(httpClient, userMessageService, authService, titleService);
     this.currentPath = this.router.url;
     this.sub.add(this.router.events.subscribe((val) => {
@@ -94,8 +98,13 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     if (this.pageTitle) {
       this.titleService.updateTitle(this.pageTitle);
     }
-
+    //si carica il filtro
+    this.loadSearchFormComponent();
     //this.setupPaginatorAndSort();
+  }
+
+  ngAfterViewInit(): void {
+
   }
 
   /**
@@ -151,7 +160,19 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     }
     this.dataSub = new Subscription();
     if (this.paginator) {
+      if (this.firstPageIndex != 0) {
+        this.paginator.pageIndex = this.firstPageIndex;
+      }
+      if (this.rowsPerPage != 0) {
+        this.paginator.pageSize = this.rowsPerPage;
+      }
       if (this.sort) {
+        if (this.sortBy) {
+          this.sort.active = this.sortBy;
+          if (this.sortDirection) {
+            this.sort.direction = this.sortDirection;
+          }
+        }
         this.dataSub.add(this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0));// If the user changes the sort order, reset back to the first page.
         this.dataSub.add(merge(this.sort.sortChange, this.paginator.page).subscribe(() => this.loadListData()));
       } else {
@@ -193,8 +214,8 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     }
   }
 
-  protected sort: MatSort;
-  protected paginator: MatPaginator;
+  sort: MatSort;
+  paginator: MatPaginator;
   resultsLength = 0;//campo utile per il paginator per l'input [length]
 
   @ViewChild(MatSort) set matSort(ms: MatSort) {
@@ -358,6 +379,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
 
   protected onListLoaded(data: T[]) {
     this.dataSource = data;
+    if (this.paginator) {
+      this.paginator.pageIndex = 0;
+    }
   }
 
   prepareRoute(outlet: RouterOutlet) {
@@ -492,17 +516,41 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected filterFields: FilterField[] = [];
   protected printFields: CampoStampaInterface[] = [];
 
+
+  @ViewChild('searchHost', { static: true, read: ViewContainerRef }) searchHost: ViewContainerRef;
+  _searchComponentRef: ComponentRef<any>;
+
+  /**
+  * component di ricerca (se presente nel template HTML)
+  */
+  get searchForm(): RicercaFormComponent {
+    try {
+      return this._searchComponentRef.instance as any as RicercaFormComponent;
+    } catch (ex) {
+      console.log(ex);
+      return null;
+    }
+  }
+
+  loadSearchFormComponent() {
+    if (this.searchHost != null) {
+      this.searchHost.clear();
+      const factory = this.componentFactoryResolver.resolveComponentFactory(RicercaFormComponent);
+      this._searchComponentRef = this.searchHost.createComponent(factory);
+      this.setFormFilterSettings();
+      this._searchComponentRef.changeDetectorRef.detectChanges();
+    }
+  }
+
   /**
     * setter per il component di ricerca 'RicercaFormComponent'
     */
-  @ViewChild(RicercaFormComponent) set ricerca(rf: RicercaFormComponent) {
-    if (rf) {
-      this.searchForm = rf;
-      setTimeout(() => {
-        this.setFormFilterSettings();//TODO rimuovere timeout e correggere Expression has changed after it was checked
-      }, 1000);
-    }
-  }
+  // @ViewChild(RicercaFormComponent) set ricerca(rf: RicercaFormComponent) {
+  //   if (rf && !this.searchForm) {
+  //     this.searchForm = rf;
+  //     this.setFormFilterSettings();//TODO rimuovere timeout e correggere Expression has changed after it was checked
+  //   }
+  // }
 
   /**
    * imposta i gli attributi e le subscription per il form di ricerca
@@ -512,8 +560,14 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.searchForm.userId = this.authService.userId;
     this.searchForm.searchApiUrl = this.searchApiUrl;
     this.setFormFilterFields();
+    if (this.searchCreteria) {
+      this.searchForm.onSavedSearchClicked(this.searchCreteria);
+    }
     this.sub.add(this.searchForm.onFilterChanged.subscribe((_: string) => {
       if (!this.isLoadingResults) {
+        if (this.paginator) {
+          this.paginator.pageIndex = 0;
+        }
         this.loadListData();
       }
     }));

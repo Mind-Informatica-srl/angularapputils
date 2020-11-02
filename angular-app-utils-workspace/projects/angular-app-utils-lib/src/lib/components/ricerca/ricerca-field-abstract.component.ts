@@ -56,8 +56,22 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
         this.refreshValue();
     }
 
-    @Input() field: FilterField;
+    protected _field: FilterField;
 
+    @Input() set field(val: FilterField) {
+        this._field = val;
+        this.onFieldSetted();
+    }
+
+    get field(): FilterField {
+        return this._field;
+    }
+
+    /**
+     * chiamata quando viene chiamato il setter di field
+     */
+    onFieldSetted() {
+    }
     /**
      * eventEmitter per notificare il cambiamento del valore del component
      */

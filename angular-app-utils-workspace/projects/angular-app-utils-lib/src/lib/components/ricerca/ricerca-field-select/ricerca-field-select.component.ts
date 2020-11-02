@@ -1,4 +1,4 @@
-import { FilterFieldType } from './../ricerca.model';
+import { FilterField, FilterFieldType } from './../ricerca.model';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, forwardRef, OnDestroy, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -119,8 +119,6 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
 
   ngOnInit() {
     super.ngOnInit();
-    this.initializeAttributes();
-
     if (this.field.Type == FilterFieldType.DynamicSelect || this.field.Type == FilterFieldType.DynamicSelectNumber) {
       if (!this.field.ApiUrl) {
         console.error('RicercaFieldSelectComponent: ApiUrl non definito');
@@ -216,7 +214,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
     this.sub.unsubscribe();
   }
 
-  initializeAttributes() {
+  onFieldSetted() {
     if (this.field.Type == FilterFieldType.DynamicSelectNumber || this.field.Type == FilterFieldType.StaticSelectNumber) {
       if (this.field.StringValue != null && this.field.StringValue != '') {
         try {

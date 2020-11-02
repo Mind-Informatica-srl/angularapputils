@@ -291,12 +291,12 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   goToNextDetail: boolean = false;
 
   saveAndContinue() {
-    this.save();
     this.goToNextDetail = true;
+    this.save();
   }
 
   protected askNextDetail(oldId: any, oldElement: any, action: ApiActionsType = ApiActionsType.UpdateAction) {
-    this.dataRefreshService.askForNextDetail(this.LIST_NAME, action, this.idExtractor(oldId), oldElement, this.loadInWindow);
+    this.dataRefreshService.askForNextDetail(this.LIST_NAME, action, oldId, oldElement, this.loadInWindow);
     this.closeDetailOnSave = true;
   }
 
@@ -306,6 +306,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
       if (this.goToNextDetail) {
         this.askNextDetail(this.idExtractor(data), data, action);
+        this.closeDetailOnSave = true;
       }
     }
     if (action == ApiActionsType.AddAction) {

@@ -50,7 +50,7 @@ export class DataRefreshService {
     }
     //in localStorage non si passa elementUpdated per sicurezza. Si fornisce solo l'id della risorsa aggiornata (se presente)
     if (refreshAllPages) {
-      localStorage.setItem(DATA_REFRESH_SERVICE_NEXT_TAG + name, JSON.stringify(params));
+      localStorage.setItem(DATA_REFRESH_SERVICE_TAG + name, JSON.stringify(params));
     }
     params.ElementUpdated = elementUpdated;
     this.refreshSub.next(params);

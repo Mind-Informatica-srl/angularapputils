@@ -141,7 +141,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
       }
       return null;
     }
-    return fields.find(el => el.Name == nomeCampo && el.childrenReference == childrenRefString);
+    return fields.find(el => el.Name == nomeCampo);
   }
 
   onDeleteSearchClicked(filtro: Filtro) {

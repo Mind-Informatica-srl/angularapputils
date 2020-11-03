@@ -150,6 +150,15 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
       ).subscribe(res => {
         this.filteredList = res;
       }));
+      if (this.fieldSelectValue) {
+        //se è già selezionato un valore di default, si fa getOne e si mette la response in filteredList
+        this.sub.add(listDatasource.getElement(this.fieldSelectValue).subscribe(res => {
+          if (res) {
+            this.filteredList = [];
+            this.filteredList.push(this.mapElement(res));
+          }
+        }));
+      }
     } else if (this.field.Type == FilterFieldType.StaticSelect || this.field.Type == FilterFieldType.StaticSelectNumber) {
       //caso StaticSelect
       if (!this.field.list) {
@@ -187,27 +196,29 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
    * @param l lista da convertire in SimpleList
    */
   mapList(l: any[]): SimpleModel[] {
-    return l.map(el => {
-      let valueId: string;
-      if (this.idField.includes('#')) {
-        const ids = this.idField.split('#');
-        for (let i = 0; i < ids.length; i++) {
-          const idVal = ids[i];
-          if (valueId) {
-            valueId += "#";
-          } else {
-            valueId = "";
-          }
-          valueId += el[idVal];
+    return l.map(el => this.mapElement(el));
+  }
+
+  mapElement(el: any): SimpleModel {
+    let valueId: string;
+    if (this.idField.includes('#')) {
+      const ids = this.idField.split('#');
+      for (let i = 0; i < ids.length; i++) {
+        const idVal = ids[i];
+        if (valueId) {
+          valueId += "#";
+        } else {
+          valueId = "";
         }
-      } else {
-        valueId = el[this.idField];
+        valueId += el[idVal];
       }
-      return {
-        ID: valueId,
-        Description: el[this.descriptionField]
-      } as SimpleModel
-    });
+    } else {
+      valueId = el[this.idField];
+    }
+    return {
+      ID: valueId,
+      Description: el[this.descriptionField]
+    } as SimpleModel
   }
 
   ngOnDestroy() {

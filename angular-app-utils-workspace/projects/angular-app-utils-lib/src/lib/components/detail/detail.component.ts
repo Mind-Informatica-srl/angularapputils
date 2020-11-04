@@ -358,11 +358,10 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   canCloseDetail(): Promise<boolean> {
-
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: this.deleteDialogTitle != null ? this.deleteDialogTitle : "Attenzione",
-        message: this.deleteDialogMessage != null ? this.deleteDialogMessage : "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?",
+        title: "Attenzione",
+        message: "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?",
         action: MessageType.Warning,
         showNegativeButton: true
       }
@@ -384,6 +383,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       if (!res) {
         return;
       }
+      forceClose = true;
     }
     this.forceCloseWindow = forceClose;
     this.closeDetailAction();

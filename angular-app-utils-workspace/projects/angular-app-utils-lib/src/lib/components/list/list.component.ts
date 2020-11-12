@@ -527,7 +527,6 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     try {
       return this._searchComponentRef.instance as any as RicercaFormComponent;
     } catch (ex) {
-      console.log(ex);
       return null;
     }
   }

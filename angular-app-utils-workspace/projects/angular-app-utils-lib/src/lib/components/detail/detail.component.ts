@@ -303,7 +303,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   protected onItemSaved(data: T, action: ApiActionsType): void {
     this.resetForm();
     if (this.dataRefreshService != null) {
-      this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
+      this.callDataRefreshService(data, action);
       if (this.goToNextDetail) {
         this.askNextDetail(this.idExtractor(data), data, action);
         this.closeDetailOnSave = true;
@@ -318,6 +318,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       this.closeDetail(true);
     }
   }
+
+  callDataRefreshService(data: T, action: ApiActionsType) {
+    this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
+  }
+
 
   /**
    * chiamato quando viene sollevato un errore al salvataggio

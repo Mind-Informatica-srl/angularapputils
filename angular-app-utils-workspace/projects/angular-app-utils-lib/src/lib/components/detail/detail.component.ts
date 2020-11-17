@@ -384,9 +384,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    */
   async closeDetail(forceClose: boolean = false) {
     if (!forceClose && this.isElementChanged) {
-      let res = await this.canCloseDetail();
-      if (!res) {
-        return;
+      if (this.isAuthorizedToModify()) {//se non è abilitata la modifica, non ha senso chiamare canCloseDetail 
+        let res = await this.canCloseDetail();
+        if (!res) {
+          return;
+        }
       }
       forceClose = true;
     }

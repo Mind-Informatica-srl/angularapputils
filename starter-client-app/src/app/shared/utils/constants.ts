@@ -1,3 +1,0 @@
-export const RUOLI_LIST_NAME = "RUOLI_LIST_NAME";
-export const UTENTI_LISTA_NAME = 'UTENTI_LISTA_NAME';
-

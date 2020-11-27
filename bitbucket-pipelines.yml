@@ -13,7 +13,7 @@ pipelines:
             caches:
               - node
             script:
-              - npm install
+              - cd angular-app-utils-workspace && npm install
               - npm install -g @angular/cli
               - npm update
               - ng build angular-app-utils-lib

@@ -15,5 +15,6 @@ pipelines:
             script:
               - npm install
               - npm install -g @angular/cli
+              - npm update
               - ng build angular-app-utils-lib
               - cd dist/angular-app-utils-lib && npm pack

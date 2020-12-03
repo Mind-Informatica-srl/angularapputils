@@ -13,6 +13,7 @@ export interface PromptDialogData {
   annullaLabel?: string;//label per pulsante di annulla
   type?: string;//type dell'input
   fontLarger?: boolean;//stile css da dare al content
+  customValidator?:(any)=>boolean;//closure per validare
 }
 
 @Component({
@@ -36,6 +37,7 @@ export class PromptDialogComponent {
   annullaLabel: string = 'Annulla';
   type: string = 'text';
   fontLarger: boolean = false;
+  private customValidator?:(any)=>boolean = () => true;
 
   @ViewChild('dialogInput') dialogInput: ElementRef;
 
@@ -63,6 +65,15 @@ export class PromptDialogComponent {
       if(data.fontLarger) {
         this.fontLarger = data.fontLarger;
       }
+      if(data.customValidator) {
+        this.customValidator = data.customValidator;
+      }
+  }
+
+  get validate(): boolean {
+    console.log("***************** value è " + this.value + " required è " + this.inputRequired + " valid è " + this.customValidator(this.value));
+    console.log("validate è " + this.value != null || !this.inputRequired && this.customValidator(this.value));
+    return (this.value != null || !this.inputRequired) && this.customValidator(this.value);
   }
 
   @HostListener('document:keydown.enter', ['$event']) onKeydownHandler(event: KeyboardEvent) {

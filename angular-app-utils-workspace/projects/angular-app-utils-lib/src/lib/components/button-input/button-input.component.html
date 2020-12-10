@@ -1,0 +1,5 @@
+<mat-form-field>
+    <mat-label>{{ label }}</mat-label>
+    <input matInput #inputRef type="text" (click)="onClickIconBtn()" style="color:rgba(0, 0, 0, 0.87)" [name]="fieldName" autocomplete="off" [ngModel]= "descrizione" readonly [style]="inputStyle">
+    <mat-icon matSuffix color="accent" (click)="onClickIconBtn()">{{ icon }}</mat-icon>
+</mat-form-field>

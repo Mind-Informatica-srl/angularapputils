@@ -1,3 +1,5 @@
+import { ButtonInputComponent } from './components/button-input/button-input.component';
+import { SelectorDialogComponent } from './components/selector-dialog/selector-dialog.component';
 import { ForgotPasswordDialogComponent } from './components/forgot-password-dialog/forgot-password-dialog.component';
 import { ResetPasswordDialogComponent } from './components/reset-password-dialog/reset-password-dialog.component';
 import { PromptDialogComponent } from './components/prompt-dialog/prompt-dialog.component';
@@ -64,7 +66,9 @@ import { StampaModalComponent } from './components/stampa/stampa-modal/stampa-mo
     RicercaMenuComponent,
     HtmlContainerDialogComponent,
     StampaModalComponent,
-    StampaFormComponent
+    StampaFormComponent,
+    SelectorDialogComponent,
+    ButtonInputComponent
   ],
   imports: [
     CommonModule,
@@ -115,7 +119,9 @@ import { StampaModalComponent } from './components/stampa/stampa-modal/stampa-mo
     RicercaMenuComponent,
     HtmlContainerDialogComponent,
     StampaModalComponent,
-    StampaFormComponent
+    StampaFormComponent,
+    SelectorDialogComponent,
+    ButtonInputComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

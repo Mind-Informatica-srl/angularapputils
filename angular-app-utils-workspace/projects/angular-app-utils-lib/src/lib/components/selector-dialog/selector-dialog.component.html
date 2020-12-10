@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>{{ _preselectedElement == null || !canEdit ? chooseTitle : selectedTitle}}</h1>
+<div mat-dialog-content>
+  <div>
+
+    <ng-template #listHost></ng-template>
+    <ng-template #detailHost></ng-template>
+
+    <!--<ng-container *ngTemplateOutlet="_preselectedElement == null ? listTemplate : detailTemplate">
+        </ng-container>-->
+  </div>
+</div>
+<div mat-dialog-actions>
+  <ng-container *ngIf="canEdit">
+    <button mat-raised-button color="primary" *ngIf="_preselectedElement == null || !showDetailIfSelected"
+      [mat-dialog-close]="responseData"
+      [disabled]="_preselectedElement == null && selectedElement == null">{{selezionaTextBtn}}</button>
+    <button mat-raised-button color="accent" *ngIf="showDetailIfSelected && _preselectedElement != null"
+      (click)="removePreselected()">{{cambiaTextBtn}}</button>
+  </ng-container>
+
+  <button mat-raised-button color="warn" (click)="onNoClick()" cdkFocusInitial>{{annullaTextBtn}}</button>
+</div>

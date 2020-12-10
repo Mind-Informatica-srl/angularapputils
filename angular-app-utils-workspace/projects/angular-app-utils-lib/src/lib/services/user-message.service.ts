@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 
 export enum MessageType {
-    Insert, 
+    Insert,
     Update,
     Delete,
     Error,
@@ -19,7 +19,7 @@ export interface UserMessageData {
 
 //@Injectable({providedIn:"root"})
 export class UserMessageService {
-    
+
     private messageSubj = new Subject<UserMessageData>();
 
     get onMessage() {

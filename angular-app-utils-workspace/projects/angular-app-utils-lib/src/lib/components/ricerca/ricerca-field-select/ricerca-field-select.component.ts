@@ -1,4 +1,4 @@
-import { FilterField, FilterFieldType } from './../ricerca.model';
+import { FilterFieldType } from './../ricerca.model';
 import { HttpParams, HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, forwardRef, OnDestroy, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';

@@ -273,7 +273,14 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       } else {
         switch (action) {
           case ApiActionsType.AddAction:
-            this.dataSource.push(el);
+            const itemToUpdateIndex = this.dataSource.findIndex(item => this.idExtractor(item) == null);
+            if (itemToUpdateIndex >= 0) {
+              //si sotituisce l'elemento senza id con quello appena creato (NOTA: ovviamente dovrebbe esserci solo un unico elemento senza id nella lista)
+              this.dataSource.splice(itemToUpdateIndex, 1, el);
+            } else {
+              //altrimenti si aggiunge all'array
+              this.dataSource.push(el);
+            }
             break;
           case ApiActionsType.UpdateAction:
             this.dataSource = this.dataSource.map((item: T) => {

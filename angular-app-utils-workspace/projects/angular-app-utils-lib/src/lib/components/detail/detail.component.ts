@@ -104,12 +104,14 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       this.sub.add(this.route.params.subscribe(params => {
         const id = params["Id"];
         if (id == "new") {
+          this.createElementIfNotExists();
           this.prepareForNewItem();
           this.resetForm();
         } else {
           if (this.evaluateRouteParent) {
             const parentId = this.route.parent.snapshot.params["Id"];
             if (parentId == 'new') {
+              this.createElementIfNotExists();
               this.prepareForNewItem();
               this.resetForm();
             } else {
@@ -121,6 +123,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
         }
       }));
     } else {
+      this.createElementIfNotExists();
       this.prepareFormAndItem();
     }
   }
@@ -141,15 +144,32 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.subscribeRoute = !val;
   }
 
+  /**
+   * prepara element (in caso di inserimento) e la form
+   */
   prepareFormAndItem() {
-    if (this.element == null || this.idExtractor(this.element) == null) {
+    if (this.element == null || this.inserted) {
       this.prepareForNewItem();
     }
     this.resetForm();
   }
 
+  /**
+   * permette di preimpostare dei valori di default. 
+   * Chiamato nell'ngOnInit quando si crea un nuovo elemento
+   */
   prepareForNewItem(): void {
-    this.element = {} as T;
+
+  }
+
+  /**
+   * instanzia element se è null
+   * Chiamato nell'ngOnInit
+   */
+  createElementIfNotExists(): void {
+    if (this.element == null) {
+      this.element = {} as T;
+    }
   }
 
   loadData(id: number | string) {
@@ -248,6 +268,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       //se non esiste id dell'elemento significa che stiamo eliminando un elemento appena generato, ma non salvato su server
       this.originalElement = null;
       this.closeDetail(true);
+      this.onItemDeleted(null);
     } else {
       const oldId = this.idExtractor(this.element);
       this.saving = true;

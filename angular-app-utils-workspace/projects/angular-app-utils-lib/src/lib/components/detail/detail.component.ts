@@ -299,9 +299,15 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   protected reload(data: T): void {
     if (this.subscribeRoute) {
-      this.router.navigate(["../", this.idExtractor(data)], {
-        relativeTo: this.route
-      });
+      if (this.evaluateRouteParent) {
+        this.router.navigate(["../../", this.idExtractor(data)], {
+          relativeTo: this.route
+        });
+      } else {
+        this.router.navigate(["../", this.idExtractor(data)], {
+          relativeTo: this.route
+        });
+      }
     } else {
       this.refreshElement(data);
     }

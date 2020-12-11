@@ -201,6 +201,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   save() {
+    this.prepareElementToSave();
     if (this.validate()) {
       this.saving = true;
       if (this.inserted) {
@@ -230,6 +231,13 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   saveAndClose() {
     this.closeDetailOnSave = true;
     this.save();
+  }
+
+  /**
+   * chiamato prima del salvataggio e del validate
+   * Permette di fare operazioni un attimo prima della validazione e del salvataggio
+   */
+  protected prepareElementToSave(): void {
   }
 
   /**

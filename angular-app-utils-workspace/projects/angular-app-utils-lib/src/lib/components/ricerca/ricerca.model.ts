@@ -133,6 +133,42 @@ export interface SimpleModel {
 
 }
 
+/**
+ * si mappa un array i risultati in modo che siano di tipo SimpleModel
+ * 
+ * @param l lista da convertire in SimpleList
+ */
+export function mapSimpleModelList(l: any[], idField: string = 'ID', descriptionField: string = 'Description'): SimpleModel[] {
+    return l.map(el => mapSimpleModelListElement(el, idField, descriptionField));
+}
+
+/**
+ * si mappano i risultati in modo che siano di tipo SimpleModel
+ * 
+ * @param l lista da convertire in SimpleList
+ */
+export function mapSimpleModelListElement(el: any, idField: string = 'ID', descriptionField: string = 'Description'): SimpleModel {
+    let valueId: string;
+    if (idField.includes('#')) {
+        const ids = idField.split('#');
+        for (let i = 0; i < ids.length; i++) {
+            const idVal = ids[i];
+            if (valueId) {
+                valueId += "#";
+            } else {
+                valueId = "";
+            }
+            valueId += el[idVal];
+        }
+    } else {
+        valueId = el[idField];
+    }
+    return {
+        ID: valueId,
+        Description: el[descriptionField]
+    } as SimpleModel
+}
+
 // export interface NavItem {
 //     displayName: string;
 //     iconName?: string;

@@ -68,7 +68,7 @@ import { StampaModalComponent } from './components/stampa/stampa-modal/stampa-mo
     StampaModalComponent,
     StampaFormComponent,
     SelectorDialogComponent,
-    ButtonInputComponent
+    ButtonInputComponent,
   ],
   imports: [
     CommonModule,
@@ -121,7 +121,7 @@ import { StampaModalComponent } from './components/stampa/stampa-modal/stampa-mo
     StampaModalComponent,
     StampaFormComponent,
     SelectorDialogComponent,
-    ButtonInputComponent
+    ButtonInputComponent,
   ],
   entryComponents: [
     ConfirmDialogComponent,

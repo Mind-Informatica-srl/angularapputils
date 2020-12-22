@@ -1,4 +1,4 @@
-import { FilterFieldType, SimpleModel } from './../ricerca.model';
+import { FilterFieldType, mapSimpleModelList, SimpleModel } from './../ricerca.model';
 import { Component, forwardRef } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { RicercaFieldAbstractComponent } from '../ricerca-field-abstract.component';
@@ -80,7 +80,7 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
     if (!this.field.list) {
       throw new Error('RicercaFieldRadioComponent: list non definito');
     }
-    this.list = this.mapList(this.field.list);
+    this.list = mapSimpleModelList(this.field.list, this.idField, this.descriptionField);
   }
 
   setBooleanFields() {
@@ -94,34 +94,6 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
         Description: 'No'
       }
     ];
-  }
-
-  /**
-   * si mappano i risultati in modo che siano di tipo SimpleModel
-   * @param l lista da convertire in SimpleList
-   */
-  mapList(l: any[]): SimpleModel[] {
-    return l.map(el => {
-      let valueId: string;
-      if (this.idField.includes('#')) {
-        const ids = this.idField.split('#');
-        for (let i = 0; i < ids.length; i++) {
-          const idVal = ids[i];
-          if (valueId) {
-            valueId += "#";
-          } else {
-            valueId = "";
-          }
-          valueId += el[idVal];
-        }
-      } else {
-        valueId = el[this.idField];
-      }
-      return {
-        ID: valueId,
-        Description: el[this.descriptionField]
-      } as SimpleModel
-    });
   }
 
   /**

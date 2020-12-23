@@ -68,7 +68,7 @@ export class DataRefreshService {
       localStorage.setItem(DATA_REFRESH_SERVICE_NEXT_TAG + name, JSON.stringify(params));
     }
     params.ElementUpdated = data;
-    this.refreshSub.next(params);
+    this.nextDetailSub.next(params);
 
   }
 

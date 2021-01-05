@@ -65,10 +65,18 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     this.sub.add(this.router.events.subscribe((val) => {
       this.onRouteChanged(val);
     }));
+    this.setAttribute();
     /*if(this.dataSource == null && this.loadDataOnLoad){
       //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
       this.isLoadingResults = true;
     }*/
+  }
+
+  /**
+   * Metodo chiamato nel costruttore per poter settare eventuali attributi
+   */
+  setAttribute() {
+
   }
 
   protected onRouteChanged(val: import("@angular/router").Event) {

@@ -53,5 +53,7 @@ export * from './lib/components/stampa/stampa-modal/stampa-modal.component';
 export * from './lib/components/selector-dialog/selector-dialog.component';
 export * from './lib/components/button-input/button-input.component';
 
+export * from './lib/components/select-with-filter/select-with-filter.component';
+
 //utils
 export * from './lib/utils/italian-mat-paginator-intl';

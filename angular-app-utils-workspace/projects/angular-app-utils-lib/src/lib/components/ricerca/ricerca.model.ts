@@ -139,7 +139,10 @@ export interface SimpleModel {
  * @param l lista da convertire in SimpleList
  */
 export function mapSimpleModelList(l: any[], idField: string = 'ID', descriptionField: string = 'Description'): SimpleModel[] {
-    return l.map(el => mapSimpleModelListElement(el, idField, descriptionField));
+    if (l) {
+        return l.map(el => mapSimpleModelListElement(el, idField, descriptionField));
+    }
+    return [];
 }
 
 /**

@@ -1,3 +1,4 @@
+import { SelectWithFilterComponent } from './components/select-with-filter/select-with-filter.component';
 import { ButtonInputComponent } from './components/button-input/button-input.component';
 import { SelectorDialogComponent } from './components/selector-dialog/selector-dialog.component';
 import { ForgotPasswordDialogComponent } from './components/forgot-password-dialog/forgot-password-dialog.component';
@@ -69,6 +70,7 @@ import { StampaModalComponent } from './components/stampa/stampa-modal/stampa-mo
     StampaFormComponent,
     SelectorDialogComponent,
     ButtonInputComponent,
+    SelectWithFilterComponent
   ],
   imports: [
     CommonModule,
@@ -122,6 +124,7 @@ import { StampaModalComponent } from './components/stampa/stampa-modal/stampa-mo
     StampaFormComponent,
     SelectorDialogComponent,
     ButtonInputComponent,
+    SelectWithFilterComponent
   ],
   entryComponents: [
     ConfirmDialogComponent,

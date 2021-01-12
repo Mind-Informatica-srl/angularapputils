@@ -1,0 +1,16 @@
+<mat-form-field>
+    <mat-label *ngIf="label">{{label}}</mat-label>
+    <mat-select [(ngModel)]="value" #matSelect="matSelect" (openedChange)="onSelectOpen($event)"
+        formControlName="selectInput">
+        <div style="margin: 2px;">
+            <mat-form-field style="width: 100%;">
+                <mat-label>Cerca (o inserisci valore numerico e premi invio)</mat-label>
+                <input #searchInputRef="matInput" matInput (keyup)="onSearchChange($event.target.value)"
+                    [name]="'select_' + inputName" autocomplete="false"
+                    (keydown.enter)="onSearchInputEnter(searchInputRef.value)">
+            </mat-form-field>
+        </div>
+        <mat-option disabled>Seleziona un'opzione</mat-option>
+        <mat-option *ngFor="let el of filteredList" [value]="el.ID">{{el.Description}}</mat-option>
+    </mat-select>
+</mat-form-field>

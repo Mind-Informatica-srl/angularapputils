@@ -1,13 +1,15 @@
 <h1 mat-dialog-title>{{title}}</h1>
 <p *ngIf="subTitle">{{subTitle}}</p>
 <div mat-dialog-content>
-    <div>
+  <div>
 
-        <ng-template #detailHost></ng-template>
+    <ng-template #detailHost></ng-template>
 
-    </div>    
+  </div>
 </div>
-<div mat-dialog-actions *ngIf="detailComponent?.isAuthorizedToModify()">  
-  <button mat-raised-button color="accent" (click)="detailComponent.save()" [disabled]="detailComponent.saving || !detailComponent.form.form.valid">Salva</button>
-  <button mat-raised-button color="warn" cdkFocusInitial (click)="detailComponent.delete()" [disabled]="detailComponent.saving">Elimina</button>
+<div mat-dialog-actions *ngIf="detailComponent?.isAuthorizedToModify()">
+  <button mat-raised-button color="accent" (click)="detailComponent.save()"
+    [disabled]="detailComponent.saving || !detailComponent.form.form.valid">{{saveText}}</button>
+  <button mat-raised-button color="warn" cdkFocusInitial (click)="detailComponent.delete()"
+    [disabled]="detailComponent.saving">{{deleteText}}</button>
 </div>

@@ -9,7 +9,7 @@ import { AauDateAdapter } from '../../adapters/aau-date-adapter';
  * Component per gestire Data e Ora
  */
 @Component({
-  selector: 'app-date-time-picker',
+  selector: 'aaul-date-time-picker',
   templateUrl: './date-time-picker.component.html',
   styleUrls: ['./date-time-picker.component.scss'],
   providers: [
@@ -19,19 +19,19 @@ import { AauDateAdapter } from '../../adapters/aau-date-adapter';
       multi: true
     },
     {
-      provide: DateAdapter, 
-      useClass: AauDateAdapter 
+      provide: DateAdapter,
+      useClass: AauDateAdapter
     }
   ]
 })
 export class DateTimePickerComponent implements ControlValueAccessor, AfterViewInit {
-  
+
   @Input() dateTitle: string = "Data";
   @Input() timeTitle: string = "Ora";
-  
+
   private _value: Date;
-  onChange = (_: any) => {};
-  onTouched = (_: any) => {};
+  onChange = (_: any) => { };
+  onTouched = (_: any) => { };
   @ViewChild(MatDatepicker, { static: true }) datePicker: MatDatepicker<Date>;
   @ViewChild('dateInput', { static: true }) dateInput: ElementRef;
   @ViewChild('timeInput', { static: true }) timeInput: ElementRef;
@@ -46,49 +46,49 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
     return this._value;
   }
   set value(val) {
-    if (val != null){
+    if (val != null) {
       this._value = new Date(val);
-    }else{
+    } else {
       this._value = val;
     }
   }
-  
-  get date(){
+
+  get date() {
     return this.value;
   }
 
   set date(val: Date) {
-    try{
-      if(this._value == null || val == null){
+    try {
+      if (this._value == null || val == null) {
         this._value = val
       } else {
         this._value.setFullYear(val.getFullYear());
         this._value.setMonth(val.getMonth());
         this._value.setDate(val.getDate());
       }
-    }catch(ex){
+    } catch (ex) {
       console.log('Errore DateTimePicker', ex);
       this._value = null;
     }
     this.emitChanges();
   }
 
-  get time(){
-    return this.value? (this.parseHour(this.value.getHours()) + ":" + this.parseHour(this.value.getMinutes()) ) : '';
+  get time() {
+    return this.value ? (this.parseHour(this.value.getHours()) + ":" + this.parseHour(this.value.getMinutes())) : '';
   }
 
   set time(val: string) {
-    if(val.indexOf(':') > 0){
-      const newVal: string[] = val? val.split(':') : ['00', '00'];
+    if (val.indexOf(':') > 0) {
+      const newVal: string[] = val ? val.split(':') : ['00', '00'];
       this._value.setHours(parseInt(newVal[0]));
       this._value.setMinutes(parseInt(newVal[1]));
       this.emitChanges();
     }
   }
-  
+
   writeValue(obj: any): void {
     this.value = obj;
-  }  
+  }
   registerOnChange(fn: any): void {
     this.onChange = fn;
   }
@@ -106,7 +106,7 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
     this.onChange(this.value);
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     setTimeout(() => {
       //dentro timeoute per non avere errore angular "changed after checked"      
       this.clockTheme = {
@@ -115,16 +115,16 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
             buttonColor: '#fff'
         },*/
         dial: {
-            dialBackgroundColor: this.color,
+          dialBackgroundColor: this.color,
         },
         clockFace: {
-            //clockFaceBackgroundColor: '#555',
-            clockHandColor: this.color2,
-            //clockFaceTimeInactiveColor: 'red'
+          //clockFaceBackgroundColor: '#555',
+          clockHandColor: this.color2,
+          //clockFaceTimeInactiveColor: 'red'
         }
-      };      
+      };
     }, 100);
-    
+
   }
 
   clockTheme: NgxMaterialTimepickerTheme;
@@ -133,8 +133,8 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
    * 
    * @param value number da trasformare in stringa (con eventualmente uno zero davanti)
    */
-  parseHour(value: number): string{
-    if(value == null){
+  parseHour(value: number): string {
+    if (value == null) {
       return '00';
     }
     return value < 10 ? '0' + value : value.toString();
@@ -142,8 +142,8 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
 
   addDateEvent(type: string, event: MatDatepickerInputEvent<Date>) {
     console.log(`${type}: ${event.value}`);
-    if(event.value == null){
-      if(type == 'date-input' || type == 'date-change'){
+    if (event.value == null) {
+      if (type == 'date-input' || type == 'date-change') {
         (this.dateInput.nativeElement as HTMLInputElement).value = null;
       }
     }
@@ -152,7 +152,7 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
   //chiamato al blur dell'input time
   onTimeInputBlur(type: string, event) {
     console.log(event);
-    if(!this.isCorrectTime(event.target.value)){
+    if (!this.isCorrectTime(event.target.value)) {
       (this.timeInput.nativeElement as HTMLInputElement).value = '00:00';
     }
     this.time = event.target.value;
@@ -160,14 +160,14 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
 
   //chiamato quando viene impostato un orario dal time picker
   onTimePickerChanged(newTime: string) {
-    if(!this.timeInput.nativeElement.disabled){
+    if (!this.timeInput.nativeElement.disabled) {
       this.time = newTime;
     }
   }
 
   //verifica se la stringa passata è effettivamente un orario
   isCorrectTime(value: string): boolean {
-    if(value == null){
+    if (value == null) {
       return false;
     }
     return /^([0-1]?[0-9]|2[0-4]):([0-5]?[0-9])(:[0-5][0-9])?$/.test(value);

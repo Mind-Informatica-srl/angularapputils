@@ -26,6 +26,8 @@ export interface DetailDialogData<T> {
   loadRemoteData?: boolean;
   title: string,
   subTitle?: string,
+  saveText?: string,
+  deleteText?: string,
   meta?: Object
 
 }
@@ -43,6 +45,10 @@ export class DetailDialogComponent implements OnInit, OnDestroy {
   _detailComponentRef: ComponentRef<any>;
   title: string = "Dettaglio selezionato";
   subTitle: string = null;
+  saveText: string = 'Salva';
+  deleteText: string = 'Elimina';
+
+
 
   protected sub: Subscription = new Subscription();
 
@@ -70,6 +76,12 @@ export class DetailDialogComponent implements OnInit, OnDestroy {
     }
     if (data.subTitle) {
       this.subTitle = data.subTitle
+    }
+    if (data.saveText) {
+      this.saveText = data.saveText
+    }
+    if (data.deleteText) {
+      this.deleteText = data.deleteText
     }
     this.dialogRef.disableClose = true;
   }

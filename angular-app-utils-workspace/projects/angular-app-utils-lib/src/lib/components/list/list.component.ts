@@ -27,25 +27,69 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
 
   protected currentPath: string;
 
+  /**
+   * true se si stanno caricando i dati dal server
+   */
   isLoadingResults: boolean;
+  /**
+   * stringa di errore da valorizzare quando si hanno errori dal server
+   */
   listError: boolean = false;
+  /**
+   * contiene i dati della lista
+   * 
+   * T[] | MatTableDataSource<T>
+   */
   @Input() dataSource: T[] | MatTableDataSource<T>;
+  /**
+   * elemento selezionato al momento
+   */
   selectedElement: T;
   @Output() onSelectElement = new EventEmitter<T>();
   @Output() onDoubleSelectElement = new EventEmitter<T>();
   protected dataSub: Subscription;
 
+  /**
+   * indice della prima pagina del paginator da mostrare
+   */
   @Input() firstPageIndex: number = 0;
+  /**
+   * numero di righe per pagina del paginator
+   */
   @Input() rowsPerPage: number = 0;
   @Input() searchCreteria: Filtro;
+  /**
+   * nome della colonna per cui si deve filtrare
+   */
   @Input() sortBy: string;
+  /**
+   * ordine "", "desc" o "asc" (SortDirection) per cui si deve filtrare
+   */
   @Input() sortDirection: SortDirection;
 
-  protected refreshAll: boolean = true; //booleano per decidere se ricaricare tutta la lista al momento di un aggiornamento di un item
+  /**
+   * booleano per decidere se ricaricare tutta la lista al momento di un aggiornamento di un item
+   */
+  protected refreshAll: boolean = true;
+  /**
+   * titolo del detail (per apertura in modale)
+   */
   protected detailTitle: string = "Dettaglio";
+  /**
+   * sottotitolo del detail (per apertura in modale)
+   */
   protected detailSubTitle: string = null;
+  /**
+   * detail component (per apertura in modale)
+   */
   protected detailComponentType: Type<any>;
+  /**
+   * se true, al click del rigo apre il detail
+   */
   protected openDetailOnClick: boolean = true;
+  /**
+   * se true il detail nellla modale carica i dati dal server
+   */
   protected detailDialogLoadFromServer: boolean = false;
   protected inSelectorDialog: boolean = false;
 
@@ -293,7 +337,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
           case ApiActionsType.UpdateAction:
             this.dataSource = this.dataSource.map((item: T) => {
               if (this.idExtractor(item) === this.idExtractor(el)) {
-                return el;
+                return this.refreshSingleElement(item, el);//prima era return el
               }
               return item;
             });
@@ -310,6 +354,14 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
 
     }
   }
+
+  protected refreshSingleElement(oldData: T, newData: T): T {
+    for (let attribut in newData) {
+      oldData[attribut] = newData[attribut];
+    }
+    return oldData;
+  }
+
   /**
    * Chiamato da refreshItemList in caso si stia usando un GridListComponent
    * @param id id dell'elemento da eliminare dalla gird
@@ -370,6 +422,11 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     }));
   }
 
+  /**
+   * restituisce i parametri per filtrare la request al server
+   * 
+   * return HttpParams
+   */
   protected prepareLoadParameters(): HttpParams {
     let params = new HttpParams();
     if (this.sort && this.sort.active) {
@@ -392,6 +449,10 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     return params;
   }
 
+  /**
+   * chiamato quando si ottengono i dati dal server
+   * @param data T[]
+   */
   protected onListLoaded(data: T[]) {
     this.dataSource = data;
     if (this.paginator) {
@@ -421,6 +482,11 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     }
   }
 
+  /**
+   * apre la modale o naviga al path del detail
+   * 
+   * @param el element da visualizzare nel detail
+   */
   openDetail(el: T) {
     if (this.subscribeRoute) {
       this.router.navigate([this.currentPath, el ? this.apiDatasource.apiIdExtractor(el) : 'new']);
@@ -458,9 +524,29 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       loadRemoteData: this.detailDialogLoadFromServer,
       title: this.detailTitle,
       subTitle: this.detailSubTitle,
+      saveText: this.detailSaveText(),
+      deleteText: this.detailDeleteText(),
       meta: this.getDetailMetaData(el)
     }
     return dialogData;
+  }
+
+  /**
+   * metodo che restituisce il testo per il pulsante di salvataggio del detail che si apre nella modale
+   * 
+   * return string
+   */
+  protected detailSaveText(): string {
+    return 'Salva';
+  }
+
+  /**
+   * metodo che restituisce il testo per il pulsante di cancellazione del detail che si apre nella modale
+   * 
+   * return string
+   */
+  protected detailDeleteText(): string {
+    return 'Elimina';
   }
 
   protected getDetailMetaData(el: T): Object {

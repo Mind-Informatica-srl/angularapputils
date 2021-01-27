@@ -6,7 +6,6 @@ import { UserMessageService, MessageType } from '../services/user-message.servic
 export interface OrderInterface {
   ID: any,
   Ordine: number
-  List?: OrderInterface[];
 }
 
 export enum ApiActionsType {
@@ -155,7 +154,7 @@ export class ApiDatasource<T> {
    * @param list array da ordinare su server
    * @param path path finale per chiamata al server
    */
-  updateListOrder(list: T[], path: string = 'updateorder'): Observable<OrderInterface> {
+  updateListOrder(list: T[], path: string = 'updateorder'): Observable<OrderInterface[]> {
     let listToSend: OrderInterface[] = [];
     list.forEach(el => {
       listToSend.push({
@@ -163,12 +162,12 @@ export class ApiDatasource<T> {
         Ordine: this.ordineExtractor(el)
       });
     });
-    const data = {
-      List: listToSend
-    } as OrderInterface;
+    // const data = {
+    //   List: listToSend
+    // } as OrderInterface;
     const url = `${this.requestUrl}/${path}`;
     const headers = this.getHttpHeadersForUpdate();
-    return this._httpClient.put<OrderInterface>(url, data, { headers: headers }).pipe(
+    return this._httpClient.put<OrderInterface[]>(url, listToSend, { headers: headers }).pipe(
       catchError(err => {
         return this.onError(null, err);
       })

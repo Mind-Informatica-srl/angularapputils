@@ -3,6 +3,12 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { UserMessageService, MessageType } from '../services/user-message.service';
 
+export interface OrderInterface {
+  ID: any,
+  Ordine: number
+  List?: OrderInterface[];
+}
+
 export enum ApiActionsType {
   AddAction,
   UpdateAction,
@@ -13,10 +19,15 @@ export enum ApiActionsType {
 export class ApiDatasource<T> {
   //httpHeaders: HttpHeaders;
   private idExtractor: ((arg0: any) => any) = (element) => element.ID;
+  private ordineExtractor : ((arg0: any) => any) = (element) => element.Ordine;
   httpHeaders: HttpHeaders;
 
   get apiIdExtractor() {
     return this.idExtractor;
+  }
+
+  set apiOrdineExtractor(val: (arg0: any) => any) {
+    this.ordineExtractor = val;
   }
 
   constructor(protected _httpClient: HttpClient,
@@ -133,6 +144,40 @@ export class ApiDatasource<T> {
           this.userMessageService.message({
             element: res,
             messageType: MessageType.Delete
+          });
+        }
+      })
+    );
+  }
+
+  /**
+   * 
+   * @param list array da ordinare su server
+   * @param path path finale per chiamata al server
+   */
+  updateListOrder(list: T[], path: string = 'updateorder'): Observable<OrderInterface> {
+    let listToSend: OrderInterface[] = [];
+    list.forEach(el => {
+      listToSend.push({
+        ID: this.idExtractor(el),
+        Ordine: this.ordineExtractor(el)
+      });
+    });
+    const data = {
+      List: listToSend
+    } as OrderInterface;
+    const url = `${this.requestUrl}/${path}`;
+    const headers = this.getHttpHeadersForUpdate();
+    return this._httpClient.put<OrderInterface>(url, data, { headers: headers }).pipe(
+      catchError(err => {
+        return this.onError(null, err);
+      })
+    ).pipe(
+      tap(res => {
+        if (this.userMessageService) {
+          this.userMessageService.message({
+            element: res,
+            messageType: MessageType.Update
           });
         }
       })

@@ -19,6 +19,7 @@ import { HtmlContainerDialogComponent } from '../html-container-dialog/html-cont
 import { StampaDialogData, StampaModalComponent } from '../stampa/stampa-modal/stampa-modal.component';
 import { CampoStampaInterface, getPrintFormat, StampaFormConfig, StampaModalResponse } from '../stampa/stampa.model';
 import * as FileSaver from 'file-saver';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit, AfterViewInit {
@@ -779,6 +780,58 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
         this.print(result.Campi, result.Formato, result.Headers);
       }
     }));
+  }
+
+  /**
+   * se true, al drop di un item della lista, si invia la richiesta di salvataggio al server
+   */
+  protected onDropSaveListOrder: boolean = true;
+  /**
+   * Nome del campo che contiene l'informazione sull'ordinamento
+   */
+  protected ordineFieldName: string = 'Ordine';
+
+  /**
+   * da chiamare al drop di un item nella lista
+   * riordina dataSourceArray
+   * @param event CdkDragDrop<string[]>
+   */
+  dropItem(event: CdkDragDrop<string[]>) {
+    this.prepareListToOrderSave(event.previousIndex, event.currentIndex, this.ordineFieldName);
+    if(this.onDropSaveListOrder){
+      this.saveListOrder(this.dataSourceArray);
+    }   
+  }
+
+  /**
+   * aggiorna dataSourceArray ed i campi di ordinamento
+   * 
+   * @param previousIndex indice vecchio
+   * @param currentIndex nuovo indice
+   * @param ordineFieldName nome del campo contenente l'informazione sull'ordinamento
+   */
+  prepareListToOrderSave(previousIndex: number, currentIndex: number, ordineFieldName:string = 'Ordine'){
+    this.dataSourceArray[previousIndex][ordineFieldName] = currentIndex;
+    this.dataSourceArray[currentIndex][ordineFieldName] = previousIndex;
+    moveItemInArray(this.dataSourceArray, previousIndex, currentIndex);
+  }
+
+  /**
+   * Salva sul server il nuovo ordinamento
+   * 
+   * Se si ha errore, ricarica la lista
+   * 
+   * @param list T[]
+   * @param path path finale da aggiungere per dire al server di aggiornare l'ordine della lista
+   */
+  saveListOrder(list: T[], path: string = 'updateorder'){
+    if(this.isAuthorizedToModify()){
+      this.apiDatasource.updateListOrder(list, path).subscribe(res => {
+        console.log(res);
+      }, _ => {
+        this.loadListData();
+      }); 
+    }
   }
 
 }

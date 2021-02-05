@@ -183,6 +183,25 @@ export class ApiDatasource<T> {
     );
   }
 
+  updateList(list: T[], path: string = 'updatelist'): Observable<T[]>{
+    const url = `${this.requestUrl}/${path}`;
+    const headers = this.getHttpHeadersForUpdate();
+    return this._httpClient.put<T[]>(url, list, { headers: headers }).pipe(
+      catchError(err => {
+        return this.onError(null, err);
+      })
+    ).pipe(
+      tap(res => {
+        if (this.userMessageService) {
+          this.userMessageService.message({
+            element: res,
+            messageType: MessageType.Update
+          });
+        }
+      })
+    );
+  }
+
   protected onError(element: T, err: any) {
     if (this.userMessageService) {
       this.userMessageService.message({

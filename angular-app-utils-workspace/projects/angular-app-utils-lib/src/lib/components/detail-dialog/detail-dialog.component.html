@@ -11,5 +11,5 @@
   <button mat-raised-button color="accent" (click)="detailComponent.save()"
     [disabled]="detailComponent.saving || !detailComponent.form.form.valid">{{saveText}}</button>
   <button mat-raised-button color="warn" cdkFocusInitial (click)="detailComponent.delete()"
-    [disabled]="detailComponent.saving">{{deleteText}}</button>
+    [disabled]="detailComponent.saving" *ngIf="detailComponent.isAuthorizedToDelete()">{{deleteText}}</button>
 </div>

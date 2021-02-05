@@ -30,6 +30,8 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
    */
   idExtractor: ((arg0: any) => any) = (el) => el?.ID;
   descriptionExtractor: ((arg0: any) => any) = (el) => el?.Descrizione;
+  childrenExtractor: ((arg0: any) => T[]) = (el) => el?.Children;
+
 
   protected sub: Subscription = new Subscription();
 

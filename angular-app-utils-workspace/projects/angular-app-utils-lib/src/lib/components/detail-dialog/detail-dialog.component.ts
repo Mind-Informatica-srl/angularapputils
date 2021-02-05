@@ -48,8 +48,7 @@ export class DetailDialogComponent implements OnInit, OnDestroy {
   saveText: string = 'Salva';
   deleteText: string = 'Elimina';
 
-
-
+  
   protected sub: Subscription = new Subscription();
 
   //detailTemplate: TemplateRef<any>;

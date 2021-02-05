@@ -19,7 +19,7 @@ import { HtmlContainerDialogComponent } from '../html-container-dialog/html-cont
 import { StampaDialogData, StampaModalComponent } from '../stampa/stampa-modal/stampa-modal.component';
 import { CampoStampaInterface, getPrintFormat, StampaFormConfig, StampaModalResponse } from '../stampa/stampa.model';
 import * as FileSaver from 'file-saver';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit, AfterViewInit {
@@ -138,6 +138,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   }
 
   ngOnInit(): void {
+    this.dataRefreshService.removeOldLocalStorage(this.LIST_NAME);
     if (this.dataSource == null && this.loadDataOnLoad) {
       //se non è stato valorizzato dataSource tramite @Input, si chiama loadListData
       this.loadListData();
@@ -305,9 +306,7 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
             this.deleteItemRow(id);
           } else {
             //caso lista generica
-            this.dataSource = this.dataSource.filter((item: T) => {
-              return this.idExtractor(item) !== id;
-            })
+            this.dataSource = this.refreshItemListDeleted(el, id, this.dataSource);
           }
         } else {
           //altrimenti si richiede il detail al server
@@ -326,27 +325,13 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       } else {
         switch (action) {
           case ApiActionsType.AddAction:
-            const itemToUpdateIndex = this.dataSource.findIndex(item => this.idExtractor(item) == null);
-            if (itemToUpdateIndex >= 0) {
-              //si sotituisce l'elemento senza id con quello appena creato (NOTA: ovviamente dovrebbe esserci solo un unico elemento senza id nella lista)
-              this.dataSource.splice(itemToUpdateIndex, 1, el);
-            } else {
-              //altrimenti si aggiunge all'array
-              this.dataSource.push(el);
-            }
+            this.refreshItemListAdded(el, this.dataSource);
             break;
           case ApiActionsType.UpdateAction:
-            this.dataSource = this.dataSource.map((item: T) => {
-              if (this.idExtractor(item) === this.idExtractor(el)) {
-                return this.refreshSingleElement(item, el);//prima era return el
-              }
-              return item;
-            });
+            this.dataSource = this.refreshItemListUpdated(el, this.dataSource);
             break;
           case ApiActionsType.DeleteAction:
-            this.dataSource = this.dataSource.filter((item: T) => {
-              return this.idExtractor(item) !== this.idExtractor(el);
-            })
+            this.dataSource = this.refreshItemListDeleted(el, id, this.dataSource);
             break;
           default:
             break;
@@ -354,6 +339,70 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       }
 
     }
+  }
+
+  /**
+   * Si cicla cercando l'elemento dentro list che non ha id (e cioè è stato appena salvato su server), in modo da sovrascriverlo con i dati ottenuti dal server
+   * viene usato in refreshItemList dove si sovrascrive il comportamento in caso di AddAction in quanto si deve andare a valutare anche 
+   * gli attributi Children di ogni sinfolo elemento del datasource
+   * 
+   * @param el elemento da aggiornare
+   * @param list lista in cui cercare l'elemento da sostituire con el
+   */
+  refreshItemListAdded(el: T, list: T[]): boolean {
+    if(list){
+      const itemToUpdateIndex = list.findIndex(item => this.idExtractor(item) == null);
+      if (itemToUpdateIndex >= 0) {
+          //si sotituisce l'elemento senza id con quello appena creato (NOTA: ovviamente dovrebbe esserci solo un unico elemento senza id nella lista)
+          list.splice(itemToUpdateIndex, 1, el);
+          return true;
+      } else {
+        //altrimenti si cerca tra i figli
+        for (let i = 0; i < list.length; i++) {
+          const item = list[i];
+          const children = this.childrenExtractor(item);
+          if(children){
+            let ok = this.refreshItemListAdded(el, children);
+            if(ok){
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  refreshItemListUpdated(el: T, list: T[]): T[]{
+    if(list){
+      list = list.map((item: T) => {
+        let children = this.childrenExtractor(item);
+        if(children){
+          children = this.refreshItemListUpdated(el, children);
+        }
+        if (this.idExtractor(item) === this.idExtractor(el)) {
+          return this.refreshSingleElement(item, el);//prima era return el
+        }
+        return item;
+      });
+    }
+    return list;
+  }
+
+  refreshItemListDeleted(el: T, id: any, list: T[]): T[] {
+    if(list){
+      list = list.filter((item: T) => {
+        return this.idExtractor(item) != (id != null ? id : this.idExtractor(el));
+      });
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+        let children = this.childrenExtractor(item);
+        if(children){
+          children = this.refreshItemListDeleted(el, id, children);
+        }
+      }
+    }
+    return list;
   }
 
   protected refreshSingleElement(oldData: T, newData: T): T {
@@ -792,31 +841,6 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected ordineFieldName: string = 'Ordine';
 
   /**
-   * da chiamare al drop di un item nella lista
-   * riordina dataSourceArray
-   * @param event CdkDragDrop<string[]>
-   */
-  dropItem(event: CdkDragDrop<string[]>) {
-    this.prepareListToOrderSave(event.previousIndex, event.currentIndex, this.ordineFieldName);
-    if(this.onDropSaveListOrder){
-      this.saveListOrder(this.dataSourceArray);
-    }   
-  }
-
-  /**
-   * aggiorna dataSourceArray ed i campi di ordinamento
-   * 
-   * @param previousIndex indice vecchio
-   * @param currentIndex nuovo indice
-   * @param ordineFieldName nome del campo contenente l'informazione sull'ordinamento
-   */
-  prepareListToOrderSave(previousIndex: number, currentIndex: number, ordineFieldName:string = 'Ordine'){
-    this.dataSourceArray[previousIndex][ordineFieldName] = currentIndex;
-    this.dataSourceArray[currentIndex][ordineFieldName] = previousIndex;
-    moveItemInArray(this.dataSourceArray, previousIndex, currentIndex);
-  }
-
-  /**
    * Salva sul server il nuovo ordinamento
    * 
    * Se si ha errore, ricarica la lista
@@ -831,6 +855,41 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       }, _ => {
         this.loadListData();
       }); 
+    }
+  }
+
+  /**
+   * da chiamare al drop di un item nella lista
+   * riordina dataSourceArray
+   * @param event CdkDragDrop<string[]>
+   */
+  dropItem(event: CdkDragDrop<string[]>) {
+    if(event.previousContainer === event.container) {
+      this.prepareSingleListToOrderSave(event.previousIndex, event.currentIndex, this.ordineFieldName);
+    }else{
+      this.prepareMultipleListToOrderSave(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
+    } 
+    if(this.onDropSaveListOrder){
+      this.saveListOrder(this.dataSourceArray);
+    }
+  }
+
+  prepareMultipleListToOrderSave(previousContainerData: string[], containerData: string[], previousIndex: number, currentIndex: number) {
+    transferArrayItem(previousContainerData, containerData, previousIndex, currentIndex);
+  }
+
+  /**
+   * aggiorna dataSourceArray ed i campi di ordinamento
+   * 
+   * @param previousIndex indice vecchio
+   * @param currentIndex nuovo indice
+   * @param ordineFieldName nome del campo contenente l'informazione sull'ordinamento
+   */
+  prepareSingleListToOrderSave(previousIndex: number, currentIndex: number, ordineFieldName:string = 'Ordine'){
+    moveItemInArray(this.dataSourceArray, previousIndex, currentIndex);
+    for (let i = 0; i < this.dataSourceArray.length; i++) {
+      const item = this.dataSourceArray[i];
+      item[ordineFieldName] = i;
     }
   }
 

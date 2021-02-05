@@ -73,12 +73,14 @@ export class DataRefreshService {
   }
 
   //si rimuovono dal localStorage le vecchie cache del DataRefreshService
-  removeOldLocalStorage() {
+  //se name è valorizzato si rimuovono gli item correlati che terminano con name
+  removeOldLocalStorage(name: string = '') {
     var arr = []; // Array to hold the keys
     // Iterate over localStorage and insert the keys that meet the condition into arr
     for (var i = 0; i < localStorage.length; i++) {
-      if (localStorage.key(i).startsWith(DATA_REFRESH_SERVICE_TAG) || localStorage.key(i).startsWith(DATA_REFRESH_SERVICE_NEXT_TAG)) {
-        arr.push(localStorage.key(i));
+      const k = localStorage.key(i)
+      if ((k.startsWith(DATA_REFRESH_SERVICE_TAG) || k.startsWith(DATA_REFRESH_SERVICE_NEXT_TAG)) && k.endsWith(name)) {
+        arr.push(k);
       }
     }
 

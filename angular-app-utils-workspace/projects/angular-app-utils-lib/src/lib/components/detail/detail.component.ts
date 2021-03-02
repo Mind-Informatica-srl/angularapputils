@@ -167,9 +167,17 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * Chiamato nell'ngOnInit
    */
   createElementIfNotExists(): void {
-    if (this.element == null) {
-      this.element = {} as T;
+    if (this.createElementOnInit) {
+      this.createElement();
     }
+  }
+
+  get createElementOnInit(): boolean {
+    return this.element == null || this.subscribeRoute;
+  }
+
+  createElement(): void {
+    this.element = {} as T;
   }
 
   loadData(id: number | string) {

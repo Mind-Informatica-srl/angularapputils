@@ -74,7 +74,9 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     super.refreshItemRow(action, id, el);
     switch (action) {
       case ApiActionsType.AddAction:
-        this.tableDataSource.data.push(el);
+        const d = this.tableDataSource.data;
+        d.push(el);
+        this.tableDataSource.data = d;
         break;
       case ApiActionsType.UpdateAction:
         this.tableDataSource.data = this.tableDataSource.data.map((item: T) => {

@@ -94,6 +94,10 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   protected detailDialogLoadFromServer: boolean = false;
   protected inSelectorDialog: boolean = false;
 
+  /**
+   * se true: se selectedElement è già valorizzato, lo deseleziona in onItemSelected
+   */
+  protected deselectOnSecondClick: boolean = true;
 
   protected searchApiUrl: string = null;
 
@@ -620,7 +624,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       this.selectedElement = item;
     } else {
       //altrimenti si deseleziona
-      this.selectedElement = null;
+      if(this.deselectOnSecondClick){
+        this.selectedElement = null;
+      }
     }
     this.onSelectElement.emit(this.selectedElement);
     if (this.openDetailOnClick && this.selectedElement != null) {

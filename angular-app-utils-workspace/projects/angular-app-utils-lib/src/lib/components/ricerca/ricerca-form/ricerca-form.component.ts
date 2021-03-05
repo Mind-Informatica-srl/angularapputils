@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, Input } from '@angular/core';
+import { Component, HostListener, Input, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserMessageService } from '../../../services/user-message.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.model';
 import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
+import { MatExpansionPanel } from '@angular/material/expansion';
 
 /**
  * Component per la ricerca avanzata con utente id e sezione
@@ -177,6 +178,21 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
   onSavedSearchDeleted(res: any, idItem: any) {
     const i = this.savedFilters.findIndex(el => el.ID == idItem);
     this.savedFilters.splice(i, 1);
+  }
+
+  isOpened: boolean = false;
+
+  get searchOnEnterPressed(): boolean{
+    return this.isOpened;
+  }
+  
+  @HostListener('document:keydown.enter', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    if(this.searchOnEnterPressed){
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      this.search();
+    }
   }
 
 }

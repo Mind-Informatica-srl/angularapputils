@@ -12,6 +12,7 @@ import { UserMessageService, MessageType } from '../../services/user-message.ser
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 import { GenericComponent } from '../generic-component/generic.component';
 import { ApiActionsType } from './../../api-datasource/api-datasource';
+import { HostListener } from '@angular/core';
 
 
 export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
@@ -49,6 +50,8 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * true se il component è caricato in una window/tab a parte
    */
   loadInWindow: boolean = false;
+
+  protected saveOnEnterPressed: boolean = false;
 
   public get element(): T {
     return this._element;
@@ -275,6 +278,10 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     }
   }
 
+  isAuthorizedToModify() {
+    return super.isAuthorizedToModify() && !this.showOnlyPreview;
+  }
+
   isAuthorizedToDelete() {
     return this.isAuthorizedToModify();
   }
@@ -401,6 +408,10 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     let ret = this.isAuthorizedToModify();
     if (!ret) {
       this.validateErrorMessage = "Utente non autorizzato";
+    }else if(this.form && !this.form.valid ){
+      // se esiste una form e non è valida
+      this.validateErrorMessage = "Campi non validi";
+      ret = false;
     }
     return ret;
   }
@@ -531,6 +542,22 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    */
   annullaModifiche() {
     this.element = this.originalElement
+  }
+
+  @HostListener('document:keydown.enter', ['$event']) onEnter(event: KeyboardEvent) {
+    if(this.saveOnEnterPressed && this.isAuthorizedToModify()){
+      try{
+        (event.target as HTMLInputElement).blur();
+      }catch(ex){
+        console.log(ex);        
+      }
+      setTimeout(() => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        this.save();
+      }, 100);
+    }
   }
 
 }

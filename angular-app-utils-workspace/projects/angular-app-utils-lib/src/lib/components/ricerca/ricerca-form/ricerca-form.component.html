@@ -1,5 +1,5 @@
 <mat-accordion>
-    <mat-expansion-panel class="mat-elevation-z8 filter-accordion">
+    <mat-expansion-panel class="mat-elevation-z8 filter-accordion" (opened)="isOpened = !isOpened">
         <mat-expansion-panel-header>
             <mat-panel-title>
                 <div>Filtro Avanzato<b *ngIf="selectedFilters.length > 0"> Attivo</b></div>

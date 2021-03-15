@@ -12,7 +12,7 @@ import { DATA_REFRESH_SERVICE_TAG, DataRefreshItem, DataRefreshService, DATA_REF
 import { UserMessageService } from '../../services/user-message.service';
 import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail-dialog.component';
 import { GenericComponent } from '../generic-component/generic.component';
-import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
+import { ApiActionsType, ApiPaginatorListResponse, OrderInterface } from './../../api-datasource/api-datasource';
 import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.component';
 import { FilterField, Filtro } from '../ricerca/ricerca.model';
 import { HtmlContainerDialogComponent } from '../html-container-dialog/html-container-dialog.component';
@@ -88,6 +88,11 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
    * se true, al click del rigo apre il detail
    */
   protected openDetailOnClick: boolean = true;
+  /**
+   * se true, al doppio click del rigo apre il detail
+   */
+  protected openDetailOnDoubleClick: boolean = false;
+
   /**
    * se true il detail nellla modale carica i dati dal server
    */
@@ -559,7 +564,17 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
       data: dialogData
     });
     this.sub.add(dialogRef.afterClosed().subscribe((result: T) => {
-      this.loadListData();
+      let callback = () => {
+        if(this.selectedElement && this.dataSourceArray){
+          //dopo aver chiuso il detail si verifica esista sempre selectedElement nella lista
+          const s = this.dataSourceArray.find(el => this.idExtractor(el) == this.idExtractor(this.selectedElement));
+          //se nel dialog è stato cancellato l'elemento, si rimuove selectedElement
+          if(!s){
+            this.selectedElement = null;
+          }
+        }
+      };
+      this.loadListData(callback);
     }));
   }
 
@@ -641,6 +656,9 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
    */
   onItemDoubleClick(item: T) {
     this.onDoubleSelectElement.emit(item);
+    if(this.openDetailOnDoubleClick){
+      this.openDetail(item);
+    }
   }
 
   /**
@@ -858,10 +876,14 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
     if(this.isAuthorizedToModify()){
       this.apiDatasource.updateListOrder(list, path).subscribe(res => {
         console.log(res);
+        this.onListOrderSaved(res);
       }, _ => {
         this.loadListData();
       }); 
     }
+  }
+
+  onListOrderSaved(res: any[]) {
   }
 
   /**

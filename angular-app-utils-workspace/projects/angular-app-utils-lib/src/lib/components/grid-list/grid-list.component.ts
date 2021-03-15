@@ -70,6 +70,12 @@ export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, L
     })
   }
 
+
+  onListOrderSaved(res: any[]) {
+    super.onListOrderSaved(res);
+    this.tableDataSource.data = this.tableDataSource.data;
+  }
+
   refreshItemRow(action: ApiActionsType, id: any, el: T) {
     super.refreshItemRow(action, id, el);
     switch (action) {

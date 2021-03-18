@@ -555,13 +555,20 @@ export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, Lo
   }
 
   /**
+   * Max-width of the dialog. If a number is provided, assumes pixel units. Defaults to 80vw.
+   */
+  get maxWidthDialog(): string {
+    return '80vw';
+  }
+  /**
    * Apre dialog con detail component al suo interno
    * @param el element da aprire nel dialog
    */
   protected openDetailDialog(el: T = {} as T) {
     const dialogData: DetailDialogData<T> = this.getDetailDialogData(el);
     let dialogRef = this.dialog.open(DetailDialogComponent, {
-      data: dialogData
+      data: dialogData,
+      maxWidth: this.maxWidthDialog
     });
     this.sub.add(dialogRef.afterClosed().subscribe((result: T) => {
       let callback = () => {

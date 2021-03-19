@@ -1,7 +1,19 @@
-.filter-accordion{
-    margin-bottom: 5px;
+.filter-accordion-panel {
+  margin-bottom: 5px;
 }
 
 .field-row {
-    width: 100%;
+  width: 100%;
+}
+
+.filter-form-actions {
+  margin-top: 10px;
+}
+
+.panel-description-actions {
+  width: 100%;
+
+  button {
+    color: black;
+  }
 }

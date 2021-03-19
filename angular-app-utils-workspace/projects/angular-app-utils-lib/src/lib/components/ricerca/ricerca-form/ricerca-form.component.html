@@ -1,12 +1,53 @@
-<mat-accordion>
-    <mat-expansion-panel class="mat-elevation-z8 filter-accordion" (opened)="isOpened = !isOpened">
-        <mat-expansion-panel-header>
-            <mat-panel-title>
-                <div>Filtro Avanzato<b *ngIf="selectedFilters.length > 0"> Attivo</b></div>
+<mat-accordion class="filter-accordion">
+    <mat-expansion-panel class="mat-elevation-z8 filter-accordion-panel" (opened)="isOpened = !isOpened">
+        <mat-expansion-panel-header class="filter-accordion-panel-header">
+            <mat-panel-title class="filter-panel-title">
+                <div class="filter-panel-title-div">Filtro Avanzato<b *ngIf="selectedFilters.length > 0"> Attivo</b></div>
             </mat-panel-title>
+            <mat-panel-description class="filter-panel-description">
+                <div *ngIf="showActionButtonsAtTop" fxLayout="row" fxLayoutAlign="space-evenly center" fxLayoutGap="10px" class="panel-description-actions">
+                    <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="30px" class="filter-actions filter-accordion-actions">
+                        <button mat-button (click)="search($event)" [disabled]="isSearching">
+                            <mat-icon>search</mat-icon> CERCA
+                        </button>
+                        <button mat-button (click)="clean($event)" *ngIf="selectedFilters.length > 0">
+                            <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
+                        </button>
+                        <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
+                            <button action mat-button (click)="onSalvaRicercaClicked(selectedFilters,$event)">
+                                <mat-icon>save</mat-icon> SALVA RICERCA
+                            </button>
+                        </ng-container>
+                        <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
+                        <ng-container *ngIf="selectedFilters.length > 0">
+                            <ng-content select="[action]"></ng-content>
+                        </ng-container>
+        
+                    </div>
+                    <ng-container *ngIf="searchApiUrl || (savedFilters != null && savedFilters.length > 0)">
+                        <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu" (click)="$event.stopPropagation()">
+                            <mat-icon>start_border</mat-icon> RICERCHE SALVATE
+                        </button>
+                        <mat-menu #ricercheSalvateMenu="matMenu">
+                            <ng-container *ngFor="let item of savedFilters">
+                                <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
+                                    <button mat-menu-item (click)="onSavedSearchClicked(item)"
+                                        matTooltip="Apri ricerca salvata">
+                                        <span>{{item.Nome}}</span>
+                                    </button>
+                                    <mat-icon (click)="onDeleteSearchClicked(item)" matTooltip="Cancella ricerca salvata"
+                                        style="padding-right:10px;cursor: pointer;">search_off
+                                    </mat-icon>
+                                </div>
+                            </ng-container>
+    
+                        </mat-menu>
+                    </ng-container>
+                </div>
+            </mat-panel-description>
         </mat-expansion-panel-header>
 
-        <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px" style="width: 100%;">
+        <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px" style="width: 100%;" class="filter-accordion-content">
             <ng-container *ngIf="fields && fields.length > 0">
                 <button mat-button [matMenuTriggerFor]="menuFields.childMenu" #menuTrigger="matMenuTrigger">
                     <mat-icon>add</mat-icon> AGGIUNGI FILTRO
@@ -14,9 +55,9 @@
                 <aaul-ricerca-menu #menuFields [items]="fields" (onMenuItemClick)="addFilterField($event)">
                 </aaul-ricerca-menu>
             </ng-container>
-            <ng-container *ngIf="searchApiUrl || (savedFilters != null && savedFilters.length > 0)">
-                <span>
-                    <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu">
+            <ng-container *ngIf="!showActionButtonsAtTop">
+                <ng-container *ngIf="searchApiUrl || (savedFilters != null && savedFilters.length > 0)">
+                    <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu" (click)="$event.stopPropagation()">
                         <mat-icon>start_border</mat-icon> RICERCHE SALVATE
                     </button>
                     <mat-menu #ricercheSalvateMenu="matMenu">
@@ -33,7 +74,7 @@
                         </ng-container>
 
                     </mat-menu>
-                </span>
+                </ng-container>
             </ng-container>
             <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo header)-->
             <ng-content select="[header]"></ng-content>
@@ -116,25 +157,26 @@
                 </ng-container>
             </form>
         </div>
-        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px" style="margin-top: 10px;">
-            <button mat-button (click)="search()" [disabled]="isSearching">
-                <mat-icon>search</mat-icon> CERCA
-            </button>
-            <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">
-                <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
-            </button>
-            <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
-                <button action mat-button (click)="onSalvaRicercaClicked(selectedFilters)">
-                    <mat-icon>save</mat-icon> SALVA RICERCA
+        <ng-container *ngIf="showActionButtonsAtBottom">
+            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px" class="filter-actions filter-form-actions">
+                <button mat-button (click)="search()" [disabled]="isSearching">
+                    <mat-icon>search</mat-icon> CERCA
                 </button>
-            </ng-container>
-            <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
-            <ng-container *ngIf="selectedFilters.length > 0">
-                <ng-content select="[action]"></ng-content>
-            </ng-container>
+                <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">
+                    <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
+                </button>
+                <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
+                    <button action mat-button (click)="onSalvaRicercaClicked(selectedFilters)">
+                        <mat-icon>save</mat-icon> SALVA RICERCA
+                    </button>
+                </ng-container>
+                <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
+                <ng-container *ngIf="selectedFilters.length > 0">
+                    <ng-content select="[action]"></ng-content>
+                </ng-container>
 
-        </div>
-
+            </div>
+        </ng-container>
     </mat-expansion-panel>
 </mat-accordion>
 

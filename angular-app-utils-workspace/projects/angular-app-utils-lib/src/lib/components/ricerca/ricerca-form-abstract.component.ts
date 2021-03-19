@@ -96,7 +96,11 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
     /**
      * Svuota il filtro
      */
-    clean() {
+    clean(event: Event = null) {
+        if(event){
+            event.preventDefault();
+            event.stopPropagation();
+        }
         this.selectedFilters = [];
         if (this.searchOnClean) {
             this.search();
@@ -106,10 +110,15 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
     /**
      * Avvia ricerca con i campi selezionati
      */
-    search() {
+    search(event: Event = null) {
         //console.log('search', this.selectedFilters);
         //const param = this.prepareQueryParams();
         //console.log('search param', param);
+        if(event){
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+        }
         this.onFilterChanged.emit('');
     }
 
@@ -143,7 +152,12 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
         }));
     }
 
-    onSalvaRicercaClicked(campiRicerca: T[]) {
+    onSalvaRicercaClicked(campiRicerca: T[], event: Event = null) {
+        if(event){
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+        }
         this.salvaRicerca(campiRicerca);
     }
 
@@ -189,7 +203,7 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
      * 
      * @param filtro filtro selezionato
      */
-    abstract onSavedSearchClicked(filtro: S): void;
+    abstract onSavedSearchClicked(filtro: S, event?: Event): void;
 
     abstract onDeleteSearchClicked(filtro: S): void;
 

@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, HostListener, Input, ViewChild } from '@angular/core';
+import { Component, HostListener, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserMessageService } from '../../../services/user-message.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.model';
 import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
-import { MatExpansionPanel } from '@angular/material/expansion';
 
 /**
  * Component per la ricerca avanzata con utente id e sezione
@@ -22,6 +21,15 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
   @Input() sezione: string = '';
   @Input() userId: string | number;
   @Input() isSearching: boolean = false;
+
+  /**
+   * mostra i pulsanti di ricerca e salvataggio ricerche in alto
+   */
+  @Input() showActionButtonsAtTop: boolean = false;
+  /**
+   * mostra i pulsanti di ricerca e salvataggio ricerche in basso
+   */
+  @Input() showActionButtonsAtBottom: boolean = true;
 
   constructor(httpClient: HttpClient,
     userMessageService: UserMessageService,

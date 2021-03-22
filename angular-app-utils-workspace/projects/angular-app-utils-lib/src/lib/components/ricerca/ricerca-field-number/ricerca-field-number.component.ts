@@ -52,9 +52,13 @@ export class RicercaFieldNumberComponent extends RicercaFieldAbstractComponent {
     },
   ];
 
+  get defaultOperatore(): string {
+    return 'equalnumber';
+  }
+
   onFieldSetted() {
     super.onFieldSetted();
-    this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalnumber';
+    this.setValidOperator(this.field.ActualOperator);
     if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
       this.hideValueInput = true;
     }

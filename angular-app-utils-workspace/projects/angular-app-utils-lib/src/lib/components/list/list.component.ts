@@ -12,7 +12,7 @@ import { DATA_REFRESH_SERVICE_TAG, DataRefreshItem, DataRefreshService, DATA_REF
 import { UserMessageService } from '../../services/user-message.service';
 import { DetailDialogComponent, DetailDialogData } from '../detail-dialog/detail-dialog.component';
 import { GenericComponent } from '../generic-component/generic.component';
-import { ApiActionsType, ApiPaginatorListResponse, OrderInterface } from './../../api-datasource/api-datasource';
+import { ApiActionsType, ApiPaginatorListResponse } from './../../api-datasource/api-datasource';
 import { RicercaFormComponent } from '../ricerca/ricerca-form/ricerca-form.component';
 import { FilterField, Filtro } from '../ricerca/ricerca.model';
 import { HtmlContainerDialogComponent } from '../html-container-dialog/html-container-dialog.component';

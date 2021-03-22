@@ -49,12 +49,12 @@
 
         <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px" style="width: 100%;" class="filter-accordion-content">
             <ng-container *ngIf="fields && fields.length > 0">
-                <button mat-button [matMenuTriggerFor]="menuFields.childMenu" #menuTrigger="matMenuTrigger">
+                <button mat-button [matMenuTriggerFor]="menuItem.childMenu" #menuTrigger="matMenuTrigger" name="main_btn">
                     <mat-icon>add</mat-icon> AGGIUNGI FILTRO
                 </button>
-                <aaul-ricerca-menu #menuFields [items]="fields" (onMenuItemClick)="addFilterField($event)">
+                <aaul-ricerca-menu #menuItem [items]="fields" (onMenuItemClick)="addFilterField($event)">
                 </aaul-ricerca-menu>
-            </ng-container>
+            </ng-container>   
             <ng-container *ngIf="!showActionButtonsAtTop">
                 <ng-container *ngIf="searchApiUrl || (savedFilters != null && savedFilters.length > 0)">
                     <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu" (click)="$event.stopPropagation()">
@@ -83,77 +83,86 @@
 
         <div>
             <form>
-                <ng-container *ngFor="let item of selectedFilters">
-                    <ng-container [ngSwitch]="item.Type">
-                        <ng-container *ngSwitchCase="FilterFieldType.Number">
-                            <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                <aaul-ricerca-field-number fxFlex [field]="item" [name]="item.UniqueId"
-                                    [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                </aaul-ricerca-field-number>
-                                <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-                                    <mat-icon>delete</mat-icon>
-                                </button>
-                            </div>
-                        </ng-container>
+                <ng-container *ngFor="let item of selectedFilters; let i = index;">
+                    <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px">
+                        <ng-container *ngIf="fields && fields.length > 0">
+                            <button fxFlex="25" mat-button [matMenuTriggerFor]="menuItem.childMenu" #menuTrigger="matMenuTrigger" [name]="item.UniqueId + '_btn'">
+                                {{ item?.Label ? item.Label : 'SELEZIONA FILTRO' }}
+                            </button>
+                            <aaul-ricerca-menu #menuItem [items]="fields" (onMenuItemClick)="updateFilterField($event, item, menuTrigger)">
+                            </aaul-ricerca-menu>
+                        </ng-container>                    
+                        <ng-container [ngSwitch]="item.Type">
+                            <ng-container *ngSwitchCase="FilterFieldType.Number">
+                                <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
+                                    <aaul-ricerca-field-number fxFlex [field]="item" [name]="item.UniqueId"
+                                        [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
+                                    </aaul-ricerca-field-number>
+                                    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.Date">
-                            <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                <aaul-ricerca-field-date fxFlex [field]="item" [name]="item.UniqueId"
-                                    [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                </aaul-ricerca-field-date>
-                                <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-                                    <mat-icon>delete</mat-icon>
-                                </button>
-                            </div>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.Date">
+                                <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
+                                    <aaul-ricerca-field-date fxFlex [field]="item" [name]="item.UniqueId"
+                                        [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
+                                    </aaul-ricerca-field-date>
+                                    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.DynamicSelect">
-                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                            </ng-template>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.DynamicSelect">
+                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                                </ng-template>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.StaticSelect">
-                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                            </ng-template>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.StaticSelect">
+                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                                </ng-template>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.DynamicSelectNumber">
-                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                            </ng-template>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.DynamicSelectNumber">
+                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                                </ng-template>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.StaticSelectNumber">
-                            <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                            </ng-template>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.StaticSelectNumber">
+                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
+                                </ng-template>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.RadioString">
-                            <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
-                            </ng-template>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.RadioString">
+                                <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
+                                </ng-template>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.RadioNumber">
-                            <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
-                            </ng-template>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.RadioNumber">
+                                <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
+                                </ng-template>
+                            </ng-container>
 
-                        <ng-container *ngSwitchCase="FilterFieldType.RadioBoolean">
-                            <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
-                            </ng-template>
-                        </ng-container>
+                            <ng-container *ngSwitchCase="FilterFieldType.RadioBoolean">
+                                <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
+                                </ng-template>
+                            </ng-container>
 
-                        <ng-container *ngSwitchDefault>
-                            <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                <aaul-ricerca-field-string fxFlex [field]="item" [name]="item.UniqueId"
-                                    [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                </aaul-ricerca-field-string>
-                                <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-                                    <mat-icon>delete</mat-icon>
-                                </button>
-                            </div>
-                        </ng-container>
+                            <ng-container *ngSwitchDefault>
+                                <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
+                                    <aaul-ricerca-field-string fxFlex [field]="item" [name]="item.UniqueId"
+                                        [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
+                                    </aaul-ricerca-field-string>
+                                    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+                                        <mat-icon>delete</mat-icon>
+                                    </button>
+                                </div>
+                            </ng-container>
 
-                    </ng-container>
+                        </ng-container>
+                    </div>
                 </ng-container>
             </form>
         </div>
@@ -181,7 +190,7 @@
 </mat-accordion>
 
 <ng-template #selectTemplate let-item="item">
-    <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
+    <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
         <aaul-ricerca-field-select fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
             (onChangeValue)="onChangeValue($event)">
         </aaul-ricerca-field-select>
@@ -192,7 +201,7 @@
 </ng-template>
 
 <ng-template #radioTemplate let-item="item">
-    <div fxLayout="row" fxLayoutAlign="center center" class="field-row">
+    <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
         <aaul-ricerca-field-radio fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
             (onChangeValue)="onChangeValue($event)">
         </aaul-ricerca-field-radio>

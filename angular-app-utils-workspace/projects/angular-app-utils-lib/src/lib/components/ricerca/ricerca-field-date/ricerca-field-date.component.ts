@@ -52,9 +52,14 @@ export class RicercaFieldDateComponent extends RicercaFieldAbstractComponent {
     },
   ];
 
+  get defaultOperatore(): string {
+    return 'equaldate';
+  }
+
   onFieldSetted() {
     super.onFieldSetted();
-    this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equaldate';
+    this.setValidOperator(this.field.ActualOperator);
+    // this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : this.defaultOperatore;
     if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
       this.hideValueInput = true;
     }

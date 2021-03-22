@@ -52,11 +52,15 @@ export class RicercaFieldStringComponent extends RicercaFieldAbstractComponent {
     },
   ];
 
+  get defaultOperatore(): string {
+    return 'like';
+  } 
 
   onFieldSetted() {
     super.onFieldSetted();
     this.fieldStringValue = (this.field.StringValue != null && this.field.StringValue != '') ? this.field.StringValue : '';
-    this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'like';
+    this.setValidOperator(this.field.ActualOperator);
+    // this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'like';
     if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
       this.hideValueInput = true;
     }

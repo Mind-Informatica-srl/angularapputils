@@ -36,6 +36,11 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
      */
     protected _selectedOperatore: string;
 
+    /**
+     * valore di default dell'operatore qualora non specificato altrove
+     */
+    protected abstract get defaultOperatore(): string;
+
     get fieldStringValue(): string {
         return this._fieldStringValue;
     }
@@ -56,6 +61,8 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
         this.refreshValue();
     }
 
+    @Input() fieldsList: FilterField[];
+    
     protected _field: FilterField;
 
     @Input() set field(val: FilterField) {
@@ -187,6 +194,20 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
         } else {
             this.hideValueInput = false;
             this.setValueInputFocus();
+        }
+    }
+
+    protected setValidOperator(operatore: string): void {
+        if(operatore != null){
+            //si verifica se l'operatore passato è valido, ovvero presente nell'elenco degli operatori
+            const op = this.operatori.find(op => op.Value == operatore);
+            if(op){
+                this.selectedOperatore = operatore;
+            }else{
+                this.selectedOperatore = this.defaultOperatore;
+            }
+        }else{
+            this.selectedOperatore = this.defaultOperatore;
         }
     }
 

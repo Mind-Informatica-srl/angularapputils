@@ -225,6 +225,13 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
     this.sub.unsubscribe();
   }
 
+  get defaultOperatore(): string {
+    if(this.field.Type == FilterFieldType.DynamicSelectNumber || this.field.Type == FilterFieldType.StaticSelectNumber){
+      return 'equalnumber';
+    }
+    return 'equal';
+  } 
+
   onFieldSetted() {
     if (this.field.Type == FilterFieldType.DynamicSelectNumber || this.field.Type == FilterFieldType.StaticSelectNumber) {
       if (this.field.StringValue != null && this.field.StringValue != '') {
@@ -234,7 +241,8 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
           console.error(ex);
         }
       }
-      this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalnumber';
+      this.setValidOperator(this.field.ActualOperator);
+      // this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : this.defaultOperatore;
       if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
         this.hideValueInput = true;
       }
@@ -243,7 +251,8 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
         this.fieldSelectValue = this.field.StringValue;
       }
       this.operatori = this._operatoriString;
-      this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equal';
+      this.setValidOperator(this.field.ActualOperator);
+      // this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : this.defaultOperatore;
       if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
         this.hideValueInput = true;
       }

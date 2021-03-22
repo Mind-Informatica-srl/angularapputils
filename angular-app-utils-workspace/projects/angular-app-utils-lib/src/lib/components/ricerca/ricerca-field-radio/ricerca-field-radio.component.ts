@@ -44,6 +44,18 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
   */
   idField: string;
 
+  get defaultOperatore(): string {
+    switch (this.field.Type) {
+      case FilterFieldType.RadioNumber:
+        return 'equalnumber';
+      case FilterFieldType.RadioBoolean:
+        return 'equalboolean';
+      case FilterFieldType.RadioNumber:
+        return 'equal';
+    }
+    return 'equal';
+  }
+
   onFieldSetted() {
     super.onFieldSetted();
     this.descriptionField = this.field.DescriptionField ? this.field.DescriptionField : 'Description';
@@ -51,7 +63,8 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
     switch (this.field.Type) {
       case FilterFieldType.RadioNumber:
         this.initializeList();
-        this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalnumber';
+        this.setValidOperator(this.field.ActualOperator);
+        // this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : this.defaultOperatore;
         if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
           this.hideValueInput = true;
         }
@@ -59,7 +72,8 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
         break;
       case FilterFieldType.RadioBoolean:
         this.setBooleanFields();
-        this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equalboolean';
+        this.setValidOperator(this.field.ActualOperator);
+        // this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : this.defaultOperatore;
         if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
           this.hideValueInput = true;
         }
@@ -67,7 +81,8 @@ export class RicercaFieldRadioComponent extends RicercaFieldAbstractComponent {
         break;
       default:
         this.initializeList();
-        this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator : 'equal';
+        this.setValidOperator(this.field.ActualOperator);
+        // this.selectedOperatore = this.field.ActualOperator != null ? this.field.ActualOperator :this.defaultOperatore;
         if (this.selectedOperatore == 'isnull' || this.selectedOperatore == 'isnotnull') {
           this.hideValueInput = true;
         }

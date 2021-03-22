@@ -1,3 +1,4 @@
+import { MatMenuTrigger } from '@angular/material/menu';
 import { HttpClient } from '@angular/common/http';
 import { Component, HostListener, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -52,6 +53,30 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
       field.StringValue = '';
     }
     this.selectedFilters.push(field);
+  }
+
+  public updateFilterField(menuItemSelected: FilterField, fieldToUpdate: FilterField, menuTrigger: MatMenuTrigger) {
+    try {
+      menuTrigger.closeMenu();
+    } catch (ex) {
+      console.log(ex);
+    }
+    const indexToUpdate = this.selectedFilters.findIndex(el => el.UniqueId == fieldToUpdate.UniqueId);
+    let oldValue = fieldToUpdate.StringValue;
+    if (!oldValue) {
+      oldValue = '';
+    }else{
+      oldValue = oldValue.split('=')[1];
+    }
+    const oldOperator = fieldToUpdate.ActualOperator;
+    fieldToUpdate = {
+      ...menuItemSelected,
+      StringValue: oldValue,
+      ActualOperator: oldOperator,
+      UniqueId: menuItemSelected.Name + '_' + new Date().getTime().toString()
+    } as FilterField;
+    
+    this.selectedFilters.splice(indexToUpdate, 1 , fieldToUpdate);
   }
 
   //da classe astratta

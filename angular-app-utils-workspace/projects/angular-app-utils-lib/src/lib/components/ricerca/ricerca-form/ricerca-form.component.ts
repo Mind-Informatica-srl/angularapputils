@@ -1,11 +1,12 @@
 import { MatMenuTrigger } from '@angular/material/menu';
 import { HttpClient } from '@angular/common/http';
-import { Component, HostListener, Input } from '@angular/core';
+import { Component, HostListener, Input, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserMessageService } from '../../../services/user-message.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.model';
 import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
+import { MatExpansionPanel } from '@angular/material/expansion';
 
 /**
  * Component per la ricerca avanzata con utente id e sezione
@@ -130,9 +131,12 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
     this.savedFilters.push(res);
   }
 
+  @ViewChild('mep') matExpansionPanel: MatExpansionPanel;
+
   //da classe astratta
   onSavedSearchClicked(filtro: Filtro) {
     if (filtro.FiltroCampi != null) {
+      this.matExpansionPanel.open();
       this.selectedFilters = [];
       for (let i = 0; i < filtro.FiltroCampi.length; i++) {
         const campo = filtro.FiltroCampi[i];

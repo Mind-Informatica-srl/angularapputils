@@ -10,7 +10,7 @@
       "prefix": "aaul",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
+          "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/angular-app-utils-lib/tsconfig.lib.json",
             "project": "projects/angular-app-utils-lib/ng-package.json"

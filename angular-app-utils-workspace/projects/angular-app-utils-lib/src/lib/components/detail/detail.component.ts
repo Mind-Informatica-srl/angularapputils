@@ -1,7 +1,7 @@
 import { TitleService } from './../../services/title.service';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Input, OnInit, ViewChild } from '@angular/core';
+import { Input, OnInit, ViewChild, Directive } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -15,6 +15,7 @@ import { ApiActionsType } from './../../api-datasource/api-datasource';
 import { HostListener } from '@angular/core';
 
 
+@Directive()
 export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
 
   /**

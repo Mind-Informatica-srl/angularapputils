@@ -1,9 +1,10 @@
 import { ListComponent } from '../list/list.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { ApiActionsType } from '../../api-datasource/api-datasource';
-import { Input } from '@angular/core';
+import { Input, Directive } from '@angular/core';
 
 
+@Directive()
 export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, LoginInfo> {
 
   abstract displayedColumns: string[];

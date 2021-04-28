@@ -1,5 +1,5 @@
 import { MatSelect, MatSelectChange } from '@angular/material/select';
-import { OnInit, Input, Output, ViewChild, EventEmitter, AfterViewInit } from '@angular/core';
+import { OnInit, Input, Output, ViewChild, EventEmitter, AfterViewInit, Directive } from '@angular/core';
 import { ControlValueAccessor } from '@angular/forms';
 import { FieldSelectOption, FilterField, RicercaFieldChange } from './ricerca.model';
 import { MatInput } from '@angular/material/input';
@@ -20,6 +20,7 @@ import { MatInput } from '@angular/material/input';
  * inputName è un nome univoco per il component
  * 
  */
+@Directive()
 export abstract class RicercaFieldAbstractComponent implements ControlValueAccessor, OnInit, AfterViewInit {
 
     /**

@@ -13,6 +13,6 @@
     "file-saver": "^2.0.2"
   },
   "dependencies": {
-    "tslib": "^1.13.0"
+    "tslib": "^2.0.0"
   }
 }

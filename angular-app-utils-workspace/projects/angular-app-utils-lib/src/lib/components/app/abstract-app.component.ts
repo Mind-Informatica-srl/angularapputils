@@ -1,4 +1,4 @@
-import { OnInit, OnDestroy, HostListener } from '@angular/core';
+import { OnInit, OnDestroy, HostListener, Directive } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
@@ -7,6 +7,7 @@ import { UserMessageService, UserMessageData, MessageType } from '../../services
 
 export const CURRENT_USER_UPDATED = 'current-user-updated';
 
+@Directive()
 export abstract class AbstractAppComponent<LoginInfo> implements OnInit, OnDestroy {
 
   protected snackbarSubscription: Subscription;

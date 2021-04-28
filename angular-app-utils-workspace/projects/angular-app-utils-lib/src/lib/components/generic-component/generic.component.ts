@@ -1,11 +1,12 @@
 import { TitleService } from './../../services/title.service';
-import { Input, OnDestroy } from '@angular/core';
+import { Input, OnDestroy, Directive } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ApiDatasource } from '../../api-datasource/api-datasource';
 import { AuthenticationService } from '../../services/authentication.service';
 import { HttpClient } from '@angular/common/http';
 import { UserMessageService } from '../../services/user-message.service';
 
+@Directive()
 export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
 
   /**

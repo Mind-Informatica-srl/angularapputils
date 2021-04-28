@@ -1,6 +1,6 @@
 import { TitleService } from './../../services/title.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { EventEmitter, HostListener, Input, Output, Type, ViewChild, OnInit, AfterViewInit, ViewContainerRef, ComponentFactoryResolver, ComponentRef } from '@angular/core';
+import { EventEmitter, HostListener, Input, Output, Type, ViewChild, OnInit, AfterViewInit, ViewContainerRef, ComponentFactoryResolver, ComponentRef, Directive } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, SortDirection } from '@angular/material/sort';
@@ -22,6 +22,7 @@ import * as FileSaver from 'file-saver';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 
+@Directive()
 export abstract class ListComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit, AfterViewInit {
 
   abstract pageTitle: string;

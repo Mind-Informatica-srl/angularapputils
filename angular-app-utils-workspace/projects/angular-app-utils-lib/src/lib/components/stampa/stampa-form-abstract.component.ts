@@ -1,6 +1,6 @@
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
+import { Input, OnInit, OnDestroy, EventEmitter, Output, Directive } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ApiDatasource } from '../../api-datasource/api-datasource';
@@ -10,6 +10,7 @@ import { CampoStampaInterface, StampaFormConfig, StampaModalResponse } from './s
 
 
 
+@Directive()
 export abstract class StampaFormAbstractComponent<S> implements OnInit, OnDestroy {
 
     /**

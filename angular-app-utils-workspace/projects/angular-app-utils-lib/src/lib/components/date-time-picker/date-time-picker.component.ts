@@ -2,8 +2,9 @@ import { Component, forwardRef, ViewChild, ElementRef, Input, AfterViewInit } fr
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import { NgxMaterialTimepickerTheme } from 'ngx-material-timepicker';
-import { MatDatepicker, MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { AauDateAdapter } from '../../adapters/aau-date-adapter';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker/datepicker-input-base';
 
 /**
  * Component per gestire Data e Ora
@@ -98,7 +99,7 @@ export class DateTimePickerComponent implements ControlValueAccessor, AfterViewI
   disableState: boolean = false;
   setDisabledState?(isDisabled: boolean): void {
     this.datePicker.disabled = isDisabled;
-    this.datePicker._datepickerInput.disabled = isDisabled;
+    this.datePicker.datepickerInput.disabled = isDisabled;
     this.disableState = isDisabled;
   }
 

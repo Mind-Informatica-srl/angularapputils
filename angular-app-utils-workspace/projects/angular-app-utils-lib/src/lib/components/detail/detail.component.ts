@@ -1,22 +1,27 @@
-import { TitleService } from './../../services/title.service';
-import { Location } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Input, OnInit, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { TitleService } from "./../../services/title.service";
+import { Location } from "@angular/common";
+import { HttpClient } from "@angular/common/http";
+import { Directive, Input, OnInit, ViewChild } from "@angular/core";
+import { NgForm } from "@angular/forms";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
 
-import { AuthenticationService } from '../../services/authentication.service';
-import { DataRefreshService } from '../../services/data-refresh.service';
-import { UserMessageService, MessageType } from '../../services/user-message.service';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
-import { GenericComponent } from '../generic-component/generic.component';
-import { ApiActionsType } from './../../api-datasource/api-datasource';
-import { HostListener } from '@angular/core';
+import { AuthenticationService } from "../../services/authentication.service";
+import { DataRefreshService } from "../../services/data-refresh.service";
+import {
+  UserMessageService,
+  MessageType,
+} from "../../services/user-message.service";
+import { ConfirmDialogComponent } from "../confirm-dialog/confirm-dialog.component";
+import { GenericComponent } from "../generic-component/generic.component";
+import { ApiActionsType } from "./../../api-datasource/api-datasource";
+import { HostListener } from "@angular/core";
 
-
-export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, LoginInfo> implements OnInit {
-
+@Directive()
+export abstract class DetailComponent<T, LoginInfo>
+  extends GenericComponent<T, LoginInfo>
+  implements OnInit
+{
   /**
    * viewChild della form. Ci serve per avbilitare/disabilitare i bottoni di salvataggio (vedi onItemSaved)
    */
@@ -62,7 +67,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   /**
-   * Al salvataggio di un item, dice se notificare a tutte le tab aperte il cambiamento 
+   * Al salvataggio di un item, dice se notificare a tutte le tab aperte il cambiamento
    */
   protected onUpdateRefreshAllPages: boolean = true;
   /**
@@ -90,7 +95,8 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     protected location: Location,
     public dialog: MatDialog,
     authService: AuthenticationService<LoginInfo>,
-    titleService: TitleService) {
+    titleService: TitleService
+  ) {
     super(httpClient, userMessageService, authService, titleService);
     this.setAttribute();
   }
@@ -98,33 +104,33 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   /**
    * Metodo chiamato nel costruttore per poter settare eventuali attributi
    */
-  setAttribute() {
-
-  }
+  setAttribute() {}
 
   ngOnInit(): void {
     if (this.subscribeRoute) {
-      this.sub.add(this.route.params.subscribe(params => {
-        const id = params["Id"];
-        if (id == "new") {
-          this.createElementIfNotExists();
-          this.prepareForNewItem();
-          this.resetForm();
-        } else {
-          if (this.evaluateRouteParent) {
-            const parentId = this.route.parent.snapshot.params["Id"];
-            if (parentId == 'new') {
-              this.createElementIfNotExists();
-              this.prepareForNewItem();
-              this.resetForm();
-            } else {
-              this.loadData(parentId);
-            }
+      this.sub.add(
+        this.route.params.subscribe((params) => {
+          const id = params["Id"];
+          if (id == "new") {
+            this.createElementIfNotExists();
+            this.prepareForNewItem();
+            this.resetForm();
           } else {
-            this.loadData(id);
+            if (this.evaluateRouteParent) {
+              const parentId = this.route.parent.snapshot.params["Id"];
+              if (parentId == "new") {
+                this.createElementIfNotExists();
+                this.prepareForNewItem();
+                this.resetForm();
+              } else {
+                this.loadData(parentId);
+              }
+            } else {
+              this.loadData(id);
+            }
           }
-        }
-      }));
+        })
+      );
     } else {
       this.createElementIfNotExists();
       this.prepareFormAndItem();
@@ -158,12 +164,10 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   /**
-   * permette di preimpostare dei valori di default. 
+   * permette di preimpostare dei valori di default.
    * Chiamato nell'ngOnInit quando si crea un nuovo elemento
    */
-  prepareForNewItem(): void {
-
-  }
+  prepareForNewItem(): void {}
 
   /**
    * instanzia element se è null
@@ -186,11 +190,16 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   loadData(id: number | string) {
     this.isLoadingResults = true;
     this.dataError = false;
-    this.sub.add(this.apiDatasource.getElement(id).subscribe((data) => {
-      this.onLoadedData(data);
-    }, (error) => {
-      this.onLoadingDataError(error);
-    }));
+    this.sub.add(
+      this.apiDatasource.getElement(id).subscribe(
+        (data) => {
+          this.onLoadedData(data);
+        },
+        (error) => {
+          this.onLoadingDataError(error);
+        }
+      )
+    );
   }
 
   protected onLoadingDataError(error: any) {
@@ -216,26 +225,36 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     if (this.validate()) {
       this.saving = true;
       if (this.inserted) {
-        this.sub.add(this.apiDatasource.insert(this.element).subscribe((data) => {
-          console.log('elemento inserito');
-          this.onItemSaved(data, ApiActionsType.AddAction);
-        }, (err) => {
-          this.onSaveError(err);
-        }));
+        this.sub.add(
+          this.apiDatasource.insert(this.element).subscribe(
+            (data) => {
+              console.log("elemento inserito");
+              this.onItemSaved(data, ApiActionsType.AddAction);
+            },
+            (err) => {
+              this.onSaveError(err);
+            }
+          )
+        );
       } else {
-        this.sub.add(this.apiDatasource.update(this.element).subscribe((data) => {
-          console.log('elemento salvato');
-          this.onItemSaved(data, ApiActionsType.UpdateAction);
-        }, (err) => {
-          this.onSaveError(err, this.idExtractor(this.element));
-          console.error('errore salvataggio elemento', err);
-        }));
+        this.sub.add(
+          this.apiDatasource.update(this.element).subscribe(
+            (data) => {
+              console.log("elemento salvato");
+              this.onItemSaved(data, ApiActionsType.UpdateAction);
+            },
+            (err) => {
+              this.onSaveError(err, this.idExtractor(this.element));
+              console.error("errore salvataggio elemento", err);
+            }
+          )
+        );
       }
     } else {
       this.userMessageService.message({
         errorMessage: this.validateErrorMessage,
-        messageType: MessageType.Error
-      })
+        messageType: MessageType.Error,
+      });
     }
   }
 
@@ -248,8 +267,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * chiamato prima del salvataggio e del validate
    * Permette di fare operazioni un attimo prima della validazione e del salvataggio
    */
-  protected prepareElementToSave(): void {
-  }
+  protected prepareElementToSave(): void {}
 
   /**
    * prima di eseguire la delete, si chiede all'utente conferma dell'azione
@@ -258,23 +276,31 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     if (this.isAuthorizedToDelete()) {
       let dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: {
-          title: this.deleteDialogTitle != null ? this.deleteDialogTitle : "Richiesta eliminazione",
-          message: this.deleteDialogMessage != null ? this.deleteDialogMessage : "Vuoi eliminare l'elemento selezionato?",
+          title:
+            this.deleteDialogTitle != null
+              ? this.deleteDialogTitle
+              : "Richiesta eliminazione",
+          message:
+            this.deleteDialogMessage != null
+              ? this.deleteDialogMessage
+              : "Vuoi eliminare l'elemento selezionato?",
           action: "DELETE",
-          showNegativeButton: true
-        }
+          showNegativeButton: true,
+        },
       });
-      this.sub.add(dialogRef.afterClosed().subscribe((result: boolean) => {
-        console.log('Confirm dialog closed', result);
-        if (result) {
-          this.deleteAction();
-        }
-      }));
+      this.sub.add(
+        dialogRef.afterClosed().subscribe((result: boolean) => {
+          console.log("Confirm dialog closed", result);
+          if (result) {
+            this.deleteAction();
+          }
+        })
+      );
     } else {
       this.userMessageService.message({
         errorMessage: "Utente non autorizzato",
-        messageType: MessageType.Error
-      })
+        messageType: MessageType.Error,
+      });
     }
   }
 
@@ -295,19 +321,30 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     } else {
       const oldId = this.idExtractor(this.element);
       this.saving = true;
-      this.sub.add(this.apiDatasource.delete(this.element).subscribe((data) => {
-        console.log('elemento eliminato');
-        this.originalElement = null;
-        this.onItemDeleted(oldId);
-      }, (err) => {
-        this.onSaveError(err, oldId);
-      }));
+      this.sub.add(
+        this.apiDatasource.delete(this.element).subscribe(
+          (data) => {
+            console.log("elemento eliminato");
+            this.originalElement = null;
+            this.onItemDeleted(oldId);
+          },
+          (err) => {
+            this.onSaveError(err, oldId);
+          }
+        )
+      );
     }
   }
 
   onItemDeleted(oldId: string | number) {
     if (this.dataRefreshService != null) {
-      this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.DeleteAction, oldId, null, this.onUpdateRefreshAllPages);
+      this.dataRefreshService.dataHasChange(
+        this.LIST_NAME,
+        ApiActionsType.DeleteAction,
+        oldId,
+        null,
+        this.onUpdateRefreshAllPages
+      );
     }
     this.closeDetail(true);
   }
@@ -316,11 +353,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     if (this.subscribeRoute) {
       if (this.evaluateRouteParent) {
         this.router.navigate(["../../", this.idExtractor(data)], {
-          relativeTo: this.route
+          relativeTo: this.route,
         });
       } else {
         this.router.navigate(["../", this.idExtractor(data)], {
-          relativeTo: this.route
+          relativeTo: this.route,
         });
       }
     } else {
@@ -345,8 +382,18 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     this.save();
   }
 
-  protected askNextDetail(oldId: any, oldElement: any, action: ApiActionsType = ApiActionsType.UpdateAction) {
-    this.dataRefreshService.askForNextDetail(this.LIST_NAME, action, oldId, oldElement, this.loadInWindow);
+  protected askNextDetail(
+    oldId: any,
+    oldElement: any,
+    action: ApiActionsType = ApiActionsType.UpdateAction
+  ) {
+    this.dataRefreshService.askForNextDetail(
+      this.LIST_NAME,
+      action,
+      oldId,
+      oldElement,
+      this.loadInWindow
+    );
     this.closeDetailOnSave = true;
   }
 
@@ -370,18 +417,23 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   callDataRefreshService(data: T, action: ApiActionsType) {
-    this.dataRefreshService.dataHasChange(this.LIST_NAME, action, this.idExtractor(data), data, this.onUpdateRefreshAllPages);
+    this.dataRefreshService.dataHasChange(
+      this.LIST_NAME,
+      action,
+      this.idExtractor(data),
+      data,
+      this.onUpdateRefreshAllPages
+    );
   }
-
 
   /**
    * chiamato quando viene sollevato un errore al salvataggio
-   * se reloadListOnSaveError è 
+   * se reloadListOnSaveError è
    * @param err errore rilevato
    * @param id eventuale id del dettaglio che ha dato errore
    */
   protected onSaveError(err: any, id?: string | number): void {
-    console.error('Errore salvataggio', err);
+    console.error("Errore salvataggio", err);
     this.saving = false;
     if (this.reloadListOnSaveError) {
       this.reloadList(id);
@@ -408,7 +460,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     let ret = this.isAuthorizedToModify();
     if (!ret) {
       this.validateErrorMessage = "Utente non autorizzato";
-    }else if(this.form && !this.form.valid ){
+    } else if (this.form && !this.form.valid) {
       // se esiste una form e non è valida
       this.validateErrorMessage = "Campi non validi";
       ret = false;
@@ -420,13 +472,13 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: "Attenzione",
-        message: "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?",
+        message:
+          "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?",
         action: MessageType.Warning,
-        showNegativeButton: true
-      }
+        showNegativeButton: true,
+      },
     });
     return dialogRef.afterClosed().toPromise();
-
   }
 
   protected forceCloseWindow: boolean = false;
@@ -438,7 +490,8 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    */
   async closeDetail(forceClose: boolean = false) {
     if (!forceClose && this.isElementChanged) {
-      if (this.isAuthorizedToModify()) {//se non è abilitata la modifica, non ha senso chiamare canCloseDetail 
+      if (this.isAuthorizedToModify()) {
+        //se non è abilitata la modifica, non ha senso chiamare canCloseDetail
         let res = await this.canCloseDetail();
         if (!res) {
           return;
@@ -452,7 +505,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
 
   closeDetailAction() {
     if (this.loadInWindow) {
-      open(window.location.href, '_self').close();
+      open(window.location.href, "_self").close();
     } else if (this.subscribeRoute) {
       const index = this.router.url.lastIndexOf("/");
       const path = this.router.url.substring(0, index);
@@ -464,7 +517,11 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
   }
 
   prepareRoute(outlet: RouterOutlet) {
-    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
+    return (
+      outlet &&
+      outlet.activatedRouteData &&
+      outlet.activatedRouteData["animation"]
+    );
   }
 
   goToPreviousPage() {
@@ -475,7 +532,13 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * ricarica la lista legata al detail
    */
   reloadList(id?: string | number, el?: T) {
-    this.dataRefreshService.dataHasChange(this.LIST_NAME, ApiActionsType.UpdateAction, id, el, false);
+    this.dataRefreshService.dataHasChange(
+      this.LIST_NAME,
+      ApiActionsType.UpdateAction,
+      id,
+      el,
+      false
+    );
   }
 
   get isElementChanged(): boolean {
@@ -483,7 +546,7 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
     for (let i = 0; i < keys.length; i++) {
       let res = this.isElementPropertyChanged(keys[i]);
       if (res) {
-        console.log('isElementChanged', keys[i]);
+        console.log("isElementChanged", keys[i]);
         return true;
       }
     }
@@ -521,19 +584,19 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * Serve eventualmente per impedire che si chiuda il detail contenuto in una window se non si è salvato
    * Chiamare questo metodo tramite un HostListener
    * se this.forceCloseWindow è true, chiude forzatamente la window
-   * 
+   *
    * Esempio:
    * @HostListener("window:beforeunload", ["$event"]) unloadHandler(event: Event) {
-   * 
+   *
    *   this.unloadDetailHandler(event);
-   * 
+   *
    * }
-   * 
+   *
    * @param event event passato dal HostListener
    */
   unloadDetailHandler(event: Event) {
     if (!this.forceCloseWindow && this.isElementChanged) {
-      event.returnValue = false;//se si vuole mostrare all'utente il messaggio del browser che chiede conferma per chiudere la pagina
+      event.returnValue = false; //se si vuole mostrare all'utente il messaggio del browser che chiede conferma per chiudere la pagina
     }
   }
 
@@ -541,15 +604,17 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
    * Reimposta element a originalElement
    */
   annullaModifiche() {
-    this.element = this.originalElement
+    this.element = this.originalElement;
   }
 
-  @HostListener('document:keydown.enter', ['$event']) onEnter(event: KeyboardEvent) {
-    if(this.saveOnEnterPressed && this.isAuthorizedToModify()){
-      try{
+  @HostListener("document:keydown.enter", ["$event"]) onEnter(
+    event: KeyboardEvent
+  ) {
+    if (this.saveOnEnterPressed && this.isAuthorizedToModify()) {
+      try {
         (event.target as HTMLInputElement).blur();
-      }catch(ex){
-        console.log(ex);        
+      } catch (ex) {
+        console.log(ex);
       }
       setTimeout(() => {
         event.preventDefault();
@@ -559,5 +624,4 @@ export abstract class DetailComponent<T, LoginInfo> extends GenericComponent<T, 
       }, 100);
     }
   }
-
 }

@@ -3,7 +3,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export interface PromptDialogData {
   title?: string;//titolo dialog
-  message: string;//sotto titolo
+  message?: string;//sotto titolo
   inputLabel: string;//la label sopra l'input
   showNegativeButton?: boolean;//se false non mostra il pulsante annulla
   inputRequired: boolean;//se tru è required
@@ -78,7 +78,9 @@ export class PromptDialogComponent {
 
   @HostListener('document:keydown.enter', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     event.preventDefault();
-    this.dialogRef.close(this.value);
+    if(this.validate) {
+      this.dialogRef.close(this.value);
+    }
   }
 
 }

@@ -8,7 +8,7 @@
     <mat-form-field fxFlex="50">
         <mat-label>{{timeTitle}}</mat-label>
         <input matInput placeholder="hh:mm" aria-label="orario" [ngModel]="time" name="OraInput" #timeInput [disabled]="date == null || disableState" [required]="required" (blur)="onTimeInputBlur('time-input', $event)">
-        <mat-icon matSuffix class="grey-icon" min="6:00" max="22:00" [ngxTimepicker]="fullTime" [format]="24" *ngIf="date != null && !disableState">access_time</mat-icon>
+        <!-- <mat-icon matSuffix class="grey-icon" min="6:00" max="22:00" [ngxTimepicker]="fullTime" [format]="24" *ngIf="date != null && !disableState">access_time</mat-icon> -->
         <ngx-material-timepicker 
         #fullTime 
         (timeSet)="onTimePickerChanged($event)" 

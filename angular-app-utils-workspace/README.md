@@ -1,3 +1,7 @@
+ng build angular-app-utils-lib --prod
+cd dist/angular-app-utils-lib  
+npm publish
+
 # AngularAppUtilsWorkspace
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.18.

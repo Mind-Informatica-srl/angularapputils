@@ -34,10 +34,6 @@ export class ApiDatasource<T> {
     protected userMessageService?: UserMessageService,
     idExtractor?: ((arg0: any) => any)
   ) {
-    /*this.httpHeaders = new HttpHeaders({
-      'Content-Type': 'application/json; charset=utf-8;',
-      'access-control-allow-origin': '*',
-    })*/
     if (idExtractor != null) {
       this.idExtractor = idExtractor
     }
@@ -88,15 +84,13 @@ export class ApiDatasource<T> {
     return this.httpHeaders;
   }
 
-  update(element: T): Observable<T> {
-    const id = this.idExtractor(element);
-    const url = `${this.requestUrl}/${id}`;
+  update(element: T, params?: HttpParams): Observable<T> {
+    const url = `${this.requestUrl}/${this.idExtractor(element)}`;
     const headers = this.getHttpHeadersForUpdate();
-    return this._httpClient.put<T>(url, JSON.stringify(element), { headers: headers }).pipe(
+    return this._httpClient.put<T>(url, JSON.stringify(element), { headers: headers, params: params }).pipe(
       catchError(err => {
         return this.onError(element, err);
       })
-      //catchError(ApiDatasource.handleError)
     ).pipe(
       tap(res => {
         if (this.userMessageService) {
@@ -109,13 +103,12 @@ export class ApiDatasource<T> {
     );
   }
 
-  insert(element: T): Observable<T> {
+  insert(element: T,params?: HttpParams): Observable<T> {
     const headers = this.getHttpHeadersForInsert();
-    return this._httpClient.post<T>(this.requestUrl, element, { headers: headers }).pipe(
+    return this._httpClient.post<T>(this.requestUrl, element, { headers: headers, params: params }).pipe(
       catchError(err => {
         return this.onError(element, err);
       })
-      //catchError(ApiDatasource.handleError)
     ).pipe(
       tap(res => {
         if (this.userMessageService) {
@@ -128,15 +121,13 @@ export class ApiDatasource<T> {
     );
   }
 
-  delete(element: T): Observable<any> {
-    const id = this.idExtractor(element);
-    const url = `${this.requestUrl}/${id}`;
+  delete(element: T, params?: HttpParams): Observable<any> {
+    const url = `${this.requestUrl}/${this.idExtractor(element)}`;
     const headers = this.getHttpHeadersForDelete();
-    return this._httpClient.delete(url, { headers: headers }).pipe(
+    return this._httpClient.delete(url, { headers: headers, params: params }).pipe(
       catchError(err => {
         return this.onError(element, err);
       })
-      //catchError(ApiDatasource.handleError)
     ).pipe(
       tap(res => {
         if (this.userMessageService) {
@@ -162,9 +153,6 @@ export class ApiDatasource<T> {
         Ordine: this.ordineExtractor(el)
       });
     });
-    // const data = {
-    //   List: listToSend
-    // } as OrderInterface;
     const url = `${this.requestUrl}/${path}`;
     const headers = this.getHttpHeadersForUpdate();
     return this._httpClient.put<OrderInterface[]>(url, listToSend, { headers: headers }).pipe(
@@ -232,8 +220,6 @@ export class ApiDatasource<T> {
   }
 
   printElements(columns: string[], titles: string[], params: HttpParams, format: string = 'text', responseType: any = 'json'): Observable<any> {
-    //params = params.set('s', columns.toString());
-    //let printFormat = this.getPrintFormat(format);
     const headers = this.getHttpHeadersForPrint(format, columns, titles);
     return this._httpClient.get(this.requestUrl, { headers: headers, params: params, responseType: responseType }).pipe(
       catchError(err => {

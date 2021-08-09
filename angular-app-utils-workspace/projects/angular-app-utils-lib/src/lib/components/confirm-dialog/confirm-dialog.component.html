@@ -1,11 +1,38 @@
 <!--<h1 mat-dialog-title>{{data.username}}</h1>-->
-<div mat-dialog-title *ngIf="title" [innerHtml]="title"></div>
+<div mat-dialog-title *ngIf="data.title" [innerHtml]="data.title"></div>
 
 <div mat-dialog-content>
-    <div [innerHtml]="message">
-    </div>  
+  <div [innerHtml]="data.message"></div>
 </div>
 <div mat-dialog-actions>
-    <button mat-raised-button color="primary" [mat-dialog-close]="true" cdkFocusInitial>OK</button>
-    <button mat-raised-button color="accent" style="margin-right: 1%;" [mat-dialog-close]="false" *ngIf="showNegativeButton">Annulla</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [mat-dialog-close]="true"
+    cdkFocusInitial
+  >
+    {{ positiveText }}
+  </button>
+  <ng-container *ngIf="data.showNegativeButton">
+    <ng-container *ngIf="data.style2; else negativeRaisedStyle">
+      <button
+        mat-stroked-button
+        color="accent"
+        style="margin-right: 1%"
+        [mat-dialog-close]="false"
+      >
+        {{ negativeText }}
+      </button>
+    </ng-container>
+    <ng-template #negativeRaisedStyle>
+      <button
+        mat-raised-button
+        color="accent"
+        style="margin-right: 1%"
+        [mat-dialog-close]="false"
+      >
+        {{ negativeText }}
+      </button>
+    </ng-template>
+  </ng-container>
 </div>

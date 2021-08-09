@@ -1,0 +1,44 @@
+$padding: 5%;
+
+mat-card-content {
+  padding-left: $padding;
+  padding-right: $padding;
+  padding-top: $padding / 2;
+}
+mat-card-actions {
+  padding-left: $padding!important;
+  padding-right: $padding!important;
+  padding-bottom: 1%!important;
+}
+mat-form-field {
+  width: 100%;
+}
+
+button {
+  margin-right: 8px;
+}
+
+mat-card-header mat-icon {
+  margin-right: 1%;
+}
+
+.loading-shade {
+  position: absolute;
+  left: 42%;
+  top: 50%;
+  height:60px;
+  width:60px;
+  margin:0px auto;
+  background: transparent;
+  z-index: 100;
+}
+
+/*mat-card-header mat-icon, mat-card-header mat-card-title {
+  color: mat-color($eir-theme-primary);
+}*/
+
+/*
+mat-card {
+  margin-bottom: 2%;
+}
+*/

@@ -8,9 +8,11 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "build_lib_prod": "ng build angular-app-utils-lib --prod",
     "build_lib": "ng build angular-app-utils-lib",
     "npm_pack": "cd dist/angular-app-utils-lib && npm pack",
     "package": "npm run build_lib && npm run npm_pack",
+    "npm_publish": "npm run build_lib_prod && cd dist/angular-app-utils-lib npm publish",
     "postinstall": "ngcc"
   },
   "private": true,

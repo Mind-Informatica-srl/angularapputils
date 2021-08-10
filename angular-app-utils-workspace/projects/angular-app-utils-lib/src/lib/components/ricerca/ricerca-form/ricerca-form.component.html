@@ -1,212 +1,381 @@
 <mat-accordion class="filter-accordion">
-    <mat-expansion-panel class="mat-elevation-z2 filter-accordion-panel" (opened)="isOpened = !isOpened" #mep="matExpansionPanel">
-        <mat-expansion-panel-header class="filter-accordion-panel-header">
-            <mat-panel-title class="filter-panel-title">
-                <div class="filter-panel-title-div">Filtro Avanzato<b *ngIf="selectedFilters.length > 0"> Attivo</b></div>
-            </mat-panel-title>
-            <mat-panel-description class="filter-panel-description">
-                <div *ngIf="showActionButtonsAtTop" fxLayout="row" fxLayoutAlign="space-evenly center" fxLayoutGap="10px" class="panel-description-actions">
-                    <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="30px" class="filter-actions filter-accordion-actions">
-                        <button mat-button (click)="search($event)" [disabled]="isSearching">
-                            <mat-icon>search</mat-icon> CERCA
-                        </button>
-                        <button mat-button (click)="clean($event)" *ngIf="selectedFilters.length > 0">
-                            <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
-                        </button>
-                        <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
-                            <button action mat-button (click)="onSalvaRicercaClicked(selectedFilters,$event)">
-                                <mat-icon>save</mat-icon> SALVA RICERCA
-                            </button>
-                        </ng-container>
-                        <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
-                        <ng-container *ngIf="selectedFilters.length > 0">
-                            <ng-content select="[action]"></ng-content>
-                        </ng-container>
-        
-                    </div>
-                    <ng-container *ngIf="searchApiUrl || (savedFilters != null && savedFilters.length > 0)">
-                        <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu" (click)="$event.stopPropagation()">
-                            <mat-icon>start_border</mat-icon> RICERCHE SALVATE
-                        </button>
-                        <mat-menu #ricercheSalvateMenu="matMenu">
-                            <ng-container *ngFor="let item of savedFilters">
-                                <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
-                                    <button mat-menu-item (click)="onSavedSearchClicked(item)"
-                                        matTooltip="Apri ricerca salvata">
-                                        <span>{{item.Nome}}</span>
-                                    </button>
-                                    <mat-icon (click)="onDeleteSearchClicked(item)" matTooltip="Cancella ricerca salvata"
-                                        style="padding-right:10px;cursor: pointer;">search_off
-                                    </mat-icon>
-                                </div>
-                            </ng-container>
-    
-                        </mat-menu>
-                    </ng-container>
-                </div>
-            </mat-panel-description>
-        </mat-expansion-panel-header>
-
-        <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="20px" style="width: 100%;" class="filter-accordion-content">
-            <ng-container *ngIf="fields && fields.length > 0">
-                <button mat-button [matMenuTriggerFor]="menuItem.childMenu" #menuTrigger="matMenuTrigger" name="main_btn">
-                    <mat-icon>add</mat-icon> AGGIUNGI FILTRO
-                </button>
-                <aaul-ricerca-menu #menuItem [items]="fields" (onMenuItemClick)="addFilterField($event)">
-                </aaul-ricerca-menu>
-            </ng-container>   
-            <ng-container *ngIf="!showActionButtonsAtTop">
-                <ng-container *ngIf="searchApiUrl || (savedFilters != null && savedFilters.length > 0)">
-                    <button header mat-button [matMenuTriggerFor]="ricercheSalvateMenu" (click)="$event.stopPropagation()">
-                        <mat-icon>start_border</mat-icon> RICERCHE SALVATE
-                    </button>
-                    <mat-menu #ricercheSalvateMenu="matMenu">
-                        <ng-container *ngFor="let item of savedFilters">
-                            <div fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="10px">
-                                <button mat-menu-item (click)="onSavedSearchClicked(item)"
-                                    matTooltip="Apri ricerca salvata">
-                                    <span>{{item.Nome}}</span>
-                                </button>
-                                <mat-icon (click)="onDeleteSearchClicked(item)" matTooltip="Cancella ricerca salvata"
-                                    style="padding-right:10px;cursor: pointer;">search_off
-                                </mat-icon>
-                            </div>
-                        </ng-container>
-
-                    </mat-menu>
-                </ng-container>
+  <mat-expansion-panel
+    class="mat-elevation-z2 filter-accordion-panel"
+    (opened)="isOpened = !isOpened"
+    #mep="matExpansionPanel"
+  >
+    <mat-expansion-panel-header class="filter-accordion-panel-header">
+      <mat-panel-title class="filter-panel-title">
+        <div class="filter-panel-title-div">
+          Filtro Avanzato<b *ngIf="selectedFilters.length > 0"> Attivo</b>
+        </div>
+      </mat-panel-title>
+      <mat-panel-description class="filter-panel-description">
+        <div
+          *ngIf="showActionButtonsAtTop"
+          fxLayout="row"
+          fxLayoutAlign="space-evenly center"
+          fxLayoutGap="10px"
+          class="panel-description-actions"
+        >
+          <div
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            fxLayoutGap="30px"
+            class="filter-actions filter-accordion-actions"
+          >
+            <button
+              mat-button
+              (click)="search($event)"
+              [disabled]="isSearching"
+            >
+              <mat-icon>search</mat-icon> CERCA
+            </button>
+            <button
+              mat-button
+              (click)="clean($event)"
+              *ngIf="selectedFilters.length > 0"
+            >
+              <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
+            </button>
+            <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
+              <button
+                action
+                mat-button
+                (click)="onSalvaRicercaClicked(selectedFilters, $event)"
+              >
+                <mat-icon>save</mat-icon> SALVA RICERCA
+              </button>
             </ng-container>
-            <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo header)-->
-            <ng-content select="[header]"></ng-content>
-
+            <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
+            <ng-container *ngIf="selectedFilters.length > 0">
+              <ng-content select="[action]"></ng-content>
+            </ng-container>
+          </div>
+          <ng-container
+            *ngIf="
+              searchApiUrl || (savedFilters != null && savedFilters.length > 0)
+            "
+          >
+            <button
+              header
+              mat-button
+              [matMenuTriggerFor]="ricercheSalvateMenu"
+              (click)="$event.stopPropagation()"
+            >
+              <mat-icon>start_border</mat-icon> RICERCHE SALVATE
+            </button>
+            <mat-menu #ricercheSalvateMenu="matMenu">
+              <ng-container *ngFor="let item of savedFilters">
+                <div
+                  fxLayout="row"
+                  fxLayoutAlign="space-between center"
+                  fxLayoutGap="10px"
+                >
+                  <button
+                    mat-menu-item
+                    (click)="onSavedSearchClicked(item)"
+                    matTooltip="Apri ricerca salvata"
+                  >
+                    <span>{{ item.Nome }}</span>
+                  </button>
+                  <mat-icon
+                    (click)="onDeleteSearchClicked(item)"
+                    matTooltip="Cancella ricerca salvata"
+                    style="padding-right: 10px; cursor: pointer"
+                    >search_off
+                  </mat-icon>
+                </div>
+              </ng-container>
+            </mat-menu>
+          </ng-container>
         </div>
+      </mat-panel-description>
+    </mat-expansion-panel-header>
 
-        <div>
-            <form>
-                <ng-container *ngFor="let item of selectedFilters; let i = index;">
-                    <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px">
-                        <ng-container *ngIf="fields && fields.length > 0">
-                            <button fxFlex="25" mat-button [matMenuTriggerFor]="menuItem.childMenu" #menuTrigger="matMenuTrigger" [name]="item.UniqueId + '_btn'">
-                                {{ item?.Label ? item.Label : 'SELEZIONA FILTRO' }}
-                            </button>
-                            <aaul-ricerca-menu #menuItem [items]="fields" (onMenuItemClick)="updateFilterField($event, item, menuTrigger)">
-                            </aaul-ricerca-menu>
-                        </ng-container>                    
-                        <ng-container [ngSwitch]="item.Type">
-                            <ng-container *ngSwitchCase="FilterFieldType.Number">
-                                <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                    <aaul-ricerca-field-number fxFlex [field]="item" [name]="item.UniqueId"
-                                        [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                    </aaul-ricerca-field-number>
-                                    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                </div>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.Date">
-                                <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                    <aaul-ricerca-field-date fxFlex [field]="item" [name]="item.UniqueId"
-                                        [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                    </aaul-ricerca-field-date>
-                                    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                </div>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.DynamicSelect">
-                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                                </ng-template>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.StaticSelect">
-                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                                </ng-template>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.DynamicSelectNumber">
-                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                                </ng-template>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.StaticSelectNumber">
-                                <ng-template [ngTemplateOutlet]="selectTemplate" [ngTemplateOutletContext]="{item: item}">
-                                </ng-template>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.RadioString">
-                                <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
-                                </ng-template>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.RadioNumber">
-                                <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
-                                </ng-template>
-                            </ng-container>
-
-                            <ng-container *ngSwitchCase="FilterFieldType.RadioBoolean">
-                                <ng-template [ngTemplateOutlet]="radioTemplate" [ngTemplateOutletContext]="{item: item}">
-                                </ng-template>
-                            </ng-container>
-
-                            <ng-container *ngSwitchDefault>
-                                <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
-                                    <aaul-ricerca-field-string fxFlex [field]="item" [name]="item.UniqueId"
-                                        [(ngModel)]="item.StringValue" (onChangeValue)="onChangeValue($event)">
-                                    </aaul-ricerca-field-string>
-                                    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-                                        <mat-icon>delete</mat-icon>
-                                    </button>
-                                </div>
-                            </ng-container>
-
-                        </ng-container>
-                    </div>
-                </ng-container>
-            </form>
-        </div>
-        <ng-container *ngIf="showActionButtonsAtBottom">
-            <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px" class="filter-actions filter-form-actions">
-                <button mat-button (click)="search()" [disabled]="isSearching">
-                    <mat-icon>search</mat-icon> CERCA
+    <div
+      fxLayout="row"
+      fxLayoutAlign="space-between center"
+      fxLayoutGap="20px"
+      style="width: 100%"
+      class="filter-accordion-content"
+    >
+      <ng-container *ngIf="fields && fields.length > 0">
+        <button
+          mat-button
+          [matMenuTriggerFor]="menuItem.childMenu"
+          #menuTrigger="matMenuTrigger"
+          name="main_btn"
+        >
+          <mat-icon>add</mat-icon> AGGIUNGI FILTRO
+        </button>
+        <aaul-ricerca-menu
+          #menuItem
+          [items]="fields"
+          (onMenuItemClick)="addFilterField($event)"
+        >
+        </aaul-ricerca-menu>
+      </ng-container>
+      <ng-container *ngIf="!showActionButtonsAtTop">
+        <ng-container
+          *ngIf="
+            searchApiUrl || (savedFilters != null && savedFilters.length > 0)
+          "
+        >
+          <button
+            header
+            mat-button
+            [matMenuTriggerFor]="ricercheSalvateMenu"
+            (click)="$event.stopPropagation()"
+          >
+            <mat-icon>start_border</mat-icon> RICERCHE SALVATE
+          </button>
+          <mat-menu #ricercheSalvateMenu="matMenu">
+            <ng-container *ngFor="let item of savedFilters">
+              <div
+                fxLayout="row"
+                fxLayoutAlign="space-between center"
+                fxLayoutGap="10px"
+              >
+                <button
+                  mat-menu-item
+                  (click)="onSavedSearchClicked(item)"
+                  matTooltip="Apri ricerca salvata"
+                >
+                  <span>{{ item.Nome }}</span>
                 </button>
-                <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">
-                    <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
-                </button>
-                <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
-                    <button action mat-button (click)="onSalvaRicercaClicked(selectedFilters)">
-                        <mat-icon>save</mat-icon> SALVA RICERCA
-                    </button>
-                </ng-container>
-                <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
-                <ng-container *ngIf="selectedFilters.length > 0">
-                    <ng-content select="[action]"></ng-content>
-                </ng-container>
-
-            </div>
+                <mat-icon
+                  (click)="onDeleteSearchClicked(item)"
+                  matTooltip="Cancella ricerca salvata"
+                  style="padding-right: 10px; cursor: pointer"
+                  >search_off
+                </mat-icon>
+              </div>
+            </ng-container>
+          </mat-menu>
         </ng-container>
-    </mat-expansion-panel>
+      </ng-container>
+      <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo header)-->
+      <ng-content select="[header]"></ng-content>
+    </div>
+
+    <div>
+      <form>
+        <ng-container *ngFor="let item of selectedFilters; let i = index">
+          <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px">
+            <ng-container *ngIf="fields && fields.length > 0">
+              <button
+                fxFlex="25"
+                mat-button
+                [matMenuTriggerFor]="menuItem.childMenu"
+                #menuTrigger="matMenuTrigger"
+                [name]="item.UniqueId + '_btn'"
+                class="button-filter-field"
+              >
+                {{ item?.Label ? item.Label : "SELEZIONA FILTRO" }}
+              </button>
+              <aaul-ricerca-menu
+                #menuItem
+                [items]="fields"
+                (onMenuItemClick)="updateFilterField($event, item, menuTrigger)"
+              >
+              </aaul-ricerca-menu>
+            </ng-container>
+            <ng-container [ngSwitch]="item.Type">
+              <ng-container *ngSwitchCase="FilterFieldType.Number">
+                <div
+                  fxFlex
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  class="field-row"
+                >
+                  <aaul-ricerca-field-number
+                    fxFlex
+                    [field]="item"
+                    [name]="item.UniqueId"
+                    [(ngModel)]="item.StringValue"
+                    (onChangeValue)="onChangeValue($event)"
+                  >
+                  </aaul-ricerca-field-number>
+                  <button
+                    fxFlex="10"
+                    mat-icon-button
+                    (click)="removeField(item.UniqueId)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.Date">
+                <div
+                  fxFlex
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  class="field-row"
+                >
+                  <aaul-ricerca-field-date
+                    fxFlex
+                    [field]="item"
+                    [name]="item.UniqueId"
+                    [(ngModel)]="item.StringValue"
+                    (onChangeValue)="onChangeValue($event)"
+                  >
+                  </aaul-ricerca-field-date>
+                  <button
+                    fxFlex="10"
+                    mat-icon-button
+                    (click)="removeField(item.UniqueId)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.DynamicSelect">
+                <ng-template
+                  [ngTemplateOutlet]="selectTemplate"
+                  [ngTemplateOutletContext]="{ item: item }"
+                >
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.StaticSelect">
+                <ng-template
+                  [ngTemplateOutlet]="selectTemplate"
+                  [ngTemplateOutletContext]="{ item: item }"
+                >
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.DynamicSelectNumber">
+                <ng-template
+                  [ngTemplateOutlet]="selectTemplate"
+                  [ngTemplateOutletContext]="{ item: item }"
+                >
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.StaticSelectNumber">
+                <ng-template
+                  [ngTemplateOutlet]="selectTemplate"
+                  [ngTemplateOutletContext]="{ item: item }"
+                >
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.RadioString">
+                <ng-template
+                  [ngTemplateOutlet]="radioTemplate"
+                  [ngTemplateOutletContext]="{ item: item }"
+                >
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.RadioNumber">
+                <ng-template
+                  [ngTemplateOutlet]="radioTemplate"
+                  [ngTemplateOutletContext]="{ item: item }"
+                >
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="FilterFieldType.RadioBoolean">
+                <ng-template
+                  [ngTemplateOutlet]="radioTemplate"
+                  [ngTemplateOutletContext]="{ item: item }"
+                >
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngSwitchDefault>
+                <div
+                  fxFlex
+                  fxLayout="row"
+                  fxLayoutAlign="center center"
+                  class="field-row"
+                >
+                  <aaul-ricerca-field-string
+                    fxFlex
+                    [field]="item"
+                    [name]="item.UniqueId"
+                    [(ngModel)]="item.StringValue"
+                    (onChangeValue)="onChangeValue($event)"
+                  >
+                  </aaul-ricerca-field-string>
+                  <button
+                    fxFlex="10"
+                    mat-icon-button
+                    (click)="removeField(item.UniqueId)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+        </ng-container>
+      </form>
+    </div>
+    <ng-container *ngIf="showActionButtonsAtBottom">
+      <div
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        fxLayoutGap="40px"
+        class="filter-actions filter-form-actions"
+      >
+        <button mat-button (click)="search()" [disabled]="isSearching">
+          <mat-icon>search</mat-icon> CERCA
+        </button>
+        <button mat-button (click)="clean()" *ngIf="selectedFilters.length > 0">
+          <mat-icon>cleaning_services</mat-icon> SVUOTA FILTRO
+        </button>
+        <ng-container *ngIf="searchApiUrl && selectedFilters.length > 0">
+          <button
+            action
+            mat-button
+            (click)="onSalvaRicercaClicked(selectedFilters)"
+          >
+            <mat-icon>save</mat-icon> SALVA RICERCA
+          </button>
+        </ng-container>
+        <!--spazio in cui si possono aggiungere altri pulsanti o altri componenti (deve esserci attributo action)-->
+        <ng-container *ngIf="selectedFilters.length > 0">
+          <ng-content select="[action]"></ng-content>
+        </ng-container>
+      </div>
+    </ng-container>
+  </mat-expansion-panel>
 </mat-accordion>
 
 <ng-template #selectTemplate let-item="item">
-    <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
-        <aaul-ricerca-field-select fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
-            (onChangeValue)="onChangeValue($event)">
-        </aaul-ricerca-field-select>
-        <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-            <mat-icon>delete</mat-icon>
-        </button>
-    </div>
+  <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
+    <aaul-ricerca-field-select
+      fxFlex
+      [field]="item"
+      [name]="item.UniqueId"
+      [(ngModel)]="item.StringValue"
+      (onChangeValue)="onChangeValue($event)"
+    >
+    </aaul-ricerca-field-select>
+    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
 </ng-template>
 
 <ng-template #radioTemplate let-item="item">
-    <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
-        <aaul-ricerca-field-radio fxFlex [field]="item" [name]="item.UniqueId" [(ngModel)]="item.StringValue"
-            (onChangeValue)="onChangeValue($event)">
-        </aaul-ricerca-field-radio>
-        <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
-            <mat-icon>delete</mat-icon>
-        </button>
-    </div>
+  <div fxFlex fxLayout="row" fxLayoutAlign="center center" class="field-row">
+    <aaul-ricerca-field-radio
+      fxFlex
+      [field]="item"
+      [name]="item.UniqueId"
+      [(ngModel)]="item.StringValue"
+      (onChangeValue)="onChangeValue($event)"
+    >
+    </aaul-ricerca-field-radio>
+    <button fxFlex="10" mat-icon-button (click)="removeField(item.UniqueId)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
 </ng-template>

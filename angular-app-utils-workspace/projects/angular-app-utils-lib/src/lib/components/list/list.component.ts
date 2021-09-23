@@ -697,6 +697,8 @@ export abstract class ListComponent<T, LoginInfo>
       saveText: this.detailSaveText(),
       deleteText: this.detailDeleteText(),
       meta: this.getDetailMetaData(el),
+      saveElementOnOkPressed: true,
+      deleteElementOnNoPressed: true,
     };
     return dialogData;
   }

@@ -1,7 +1,7 @@
 import { TitleService } from "./../../services/title.service";
 import { Location } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
-import { OnInit, Directive } from "@angular/core";
+import { OnInit, Directive, Input } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute, Router } from "@angular/router";
 
@@ -27,6 +27,19 @@ export abstract class DetailReactiveComponent<T, LoginInfo>
   public get element(): T {
     return this.reactiveForm?.value;
   }
+
+  @Input() public set element(value: T) {
+    this.setReactiveFormValues(value);
+    this.onElementChanged();
+  }
+
+  // /**
+  //  * se subscribeRoute è false va passato element come input;
+  //  * se subscribeRoute è true element viene caricato tramite apiDatasource nell'ngOnInit;
+  //  */
+  // @Input() public set element(value: T) {
+  //   this.setReactiveFormValues(value);
+  // }
 
   get inserted(): boolean {
     return this.idExtractor(this.element) == null;
@@ -95,6 +108,10 @@ export abstract class DetailReactiveComponent<T, LoginInfo>
     this.refreshElement(data);
     this.isLoadingResults = false;
   }
+
+  // initializeElement(data: T): void {
+  //   this.refreshElement(data);
+  // }
 
   /**
    * si sovrascrivono gli attributi di element (chiamato dopo il metodo save)

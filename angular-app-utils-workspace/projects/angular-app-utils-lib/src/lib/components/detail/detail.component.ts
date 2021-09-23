@@ -469,12 +469,22 @@ export abstract class DetailComponent<T, LoginInfo>
     return ret;
   }
 
+  get isValid(): boolean {
+    return this.validate();
+  }
+
   canCloseDetail(): Promise<boolean> {
+    let msg: string;
+    if (this.containerDialogRef != null && !this.isValid) {
+      msg = this.validateErrorMessage;
+    } else {
+      msg =
+        "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?";
+    }
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: "Attenzione",
-        message:
-          "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?",
+        message: msg,
         action: MessageType.Warning,
         showNegativeButton: true,
       } as ConfirmDialogData,
@@ -513,7 +523,7 @@ export abstract class DetailComponent<T, LoginInfo>
       this.router.navigate([path]);
       //this.location.back();
     } else if (this.containerDialogRef) {
-      this.containerDialogRef.close();
+      this.containerDialogRef.close(this.element);
     }
   }
 
@@ -543,7 +553,11 @@ export abstract class DetailComponent<T, LoginInfo>
   }
 
   get isElementChanged(): boolean {
-    const keys = Object.keys(this.element);
+    return this.isObjectChanged(this.element);
+  }
+
+  protected isObjectChanged(obj: any): boolean {
+    const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++) {
       let res = this.isElementPropertyChanged(keys[i]);
       if (res) {
@@ -564,7 +578,12 @@ export abstract class DetailComponent<T, LoginInfo>
    * @param prop proprietà da confrontare
    */
   isElementPropertyChanged(prop: string): boolean {
-    return this.originalElement[prop] !== this.element[prop];
+    const obj = this.element[prop];
+    if (typeof obj === "object" && !Array.isArray(obj) && obj !== null) {
+      return this.isObjectChanged(obj);
+    } else {
+      return this.originalElement[prop] !== obj;
+    }
   }
 
   get originalElement(): T {

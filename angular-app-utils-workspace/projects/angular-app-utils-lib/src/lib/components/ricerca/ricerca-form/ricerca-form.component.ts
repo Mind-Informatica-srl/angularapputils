@@ -136,7 +136,9 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
   //da classe astratta
   onSavedSearchClicked(filtro: Filtro) {
     if (filtro.FiltroCampi != null) {
-      this.matExpansionPanel.open();
+      if (this.matExpansionPanel){
+        this.matExpansionPanel.open();
+      }
       this.selectedFilters = [];
       for (let i = 0; i < filtro.FiltroCampi.length; i++) {
         const campo = filtro.FiltroCampi[i];

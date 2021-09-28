@@ -137,7 +137,7 @@ export abstract class DetailReactiveComponent<T, LoginInfo>
     let res = super.validate();
     if (res && this.reactiveForm && !this.reactiveForm.valid) {
       // se esiste una form e non è valida
-      this.validateErrorMessage = "Campi non validi";
+      this.validateErrorMessage = "Attenzione: campi non validi";
       res = false;
     }
     return res;

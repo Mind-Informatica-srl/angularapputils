@@ -463,7 +463,7 @@ export abstract class DetailComponent<T, LoginInfo>
       this.validateErrorMessage = "Utente non autorizzato";
     } else if (this.form && !this.form.valid) {
       // se esiste una form e non è valida
-      this.validateErrorMessage = "Campi non validi";
+      this.validateErrorMessage = "Attenzione: campi non validi";
       ret = false;
     }
     return ret;
@@ -553,13 +553,24 @@ export abstract class DetailComponent<T, LoginInfo>
   }
 
   get isElementChanged(): boolean {
-    return this.isObjectChanged(this.element);
+    return DetailComponent.isObjectChanged(this.originalElement, this.element);
   }
 
-  protected isObjectChanged(obj: any): boolean {
+  /**
+   * Restituisce false se original e obj hanno stessi valori
+   *
+   * @param original any elemento originario
+   * @param obj any nuovo elemento da confrontare con original
+   * @returns boolean
+   */
+  static isObjectChanged(original: any, obj: any): boolean {
     const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++) {
-      let res = this.isElementPropertyChanged(keys[i]);
+      const prop = keys[i];
+      let res = DetailComponent.isElementPropertyChanged(
+        original[prop],
+        obj[prop]
+      );
       if (res) {
         console.log("isElementChanged", keys[i]);
         return true;
@@ -569,22 +580,54 @@ export abstract class DetailComponent<T, LoginInfo>
   }
 
   /**
-   * elemento di "backup" per confronare le modifiche effettuate prima di un eventuale salvataggio
-   */
-  protected _originalElement: T;
-
-  /**
    * ritorna true se la proprietà passata ha valore diverso in element e _originalElement
    * @param prop proprietà da confrontare
    */
-  isElementPropertyChanged(prop: string): boolean {
-    const obj = this.element[prop];
-    if (typeof obj === "object" && !Array.isArray(obj) && obj !== null) {
-      return this.isObjectChanged(obj);
+  static isElementPropertyChanged(originalValue: any, newValue: any): boolean {
+    if (
+      (originalValue == null && newValue != null) ||
+      (originalValue != null && newValue == null)
+    ) {
+      return true;
+    }
+    if (typeof newValue === "object" && newValue != null) {
+      if (!Array.isArray(newValue)) {
+        // se non è un array, si richiama isObjectChanged
+        return DetailComponent.isObjectChanged(originalValue, newValue);
+      } else {
+        // se è un array, prima si guarda se newValue e originalValue hanno stessa lunghezza
+        if (
+          !Array.isArray(originalValue) ||
+          originalValue.length != newValue.length
+        ) {
+          return true;
+        }
+        // si cicla sugli elementi dell'array di newValue
+        for (let i = 0; i < newValue.length; i++) {
+          const el = newValue[i];
+          const oldEl = originalValue[i];
+          if (oldEl != null) {
+            const res = DetailComponent.isObjectChanged(oldEl, el);
+            if (res) {
+              return res;
+            }
+          }
+        }
+        return false;
+      }
     } else {
-      return this.originalElement[prop] !== obj;
+      return originalValue !== newValue;
     }
   }
+
+  // protected isObjectChanged(obj: any): boolean {
+  //   return DetailComponent.isObjectChangedFromOriginal(this.originalElement, obj);
+  // }
+
+  /**
+   * elemento di "backup" per confronare le modifiche effettuate prima di un eventuale salvataggio
+   */
+  protected _originalElement: T;
 
   get originalElement(): T {
     if (!this._originalElement) {

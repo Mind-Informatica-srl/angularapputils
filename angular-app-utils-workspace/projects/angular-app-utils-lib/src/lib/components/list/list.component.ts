@@ -183,7 +183,7 @@ export abstract class ListComponent<T, LoginInfo>
   }
 
   protected onNavigationEnded(val: NavigationEnd) {
-    this.selectedElement = null;
+    this.deselectElement();
   }
 
   ngOnInit(): void {
@@ -622,7 +622,7 @@ export abstract class ListComponent<T, LoginInfo>
    */
   addNewClicked() {
     if (this.isAuthorizedToModify()) {
-      this.selectedElement = null;
+      this.deselectElement();
       this.openDetail(null);
     }
   }
@@ -670,7 +670,7 @@ export abstract class ListComponent<T, LoginInfo>
             );
             //se nel dialog è stato cancellato l'elemento, si rimuove selectedElement
             if (!s) {
-              this.selectedElement = null;
+              this.deselectElement();
             }
           }
         };
@@ -732,6 +732,10 @@ export abstract class ListComponent<T, LoginInfo>
   protected delay = 200;
   protected prevent = false;
 
+  deselectElement(): void {
+    this.selectedElement = null;
+  }
+
   /**
    * chiamato alla selezione di un item
    * @param item item selezionato
@@ -745,7 +749,7 @@ export abstract class ListComponent<T, LoginInfo>
     } else {
       //altrimenti si deseleziona
       if (this.deselectOnSecondClick) {
-        this.selectedElement = null;
+        this.deselectElement();
       }
     }
     this.onSelectElement.emit(this.selectedElement);

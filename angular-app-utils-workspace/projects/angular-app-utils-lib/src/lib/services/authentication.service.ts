@@ -3,12 +3,14 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { ApiDatasource } from '../api-datasource/api-datasource';
 import { ResetPwdDialogData } from '../components/reset-password-dialog/reset-password-dialog.component';
+import { Directive } from '@angular/core';
 
 export const CURRENT_USER: string = "CURRENT_USER";
 export const TOKEN_OTP: string = "TOKEN_OTP";
 export const CURRENT_USER_TO_DELETE: string = "CURRENT_USER_TO_DELETE";
 
 //@Injectable({ providedIn: 'root' })
+@Directive()
 export abstract class AuthenticationService<LoginInfo> {
 
     protected currentLoginInfoSubject: BehaviorSubject<LoginInfo>;

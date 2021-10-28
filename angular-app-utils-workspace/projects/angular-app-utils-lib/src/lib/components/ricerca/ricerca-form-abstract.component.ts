@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy } from '@angular/core';
+import { EventEmitter, Input, OnInit, Output, ViewChild, OnDestroy, Directive } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
@@ -12,7 +12,7 @@ import { RicercaFieldChange } from './ricerca.model';
 /**
  * Component astratto per la ricerca avanzata
  */
-
+ @Directive()
 export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDestroy {
 
     /**

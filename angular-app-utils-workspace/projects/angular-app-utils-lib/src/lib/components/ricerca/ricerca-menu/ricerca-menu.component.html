@@ -1,11 +1,11 @@
 <mat-menu #childMenu>
     <ng-container *ngFor="let item of items">
-        <button *ngIf="!item.children; else branch" mat-menu-item (click)="onClick(item)">
+        <button *ngIf="!item.children; else branch" mat-menu-item (click)="onClick(item)" class="aau-search-option">
             <mat-icon *ngIf="item.iconName != null">{{ item.iconName }}</mat-icon>
             <span>{{getMenuItemLabel(item.Label)}}</span>
         </button>
         <ng-template #branch>
-            <button mat-menu-item [matMenuTriggerFor]="innerPanel.childMenu" (click)="onClick(item)">
+            <button mat-menu-item [matMenuTriggerFor]="innerPanel.childMenu" (click)="onClick(item)" class="aau-search-option">
                 <mat-icon *ngIf="item.iconName != null">{{ item.iconName }}</mat-icon>
                 <span>{{getMenuItemLabel(item.Label)}}</span>
             </button>

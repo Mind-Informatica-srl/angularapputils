@@ -1,12 +1,12 @@
 {
-  "name": "angular-app-utils-lib",
-  "version": "0.0.1",
+  "name": "@mind-informatica-srl/angular-app-utils",
+  "version": "0.0.2-p",
   "peerDependencies": {
     "@angular/common": "^9.1.4",
     "@angular/core": "^9.1.4",
-    "@angular/animations": "~9.1.4",
+    "@angular/animations": "~9.1.3",
     "@angular/cdk": "^9.2.2",
-    "@angular/flex-layout": "^9.0.0-beta.29",
+    "@angular/flex-layout": "9.0.0-beta.29",
     "@angular/forms": "~9.1.4",
     "@angular/material": "^9.2.2",
     "ngx-material-timepicker": "^5.5.1",
@@ -14,5 +14,17 @@
   },
   "dependencies": {
     "tslib": "^1.13.0"
-  }
+  },
+  "description": "Angular App Utils of Mind Informatica per PRATIKO",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Mind-Informatica-srl/angularapputils"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "author": "Mind Informatica",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/mindinformatica/angularapputils#readme"
 }

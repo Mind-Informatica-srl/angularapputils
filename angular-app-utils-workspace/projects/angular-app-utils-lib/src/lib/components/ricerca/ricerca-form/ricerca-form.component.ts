@@ -103,7 +103,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
       const val = field.StringValue;
       if (val) {
         if (res != "") {
-          res += "&";
+          res += "{&}";
         }
         res += val;
       }

@@ -1,6 +1,6 @@
 {
   "name": "@mind-informatica-srl/angular-app-utils",
-  "version": "0.0.3-p",
+  "version": "0.0.5-p",
   "peerDependencies": {
     "@angular/common": "^9.1.4",
     "@angular/core": "^9.1.4",
@@ -24,6 +24,7 @@
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
+  "private": false,
   "author": "Mind Informatica",
   "license": "ISC",
   "homepage": "https://bitbucket.org/mindinformatica/angularapputils#readme"

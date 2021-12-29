@@ -180,7 +180,8 @@ export abstract class RicercaFormAbstractComponent<T, S> implements OnInit, OnDe
             message: modalMessage,
             inputLabel: modalInputName,
             showNegativeButton: true,
-            inputRequired: true
+            inputRequired: true,
+            fieldType: 'input'
         }
         let dialogRef = this.dialog.open(PromptDialogComponent, { data: promptData });
         this.sub.add(dialogRef.afterClosed().subscribe((nomeRicerca: string) => {

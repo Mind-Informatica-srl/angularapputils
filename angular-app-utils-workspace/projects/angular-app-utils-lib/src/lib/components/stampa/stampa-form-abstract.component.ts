@@ -198,7 +198,8 @@ export abstract class StampaFormAbstractComponent<S> implements OnInit, OnDestro
             message: modalMessage,
             inputLabel: modalInputName,
             showNegativeButton: true,
-            inputRequired: true
+            inputRequired: true,
+            fieldType: 'input'
         }
         let dialogRef = this.dialog.open(PromptDialogComponent, { data: promptData });
         this.sub.add(dialogRef.afterClosed().subscribe((nomeLayout: string) => {

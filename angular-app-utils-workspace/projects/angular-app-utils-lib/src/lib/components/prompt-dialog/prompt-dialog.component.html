@@ -1,24 +1,30 @@
-<div mat-dialog-title *ngIf="title" [innerHtml]="title"></div>
+<div mat-dialog-title *ngIf="data.title" [innerHtml]="data.title"></div>
 
-<div mat-dialog-content [ngClass]="{'font-larger':fontLarger}">
-    <div [innerHtml]="message">
-    </div>
-    <form name="dialogInputForm" #f="ngForm" autocomplete="off">
-        <mat-form-field>
-          <mat-label for="dialogInput">{{inputLabel}}</mat-label>
-          <input
-            *ngIf="!textArea; else textareaTemplate"
-            matInput
-            id="dialogInput"
-            name="dialogInput"
-            #dialogInput
-            [required]="inputRequired"
+<div mat-dialog-content [ngClass]="{ 'font-larger': data.fontLarger }">
+  <div [innerHtml]="data.message"></div>
+  <form name="dialogInputForm" #f="ngForm" autocomplete="off">
+    <mat-form-field>
+      <mat-label for="dialogInput">{{ data.inputLabel }}</mat-label>
+      <ng-container [ngSwitch]="data.fieldType">
+        <p *ngSwitchCase="'select'">
+          <mat-select
+            #select
             [(ngModel)]="value"
-            [type]="type"
-            cdkFocusInitial
+            name="dialogInput"
+            id="dialogInput"
+            [required]="data.inputRequired"
           >
-          <ng-template #textareaTemplate>
-            <textarea
+            <mat-select-trigger>
+              {{ data.descriptionExtractor(select.value) }}
+            </mat-select-trigger>
+            <mat-option [disabled]="data.inputRequired"> - </mat-option>
+            <mat-option *ngFor="let v of data.optionsList" [value]="v">
+              {{ data.descriptionExtractor(v) }}
+            </mat-option>
+          </mat-select>
+        </p>
+        <p *ngSwitchCase="'textarea'">
+          <textarea
             matInput
             cdkTextareaAutosize
             #autosize="cdkTextareaAutosize"
@@ -27,16 +33,45 @@
             id="dialogInput"
             name="dialogInput"
             #dialogInput
-            [required]="inputRequired"
+            [required]="data.inputRequired"
             [(ngModel)]="value"
-            ></textarea>
-          </ng-template>
+          ></textarea>
+        </p>
+        <p *ngSwitchDefault>
+          <input
+            matInput
+            id="dialogInput"
+            name="dialogInput"
+            #dialogInput
+            [required]="data.inputRequired"
+            [(ngModel)]="value"
+            [type]="data.type"
+            cdkFocusInitial
+          />
+        </p>
+      </ng-container>
 
-          <mat-hint *ngIf="!inputRequired">Facoltativo</mat-hint>
-        </mat-form-field>
-    </form>
+      <mat-hint *ngIf="!data.inputRequired">Facoltativo</mat-hint>
+    </mat-form-field>
+  </form>
 </div>
 <div mat-dialog-actions>
-    <button mat-raised-button color="primary" [mat-dialog-close]="value" cdkFocusInitial [disabled]="!validate">{{okLabel}}</button>
-    <button mat-raised-button color="accent" style="margin-right: 1%;" *ngIf="showNegativeButton" [mat-dialog-close]="">{{annullaLabel}}</button>
+  <button
+    mat-raised-button
+    color="primary"
+    [mat-dialog-close]="value"
+    cdkFocusInitial
+    [disabled]="!validate"
+  >
+    {{ data.okLabel }}
+  </button>
+  <button
+    mat-raised-button
+    color="accent"
+    style="margin-right: 1%"
+    *ngIf="data.showNegativeButton"
+    [mat-dialog-close]=""
+  >
+    {{ data.annullaLabel }}
+  </button>
 </div>

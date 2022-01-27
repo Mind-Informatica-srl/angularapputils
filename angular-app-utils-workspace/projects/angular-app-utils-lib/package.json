@@ -1,6 +1,6 @@
 {
   "name": "@mind-informatica-srl/angular-app-utils",
-  "version": "0.0.5-p",
+  "version": "0.0.6-p",
   "peerDependencies": {
     "@angular/common": "^9.1.4",
     "@angular/core": "^9.1.4",

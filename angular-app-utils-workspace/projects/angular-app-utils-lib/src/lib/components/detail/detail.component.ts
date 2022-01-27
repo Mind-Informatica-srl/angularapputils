@@ -402,8 +402,7 @@ export abstract class DetailComponent<T, LoginInfo>
     if (this.dataRefreshService != null) {
       this.callDataRefreshService(data, action);
       if (this.goToNextDetail) {
-        this.askNextDetail(this.idExtractor(data), data, action);
-        this.closeDetailOnSave = true;
+        this.toNextDetail(data, action);
       }
     }
     if (action == ApiActionsType.AddAction) {
@@ -414,6 +413,11 @@ export abstract class DetailComponent<T, LoginInfo>
     if (this.closeDetailOnSave) {
       this.closeDetail(true);
     }
+  }
+
+  toNextDetail(data: T, action: ApiActionsType) {
+    this.askNextDetail(this.idExtractor(data), data, action);
+    this.closeDetailOnSave = true;
   }
 
   callDataRefreshService(data: T, action: ApiActionsType) {

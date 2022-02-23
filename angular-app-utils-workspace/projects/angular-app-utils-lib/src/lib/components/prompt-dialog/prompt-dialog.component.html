@@ -6,7 +6,7 @@
     <mat-form-field>
       <mat-label for="dialogInput">{{ data.inputLabel }}</mat-label>
       <ng-container [ngSwitch]="data.fieldType">
-        <p *ngSwitchCase="'select'">
+        <ng-container *ngSwitchCase="'select'">
           <mat-select
             #select
             [(ngModel)]="value"
@@ -22,8 +22,8 @@
               {{ data.descriptionExtractor(v) }}
             </mat-option>
           </mat-select>
-        </p>
-        <p *ngSwitchCase="'textarea'">
+        </ng-container>
+        <ng-container *ngSwitchCase="'textarea'">
           <textarea
             matInput
             cdkTextareaAutosize
@@ -36,8 +36,8 @@
             [required]="data.inputRequired"
             [(ngModel)]="value"
           ></textarea>
-        </p>
-        <p *ngSwitchDefault>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
           <input
             matInput
             id="dialogInput"
@@ -48,7 +48,7 @@
             [type]="data.type"
             cdkFocusInitial
           />
-        </p>
+        </ng-container>
       </ng-container>
 
       <mat-hint *ngIf="!data.inputRequired">Facoltativo</mat-hint>

@@ -1,7 +1,7 @@
 import { ConfirmDialogData } from "./../confirm-dialog/confirm-dialog.component";
 import { TitleService } from "./../../services/title.service";
 import { Location } from "@angular/common";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Input, OnInit, ViewChild, Directive } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
@@ -221,34 +221,62 @@ export abstract class DetailComponent<T, LoginInfo>
     this.updateTitle(this.descriptionExtractor(this.element));
   }
 
+  /**
+   * eventualmente da sovrascrivere per aggiungere HttpParams
+   * alla request di insert
+   */
+  protected get insertHttpParams(): HttpParams | undefined {
+    return;
+  }
+
+  /**
+   * eventualmente da sovrascrivere per aggiungere HttpParams
+   * alla request di update
+   */
+  protected get updateHttpParams(): HttpParams | undefined {
+    return;
+  }
+
+  /**
+   * eventualmente da sovrascrivere per aggiungere HttpParams
+   * alla request di delete
+   */
+  protected get deleteHttpParams(): HttpParams | undefined {
+    return;
+  }
+
   save() {
     this.prepareElementToSave();
     if (this.validate()) {
       this.saving = true;
       if (this.inserted) {
         this.sub.add(
-          this.apiDatasource.insert(this.element).subscribe(
-            (data) => {
-              console.log("elemento inserito");
-              this.onItemSaved(data, ApiActionsType.AddAction);
-            },
-            (err) => {
-              this.onSaveError(err);
-            }
-          )
+          this.apiDatasource
+            .insert(this.element, this.insertHttpParams)
+            .subscribe(
+              (data) => {
+                console.log("elemento inserito");
+                this.onItemSaved(data, ApiActionsType.AddAction);
+              },
+              (err) => {
+                this.onSaveError(err);
+              }
+            )
         );
       } else {
         this.sub.add(
-          this.apiDatasource.update(this.element).subscribe(
-            (data) => {
-              console.log("elemento salvato");
-              this.onItemSaved(data, ApiActionsType.UpdateAction);
-            },
-            (err) => {
-              this.onSaveError(err, this.idExtractor(this.element));
-              console.error("errore salvataggio elemento", err);
-            }
-          )
+          this.apiDatasource
+            .update(this.element, this.updateHttpParams)
+            .subscribe(
+              (data) => {
+                console.log("elemento salvato");
+                this.onItemSaved(data, ApiActionsType.UpdateAction);
+              },
+              (err) => {
+                this.onSaveError(err, this.idExtractor(this.element));
+                console.error("errore salvataggio elemento", err);
+              }
+            )
         );
       }
     } else {
@@ -323,16 +351,18 @@ export abstract class DetailComponent<T, LoginInfo>
       const oldId = this.idExtractor(this.element);
       this.saving = true;
       this.sub.add(
-        this.apiDatasource.delete(this.element).subscribe(
-          (data) => {
-            console.log("elemento eliminato");
-            this.originalElement = null;
-            this.onItemDeleted(oldId);
-          },
-          (err) => {
-            this.onSaveError(err, oldId);
-          }
-        )
+        this.apiDatasource
+          .delete(this.element, this.deleteHttpParams)
+          .subscribe(
+            (data) => {
+              console.log("elemento eliminato");
+              this.originalElement = null;
+              this.onItemDeleted(oldId);
+            },
+            (err) => {
+              this.onSaveError(err, oldId);
+            }
+          )
       );
     }
   }

@@ -7,6 +7,7 @@ import { ResetPwdDialogData } from "../components/reset-password-dialog/reset-pa
 export const CURRENT_USER: string = "CURRENT_USER";
 export const TOKEN_OTP: string = "TOKEN_OTP";
 export const CURRENT_USER_TO_DELETE: string = "CURRENT_USER_TO_DELETE";
+export const LOGIN_CANDIDATE: string = "LOGIN_CANDIDATE";
 
 //@Injectable({ providedIn: 'root' })
 export abstract class AuthenticationService<LoginInfo> {
@@ -17,6 +18,10 @@ export abstract class AuthenticationService<LoginInfo> {
   usernameExtractor: (arg0: any) => any = (element: any) => element.Username;
 
   constructor(protected http: HttpClient, protected apiUrl: string) {
+    const candidate = JSON.parse(localStorage.getItem(LOGIN_CANDIDATE));
+    if(candidate) {
+        this.login(candidate.Username, candidate.Password, true).subscribe();
+    }
     this.currentLoginInfoSubject = new BehaviorSubject<LoginInfo>(
       JSON.parse(localStorage.getItem(CURRENT_USER))
     );
@@ -157,6 +162,7 @@ export abstract class AuthenticationService<LoginInfo> {
   logout() {
     // remove Utente from local storage to log Utente out
     localStorage.removeItem(CURRENT_USER);
+    localStorage.removeItem(LOGIN_CANDIDATE);
     this.currentLoginInfoSubject.next(null);
   }
 
@@ -177,6 +183,7 @@ export abstract class AuthenticationService<LoginInfo> {
             localStorage.removeItem(CURRENT_USER);
             //localStorage.setItem(CURRENT_USER, JSON.stringify(utente));
           }
+          localStorage.removeItem(LOGIN_CANDIDATE);
           this.currentLoginInfoSubject.value["DataScadenza"] =
             utente["DataScadenza"];
           this.currentLoginInfoSubject.value["TmpCrd"] = utente["TmpCrd"];
@@ -210,6 +217,7 @@ export abstract class AuthenticationService<LoginInfo> {
   //rimuove l'utente dalle cache
   private removeUserFromCache() {
     localStorage.removeItem(CURRENT_USER);
+    localStorage.removeItem(LOGIN_CANDIDATE);
     localStorage.removeItem(CURRENT_USER_TO_DELETE);
   }
 
@@ -219,7 +227,10 @@ export abstract class AuthenticationService<LoginInfo> {
       .pipe(
         map((user) => {
           if (remember) {
-            localStorage.setItem(CURRENT_USER, JSON.stringify(user));
+            localStorage.setItem(LOGIN_CANDIDATE, JSON.stringify({
+                Username: username,
+                Password: password
+            }));
           }
           this.updateUser(user);
           return user;

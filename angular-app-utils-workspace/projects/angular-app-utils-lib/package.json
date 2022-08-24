@@ -1,5 +1,5 @@
 {
-  "name": "@mind-informatica-srl/angularapputils",
+  "name": "@mind-informatica-srl/angular-app-utils",
   "version": "1.0.25",
   "peerDependencies": {
     "@angular/common": "^11.2.11",

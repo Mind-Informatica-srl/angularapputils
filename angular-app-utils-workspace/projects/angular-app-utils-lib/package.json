@@ -19,9 +19,9 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://bitbucket.org/mindinformatica/angularapputils.git"
+    "url": "git+https://github.com/Mind-Informatica-srl/angularapputils"
   },
   "author": "Mind Informatica",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/mindinformatica/angularapputils#readme"
+  "homepage": "https://github.com/Mind-Informatica-srl/angularapputils#readme"
 }

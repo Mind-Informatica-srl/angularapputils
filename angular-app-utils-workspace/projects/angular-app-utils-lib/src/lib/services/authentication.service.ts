@@ -164,6 +164,9 @@ export abstract class AuthenticationService<LoginInfo> {
     localStorage.removeItem(CURRENT_USER);
     localStorage.removeItem(LOGIN_CANDIDATE);
     this.currentLoginInfoSubject.next(null);
+    if(this.refreshTimeout) {
+      clearTimeout(this.refreshTimeout);
+    }
   }
 
   resetPassword(data: ResetPwdDialogData): Observable<LoginInfo> {
@@ -221,6 +224,8 @@ export abstract class AuthenticationService<LoginInfo> {
     localStorage.removeItem(CURRENT_USER_TO_DELETE);
   }
 
+  private refreshTimeout?: any;
+
   login(username: string, password: string, remember: boolean) {
     return this.http
       .post<LoginInfo>(`${this.apiUrl}login`, { username, password })
@@ -232,6 +237,9 @@ export abstract class AuthenticationService<LoginInfo> {
                 Password: password
             }));
           }
+          this.refreshTimeout = setTimeout(() => {
+            this.login(username, password, remember).subscribe();
+          }, 3600000);
           this.updateUser(user);
           return user;
         })

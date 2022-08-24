@@ -19,8 +19,12 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Mind-Informatica-srl/angularapputils"
+    "url": "git://github.com/Mind-Informatica-srl/angularapputils"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "private": false,
   "author": "Mind Informatica",
   "license": "ISC",
   "homepage": "https://github.com/Mind-Informatica-srl/angularapputils#readme"

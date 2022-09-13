@@ -299,7 +299,7 @@ export abstract class ListComponent<T, LoginInfo>
     if (ev.key) {
       if (ev.key.startsWith(DATA_REFRESH_SERVICE_TAG)) {
         /*console.log('onStorageChange', ev.key);
-        console.log('oldValue', ev.oldValue);        
+        console.log('oldValue', ev.oldValue);
         console.log('newValue', ev.newValue);  */
         this.refreshFromService(JSON.parse(ev.newValue));
       }
@@ -814,6 +814,7 @@ export abstract class ListComponent<T, LoginInfo>
     }
   }
 
+  openSearchOnLoad: boolean = false;
   loadSearchFormComponent() {
     if (this.searchHost != null) {
       this.searchHost.clear();
@@ -824,6 +825,9 @@ export abstract class ListComponent<T, LoginInfo>
       this._searchComponentRef = this.searchHost.createComponent(factory);
       this.setFormFilterSettings();
       this._searchComponentRef.changeDetectorRef.detectChanges();
+      if(this.openSearchOnLoad) {
+        (this._searchComponentRef.instance as RicercaFormComponent).isOpened = true;
+      }
     }
   }
 

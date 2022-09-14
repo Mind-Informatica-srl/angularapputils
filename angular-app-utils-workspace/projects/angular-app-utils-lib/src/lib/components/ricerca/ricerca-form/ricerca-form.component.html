@@ -2,7 +2,7 @@
   <mat-expansion-panel
     class="mat-elevation-z2 filter-accordion-panel"
     (opened)="isOpened = !isOpened"
-    expanded="true"
+    [expanded]="selectedFilters.length > 0"
     #mep="matExpansionPanel"
   >
     <mat-expansion-panel-header class="filter-accordion-panel-header">
@@ -216,6 +216,7 @@
                   class="field-row"
                 >
                   <aaul-ricerca-field-date
+                    #fieldDate
                     fxFlex
                     [field]="item"
                     [name]="item.UniqueId"

@@ -6,19 +6,19 @@ import { MatInput } from '@angular/material/input';
 
 /**
  * classe astratta per i campi di ricerca
- * 
+ *
  * è costituito oltre che da una label indicante il nome dell'attributo anche da un campo "operatore" e da un campo "valore"
- * 
+ *
  * Nome attributo = this.field.Name
- * 
+ *
  * selectedOperatore = opzione selezionata dalla select degli operatori (es: "uguale", "maggiore", "isnull", etc...)
- * 
+ *
  * fieldStringValue = è il valore in stringa dell'input "valore". Per esempio nel caso del component di ricerca di tipo date, è la data convertita in ISOString
- * 
+ *
  * refreshValue() è il metodo che si occupa di settare "value" ovvero il valore completo del component da rendere disponibile nel ngModel
- * 
+ *
  * inputName è un nome univoco per il component
- * 
+ *
  */
 @Directive()
 export abstract class RicercaFieldAbstractComponent implements ControlValueAccessor, OnInit, AfterViewInit {
@@ -27,7 +27,6 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
      * lista degli operatori (la select che permette di stabilire il criterio di confronto con il valore)
      */
     abstract operatori: FieldSelectOption[];
-
     /**
      * valore dell'input valore in string
      */
@@ -63,7 +62,7 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
     }
 
     @Input() fieldsList: FilterField[];
-    
+
     protected _field: FilterField;
 
     @Input() set field(val: FilterField) {
@@ -88,7 +87,7 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
     /**
      * ElementRef dell'input contenente il valore
      */
-    @ViewChild('inputRef') inputRef: MatInput | MatSelect;
+    @ViewChild('inputRef') protected inputRef: MatInput | MatSelect;
 
     /**
      * name univoco
@@ -181,11 +180,11 @@ export abstract class RicercaFieldAbstractComponent implements ControlValueAcces
 
     /**
      * chiamato quando si cambia la scelta nella select dell'operatore
-     * 
+     *
      * si occupa di nascondere il campo del "valore" quando l'operatore selezionato è isnull o isnotnull
-     * 
+     *
      * altrimenti imposta il focus sul campo "valore"
-     * 
+     *
      * @param event MatSelectChange
      */
     onOperatoreChange(event: MatSelectChange) {

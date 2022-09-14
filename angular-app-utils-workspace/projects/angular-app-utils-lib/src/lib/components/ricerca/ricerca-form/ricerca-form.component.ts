@@ -1,12 +1,15 @@
 import { MatMenuTrigger } from '@angular/material/menu';
 import { HttpClient } from '@angular/common/http';
-import { Component, HostListener, Input, ViewChild } from '@angular/core';
+import { Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserMessageService } from '../../../services/user-message.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.model';
 import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
 import { MatExpansionPanel } from '@angular/material/expansion';
+import { RicercaFieldDateComponent } from '../ricerca-field-date/ricerca-field-date.component';
+import { MatInput } from '@angular/material/input';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
 
 /**
  * Component per la ricerca avanzata con utente id e sezione
@@ -18,7 +21,10 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 })
 export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterField, Filtro> {
 
+  @ViewChild('fieldDate') fieldDate: RicercaFieldDateComponent;
+
   FilterFieldType = FilterFieldType;
+
 
   @Input() sezione: string = '';
   @Input() userId: string | number;
@@ -36,6 +42,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
   constructor(httpClient: HttpClient,
     userMessageService: UserMessageService,
     public dialog: MatDialog) {
+
     super(httpClient, userMessageService, dialog);
   }
 
@@ -76,7 +83,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
       ActualOperator: oldOperator,
       UniqueId: menuItemSelected.Name + '_' + new Date().getTime().toString()
     } as FilterField;
-    
+
     this.selectedFilters.splice(indexToUpdate, 1 , fieldToUpdate);
   }
 
@@ -156,7 +163,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
 
   /**
    * metodo per ottenere il FilterField corrispondente a nomeCampo e childrenRefString
-   * 
+   *
    * @param nomeCampo nome del campo da cercare in filterFields e children
    * @param childrenRefString stringa childrenRef per filtrare i risultati nei children
    * @param fields campi in cui cercare di default è filterFields
@@ -190,9 +197,9 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
 
   /**
    * metodo per cancellare una ricerca salvata
-   * 
+   *
    * apre prima una modal per chiedere conferma della cancellazione
-   * 
+   *
    * @param filtro filtro da cancellare
    * @param modalTitle titolo della modal
    * @param modalMessage messaggio della modal
@@ -224,7 +231,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterFie
   get searchOnEnterPressed(): boolean{
     return this.isOpened;
   }
-  
+
   @HostListener('document:keydown.enter', ['$event']) onKeydownHandler(event: KeyboardEvent) {
     if(this.searchOnEnterPressed){
       event.preventDefault();

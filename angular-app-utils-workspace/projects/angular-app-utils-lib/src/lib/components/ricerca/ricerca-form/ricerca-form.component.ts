@@ -1,15 +1,13 @@
 import { MatMenuTrigger } from '@angular/material/menu';
 import { HttpClient } from '@angular/common/http';
-import { Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserMessageService } from '../../../services/user-message.service';
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
 import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.model';
 import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { RicercaFieldDateComponent } from '../ricerca-field-date/ricerca-field-date.component';
-import { MatInput } from '@angular/material/input';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { RicercaFieldSelectComponent } from '../ricerca-field-select/ricerca-field-select.component';
 
 /**
  * Component per la ricerca avanzata con utente id e sezione
@@ -21,7 +19,9 @@ import { MatSelect, MatSelectModule } from '@angular/material/select';
 })
 export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterField, Filtro> {
 
-  @ViewChild('fieldDate') fieldDate: RicercaFieldDateComponent;
+  @ViewChild('fieldSelectApp') fieldSelectApp: RicercaFieldSelectComponent; // Accesso al component dove è presente la Mat-Select
+  @ViewChild('menuTrigger') public trigger: MatMenuTrigger;
+
 
   FilterFieldType = FilterFieldType;
 

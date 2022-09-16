@@ -1,6 +1,6 @@
 import { FilterFieldType } from './../ricerca.model';
 import { HttpParams, HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, forwardRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, forwardRef, OnDestroy, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, tap, switchMap } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { SimpleModel } from '../ricerca.model';
 import { MatInput } from '@angular/material/input';
 import { UserMessageService } from '../../../services/user-message.service';
 import { ApiDatasource } from '../../../api-datasource/api-datasource';
+import { MatSelect } from '@angular/material/select';
 
 
 @Component({
@@ -26,20 +27,22 @@ import { ApiDatasource } from '../../../api-datasource/api-datasource';
 export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent implements OnDestroy {
   /**
    * stringa utilizzata per ricavare la descrizione da mostrare all'utente delle option della select di filteredList
-   * 
-   * di default è 'Titolo', 
-   * 
+   *
+   * di default è 'Titolo',
+   *
    * altrimenti si può sovrascrivere passando in field l'attributo opzionale DescriptionField
    */
   descriptionField: string;
   /**
   * stringa utilizzata per ricavare l'id delle option della select di filteredList
-  * 
-  * di default è 'ID', 
-  * 
+  *
+  * di default è 'ID',
+  *
   * altrimenti si può sovrascrivere passando in field l'attributo opzionale IDField
   */
   idField: string;
+
+  @ViewChild('selectField',{static: true}) public selectField: ElementRef<MatSelect>;
 
   constructor(protected httpClient: HttpClient, protected userMessageService: UserMessageService) {
     super();
@@ -97,7 +100,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
   protected _list: SimpleModel[] = [];
   /**
    * lista totale (utile per StaticSelect)
-   * 
+   *
    * nel caso di una StaticSelect, va passato l'attributo opzionale 'list' in field
    */
   set list(val: SimpleModel[]) {
@@ -230,7 +233,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
       return 'equalnumber';
     }
     return 'equal';
-  } 
+  }
 
   onFieldSetted() {
     if (this.field.Type == FilterFieldType.DynamicSelectNumber || this.field.Type == FilterFieldType.StaticSelectNumber) {
@@ -248,7 +251,7 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
       }
     } else {
       if (this.field.StringValue != null && this.field.StringValue != '') {
-        this.fieldSelectValue = this.field.StringValue;
+        this.fieldSelectValue = parseInt(this.field.StringValue);
       }
       this.operatori = this._operatoriString;
       this.setValidOperator(this.field.ActualOperator);
@@ -273,6 +276,9 @@ export class RicercaFieldSelectComponent extends RicercaFieldAbstractComponent i
   set fieldSelectValue(val: number | string) {
     this._fieldSelectValue = val;
     this.fieldStringValue = this.fieldSelectValue != null ? this.fieldSelectValue.toString() : '';
+    if(this.selectField){
+      this.selectField.nativeElement.value = this.fieldStringValue;
+    }
   }
 
   private _listSelectFilterValue: string;

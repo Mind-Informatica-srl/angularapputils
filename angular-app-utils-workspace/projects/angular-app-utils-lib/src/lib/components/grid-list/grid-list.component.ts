@@ -3,6 +3,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ApiActionsType } from '../../api-datasource/api-datasource';
 import { Input, Directive } from '@angular/core';
 
+
 @Directive()
 export abstract class GridListComponent<T, LoginInfo> extends ListComponent<T, LoginInfo> {
 

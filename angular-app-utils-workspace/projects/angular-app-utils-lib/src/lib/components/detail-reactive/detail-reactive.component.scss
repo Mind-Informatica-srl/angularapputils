@@ -22,10 +22,6 @@ mat-card-header mat-icon {
   margin-right: 1%;
 }
 
-form {
-  padding-bottom: 15px;
-}
-/*
 .loading-shade {
   position: absolute;
   left: 42%;
@@ -35,5 +31,14 @@ form {
   margin:0px auto;
   background: transparent;
   z-index: 100;
+}
+
+/*mat-card-header mat-icon, mat-card-header mat-card-title {
+  color: mat-color($eir-theme-primary);
 }*/
 
+/*
+mat-card {
+  margin-bottom: 2%;
+}
+*/

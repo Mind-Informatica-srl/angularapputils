@@ -1,33 +1,32 @@
-import { MatMenuTrigger } from "@angular/material/menu";
-import { HttpClient } from "@angular/common/http";
-import { Component, HostListener, Input, ViewChild } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { UserMessageService } from "../../../services/user-message.service";
-import { ConfirmDialogComponent } from "../../confirm-dialog/confirm-dialog.component";
-import {
-  FilterField,
-  FilterFieldType,
-  Filtro,
-  FiltroCampo,
-} from "../ricerca.model";
-import { RicercaFormAbstractComponent } from "../ricerca-form-abstract.component";
-import { MatExpansionPanel } from "@angular/material/expansion";
+import { MatMenuTrigger } from '@angular/material/menu';
+import { HttpClient } from '@angular/common/http';
+import { AfterViewInit, Component, HostListener, Input, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { UserMessageService } from '../../../services/user-message.service';
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component';
+import { FilterField, FilterFieldType, Filtro, FiltroCampo } from '../ricerca.model';
+import { RicercaFormAbstractComponent } from '../ricerca-form-abstract.component';
+import { MatExpansionPanel } from '@angular/material/expansion';
+import { RicercaFieldSelectComponent } from '../ricerca-field-select/ricerca-field-select.component';
 
 /**
  * Component per la ricerca avanzata con utente id e sezione
  */
 @Component({
-  selector: "aaul-ricerca-form",
-  templateUrl: "./ricerca-form.component.html",
-  styleUrls: ["./ricerca-form.component.scss"],
+  selector: 'aaul-ricerca-form',
+  templateUrl: './ricerca-form.component.html',
+  styleUrls: ['./ricerca-form.component.scss']
 })
-export class RicercaFormComponent extends RicercaFormAbstractComponent<
-  FilterField,
-  Filtro
-> {
+export class RicercaFormComponent extends RicercaFormAbstractComponent<FilterField, Filtro> {
+
+  @ViewChild('fieldSelectApp') fieldSelectApp: RicercaFieldSelectComponent; // Accesso al component dove è presente la Mat-Select
+  @ViewChild('menuTrigger') public trigger: MatMenuTrigger;
+
+
   FilterFieldType = FilterFieldType;
 
-  @Input() sezione: string = "";
+
+  @Input() sezione: string = '';
   @Input() userId: string | number;
   @Input() isSearching: boolean = false;
 
@@ -40,11 +39,10 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
    */
   @Input() showActionButtonsAtBottom: boolean = true;
 
-  constructor(
-    httpClient: HttpClient,
+  constructor(httpClient: HttpClient,
     userMessageService: UserMessageService,
-    public dialog: MatDialog
-  ) {
+    public dialog: MatDialog) {
+
     super(httpClient, userMessageService, dialog);
   }
 
@@ -57,53 +55,47 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
     }
     let field = {
       ...item,
-      UniqueId: item.Name + "_" + new Date().getTime().toString(),
+      UniqueId: item.Name + '_' + new Date().getTime().toString()
     } as FilterField;
     if (!field.StringValue) {
-      field.StringValue = "";
+      field.StringValue = '';
     }
     this.selectedFilters.push(field);
   }
 
-  public updateFilterField(
-    menuItemSelected: FilterField,
-    fieldToUpdate: FilterField,
-    menuTrigger: MatMenuTrigger
-  ) {
+  public updateFilterField(menuItemSelected: FilterField, fieldToUpdate: FilterField, menuTrigger: MatMenuTrigger) {
     try {
       menuTrigger.closeMenu();
     } catch (ex) {
       console.log(ex);
     }
-    const indexToUpdate = this.selectedFilters.findIndex(
-      (el) => el.UniqueId == fieldToUpdate.UniqueId
-    );
+    const indexToUpdate = this.selectedFilters.findIndex(el => el.UniqueId == fieldToUpdate.UniqueId);
     let oldValue = fieldToUpdate.StringValue;
     if (!oldValue) {
-      oldValue = "";
-    } else {
-      oldValue = oldValue.split("=")[1];
+      oldValue = '';
+    }else{
+      oldValue = oldValue.split('=')[1];
     }
     const oldOperator = fieldToUpdate.ActualOperator;
     fieldToUpdate = {
       ...menuItemSelected,
       StringValue: oldValue,
       ActualOperator: oldOperator,
-      UniqueId: menuItemSelected.Name + "_" + new Date().getTime().toString(),
+      UniqueId: menuItemSelected.Name + '_' + new Date().getTime().toString()
     } as FilterField;
 
-    this.selectedFilters.splice(indexToUpdate, 1, fieldToUpdate);
+    this.selectedFilters.splice(indexToUpdate, 1 , fieldToUpdate);
   }
 
   //da classe astratta
   prepareQueryParams(): string {
-    let res = "";
+    let res = '';
     for (let i = 0; i < this.selectedFilters.length; i++) {
       const field = this.selectedFilters[i];
       const val = field.StringValue;
       if (val) {
-        if (res != "") {
-          res += "{&}";
+        if (res != '') {
+          res += '&';
         }
         res += val;
       }
@@ -113,38 +105,31 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
 
   //da classe astratta
   removeField(uniqueId: string) {
-    this.selectedFilters = this.selectedFilters.filter(
-      (el) => el.UniqueId != uniqueId
-    );
+    this.selectedFilters = this.selectedFilters.filter(el => el.UniqueId != uniqueId);
   }
 
   //da classe astratta
   loadSavedFilterParams() {
     let params = super.loadSavedFilterParams();
     const utenteId = this.userId;
-    return params
-      .set("UtenteID", utenteId.toString())
-      .set("Sezione", this.sezione);
+    return params.set('UtenteID', utenteId.toString()).set('Sezione', this.sezione);
   }
 
   //da classe astratta
-  prepareSearchToBeSaved(
-    nomeRicerca: string,
-    campiRicerca: FilterField[]
-  ): any {
+  prepareSearchToBeSaved(nomeRicerca: string, campiRicerca: FilterField[]): any {
     return {
       Nome: nomeRicerca,
       Sezione: this.sezione,
       UtenteID: this.userId,
-      FiltroCampi: campiRicerca.map((el) => {
+      FiltroCampi: campiRicerca.map(el => {
         return {
           Name: el.Name,
           Label: el.Label,
           StringValue: el.ActualValueString,
           DefaultOperator: el.ActualOperator,
-          ChildrenReference: el.parentReference,
-        } as FiltroCampo;
-      }),
+          ChildrenReference: el.parentReference
+        } as FiltroCampo
+      })
     } as Filtro;
   }
 
@@ -153,21 +138,18 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
     this.savedFilters.push(res);
   }
 
-  @ViewChild("mep") matExpansionPanel: MatExpansionPanel;
+  @ViewChild('mep') matExpansionPanel: MatExpansionPanel;
 
   //da classe astratta
   onSavedSearchClicked(filtro: Filtro) {
     if (filtro.FiltroCampi != null) {
-      if (this.matExpansionPanel) {
+      if (this.matExpansionPanel){
         this.matExpansionPanel.open();
       }
       this.selectedFilters = [];
       for (let i = 0; i < filtro.FiltroCampi.length; i++) {
         const campo = filtro.FiltroCampi[i];
-        const item: FilterField = this.getItemMenu(
-          campo.Name,
-          campo.ChildrenReference
-        );
+        const item: FilterField = this.getItemMenu(campo.Name, campo.ChildrenReference);
         if (item) {
           item.Label = campo.Label;
           item.ActualOperator = campo.DefaultOperator;
@@ -186,13 +168,9 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
    * @param childrenRefString stringa childrenRef per filtrare i risultati nei children
    * @param fields campi in cui cercare di default è filterFields
    */
-  getItemMenu(
-    nomeCampo: string,
-    childrenRefString: string,
-    fields: FilterField[] = this.fields
-  ): FilterField {
-    if (childrenRefString != null && childrenRefString != "") {
-      const index = childrenRefString.indexOf(".");
+  getItemMenu(nomeCampo: string, childrenRefString: string, fields: FilterField[] = this.fields): FilterField {
+    if (childrenRefString != null && childrenRefString != '') {
+      const index = childrenRefString.indexOf('.');
       let childRef: string;
       let nextChildrenRef: string;
       if (index > -1) {
@@ -202,7 +180,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
         childRef = childrenRefString;
         nextChildrenRef = null;
       }
-      let item = fields.find((el) => {
+      let item = fields.find(el => {
         return el.childrenReference == childRef;
       });
       if (item) {
@@ -210,7 +188,7 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
       }
       return null;
     }
-    return fields.find((el) => el.Name == nomeCampo);
+    return fields.find(el => el.Name == nomeCampo);
   }
 
   onDeleteSearchClicked(filtro: Filtro) {
@@ -226,48 +204,41 @@ export class RicercaFormComponent extends RicercaFormAbstractComponent<
    * @param modalTitle titolo della modal
    * @param modalMessage messaggio della modal
    */
-  deleteSavedSearch(
-    filtro: Filtro,
-    modalTitle: string = `Elimina Ricerca`,
-    modalMessage: string = `<p>Si desidera eliminare la ricerca ${filtro.Nome}?</p>`
-  ) {
+  deleteSavedSearch(filtro: Filtro, modalTitle: string = `Elimina Ricerca`, modalMessage: string = `<p>Si desidera eliminare la ricerca ${filtro.Nome}?</p>`) {
     let deleteDialog = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: modalTitle,
         message: modalMessage,
-        showNegativeButton: true,
-      },
+        showNegativeButton: true
+      }
     });
-    this.sub.add(
-      deleteDialog.afterClosed().subscribe((confirm: boolean) => {
-        if (confirm) {
-          this.filtroDatasource.delete(filtro).subscribe((res) => {
-            this.onSavedSearchDeleted(res, filtro.ID);
-          });
-        }
-      })
-    );
+    this.sub.add(deleteDialog.afterClosed().subscribe((confirm: boolean) => {
+      if (confirm) {
+        this.filtroDatasource.delete(filtro).subscribe(res => {
+          this.onSavedSearchDeleted(res, filtro.ID);
+        });
+      }
+    }));
   }
 
   onSavedSearchDeleted(res: any, idItem: any) {
-    const i = this.savedFilters.findIndex((el) => el.ID == idItem);
+    const i = this.savedFilters.findIndex(el => el.ID == idItem);
     this.savedFilters.splice(i, 1);
   }
 
   isOpened: boolean = false;
 
-  get searchOnEnterPressed(): boolean {
+  get searchOnEnterPressed(): boolean{
     return this.isOpened;
   }
 
-  @HostListener("document:keydown.enter", ["$event"]) onKeydownHandler(
-    event: KeyboardEvent
-  ) {
-    if (this.searchOnEnterPressed) {
+  @HostListener('document:keydown.enter', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+    if(this.searchOnEnterPressed){
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
       this.search();
     }
   }
+
 }

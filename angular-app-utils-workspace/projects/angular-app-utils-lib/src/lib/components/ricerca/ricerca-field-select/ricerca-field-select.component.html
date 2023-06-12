@@ -13,7 +13,7 @@
 
         <mat-form-field fxFlex>
             <mat-label>Valore</mat-label>
-            <mat-select [(ngModel)]="fieldSelectValue" #inputRef="matSelect" (openedChange)="onSelectOpen($event)">
+            <mat-select [(ngModel)]="fieldSelectValue" #inputRef="matSelect" (openedChange)="onSelectOpen($event)" #selectField>
                 <div style="margin: 2px;">
                     <mat-form-field style="width: 100%;">
                         <mat-label>Cerca...</mat-label>

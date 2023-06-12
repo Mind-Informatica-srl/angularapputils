@@ -17,6 +17,8 @@ import { RicercaFieldAbstractComponent } from '../ricerca-field-abstract.compone
 })
 export class RicercaFieldDateComponent extends RicercaFieldAbstractComponent {
 
+
+
   operatori = [
     {
       Label: 'uguale',

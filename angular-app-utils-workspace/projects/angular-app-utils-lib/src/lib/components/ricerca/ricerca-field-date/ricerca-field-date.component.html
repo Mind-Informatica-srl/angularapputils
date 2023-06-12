@@ -14,8 +14,8 @@
         <mat-form-field fxFlex>
             <mat-label>Valore</mat-label>
             <input #inputRef="matInput" matInput placeholder="gg/mm/aaaa" [matDatepicker]="pickerData" name="inputName"
-                [(ngModel)]="fieldDateValue" (focus)="pickerData.open()">
-            <mat-hint>gg/mm/aaaa</mat-hint>
+                [(ngModel)]="fieldDateValue" (click)="pickerData.open()">
+
             <mat-datepicker-toggle matSuffix [for]="pickerData"></mat-datepicker-toggle>
             <mat-datepicker #pickerData></mat-datepicker>
         </mat-form-field>

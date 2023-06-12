@@ -1,7 +1,8 @@
-<h1 mat-dialog-title>{{ _preselectedElement == null || !canEdit ? chooseTitle : selectedTitle}}</h1>
+<h1 mat-dialog-title>
+  {{ _preselectedElement == null || !canEdit ? chooseTitle : selectedTitle }}
+</h1>
 <div mat-dialog-content>
   <div>
-
     <ng-template #listHost></ng-template>
     <ng-template #detailHost></ng-template>
 
@@ -11,12 +12,42 @@
 </div>
 <div mat-dialog-actions>
   <ng-container *ngIf="canEdit">
-    <button mat-raised-button color="primary" *ngIf="_preselectedElement == null || !showDetailIfSelected"
+    <button
+      mat-raised-button
+      color="primary"
+      *ngIf="_preselectedElement == null || !showDetailIfSelected"
       [mat-dialog-close]="responseData"
-      [disabled]="_preselectedElement == null && selectedElement == null">{{selezionaTextBtn}}</button>
-    <button mat-raised-button color="accent" *ngIf="showDetailIfSelected && _preselectedElement != null"
-      (click)="removePreselected()">{{cambiaTextBtn}}</button>
+      [disabled]="_preselectedElement == null && selectedElement == null"
+    >
+      {{ selezionaTextBtn }}
+    </button>
+    <button
+      mat-raised-button
+      color="accent"
+      *ngIf="showDetailIfSelected && _preselectedElement != null"
+      (click)="removePreselected()"
+    >
+      {{ cambiaTextBtn }}
+    </button>
   </ng-container>
-
-  <button mat-raised-button color="warn" (click)="onNoClick()" cdkFocusInitial>{{annullaTextBtn}}</button>
+  <ng-container *ngIf="data.style2; else oldStyleAnnullaBtn">
+    <button
+      mat-stroked-button
+      color="warn"
+      (click)="onNoClick()"
+      cdkFocusInitial
+    >
+      {{ annullaTextBtn }}
+    </button>
+  </ng-container>
+  <ng-template #oldStyleAnnullaBtn>
+    <button
+      mat-raised-button
+      color="warn"
+      (click)="onNoClick()"
+      cdkFocusInitial
+    >
+      {{ annullaTextBtn }}
+    </button>
+  </ng-template>
 </div>

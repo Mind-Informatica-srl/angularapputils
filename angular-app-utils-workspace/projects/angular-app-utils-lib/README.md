@@ -13,7 +13,7 @@ Run `ng build angular-app-utils-lib` to build the project. The build artifacts w
 
 ## Publishing
 
-After building your library with `ng build angular-app-utils-lib`, go to the dist folder `cd dist/angular-app-utils-lib` and run `npm publish`.
+After building your library with `ng build --prod angular-app-utils-lib`, go to the dist folder `cd dist/angular-app-utils-lib` and run `npm publish` (you have to sing in with `npm login` at first time).
 
 ## Running unit tests
 

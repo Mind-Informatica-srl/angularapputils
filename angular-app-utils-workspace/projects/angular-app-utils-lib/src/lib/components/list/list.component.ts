@@ -183,7 +183,7 @@ export abstract class ListComponent<T, LoginInfo>
   }
 
   protected onNavigationEnded(val: NavigationEnd) {
-    this.selectedElement = null;
+    this.deselectElement();
   }
 
   ngOnInit(): void {
@@ -299,7 +299,7 @@ export abstract class ListComponent<T, LoginInfo>
     if (ev.key) {
       if (ev.key.startsWith(DATA_REFRESH_SERVICE_TAG)) {
         /*console.log('onStorageChange', ev.key);
-        console.log('oldValue', ev.oldValue);        
+        console.log('oldValue', ev.oldValue);
         console.log('newValue', ev.newValue);  */
         this.refreshFromService(JSON.parse(ev.newValue));
       }
@@ -622,7 +622,7 @@ export abstract class ListComponent<T, LoginInfo>
    */
   addNewClicked() {
     if (this.isAuthorizedToModify()) {
-      this.selectedElement = null;
+      this.deselectElement();
       this.openDetail(null);
     }
   }
@@ -670,7 +670,7 @@ export abstract class ListComponent<T, LoginInfo>
             );
             //se nel dialog è stato cancellato l'elemento, si rimuove selectedElement
             if (!s) {
-              this.selectedElement = null;
+              this.deselectElement();
             }
           }
         };
@@ -697,6 +697,8 @@ export abstract class ListComponent<T, LoginInfo>
       saveText: this.detailSaveText(),
       deleteText: this.detailDeleteText(),
       meta: this.getDetailMetaData(el),
+      saveElementOnOkPressed: true,
+      deleteElementOnNoPressed: true,
     };
     return dialogData;
   }
@@ -730,6 +732,10 @@ export abstract class ListComponent<T, LoginInfo>
   protected delay = 200;
   protected prevent = false;
 
+  deselectElement(): void {
+    this.selectedElement = null;
+  }
+
   /**
    * chiamato alla selezione di un item
    * @param item item selezionato
@@ -743,7 +749,7 @@ export abstract class ListComponent<T, LoginInfo>
     } else {
       //altrimenti si deseleziona
       if (this.deselectOnSecondClick) {
-        this.selectedElement = null;
+        this.deselectElement();
       }
     }
     this.onSelectElement.emit(this.selectedElement);
@@ -808,6 +814,7 @@ export abstract class ListComponent<T, LoginInfo>
     }
   }
 
+  openSearchOnLoad: boolean = false;
   loadSearchFormComponent() {
     if (this.searchHost != null) {
       this.searchHost.clear();
@@ -818,6 +825,9 @@ export abstract class ListComponent<T, LoginInfo>
       this._searchComponentRef = this.searchHost.createComponent(factory);
       this.setFormFilterSettings();
       this._searchComponentRef.changeDetectorRef.detectChanges();
+      if(this.openSearchOnLoad) {
+        (this._searchComponentRef.instance as RicercaFormComponent).isOpened = true;
+      }
     }
   }
 
@@ -904,9 +914,7 @@ export abstract class ListComponent<T, LoginInfo>
   get csvTitle(): string {
     return this.pageTitle != null ? this.pageTitle + ".csv" : "export.csv";
   }
-  get pdfTitle(): string {
-    return this.pageTitle;
-  }
+
   downloadCsv(data: any) {
     const blob = new Blob([data], { type: "text/csv" });
     FileSaver.saveAs(blob, this.csvTitle);
@@ -926,7 +934,6 @@ export abstract class ListComponent<T, LoginInfo>
           htmlBody: res.Response.Body,
           htmlOkButton: "Stampa",
           styleString: res.Response.Style,
-          title: this.pdfTitle,
         },
       });
       // this.sub.add(dialogRef.afterOpened().subscribe(() => {

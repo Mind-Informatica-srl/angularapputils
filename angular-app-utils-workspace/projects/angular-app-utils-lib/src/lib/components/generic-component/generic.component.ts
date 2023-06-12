@@ -1,17 +1,18 @@
-import { TitleService } from "./../../services/title.service";
-import { Directive, Input, OnDestroy } from "@angular/core";
-import { Subscription } from "rxjs";
-import { ApiDatasource } from "../../api-datasource/api-datasource";
-import { AuthenticationService } from "../../services/authentication.service";
-import { HttpClient } from "@angular/common/http";
-import { UserMessageService } from "../../services/user-message.service";
+import { TitleService } from './../../services/title.service';
+import { Input, OnDestroy, Directive } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { ApiDatasource } from '../../api-datasource/api-datasource';
+import { AuthenticationService } from '../../services/authentication.service';
+import { HttpClient } from '@angular/common/http';
+import { UserMessageService } from '../../services/user-message.service';
 
 @Directive()
 export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
+
   /**
-   * indica se la navigazione tra lista e dettaglio segue la route o meno. Di default è true
-   * Nel caso sia false, va settato element passandolo come input nel component
-   */
+ * indica se la navigazione tra lista e dettaglio segue la route o meno. Di default è true
+ * Nel caso sia false, va settato element passandolo come input nel component
+ */
   @Input() subscribeRoute: boolean = true;
   @Input() loadDataOnLoad: boolean = true;
   private _apiDatasource: ApiDatasource<T> | null;
@@ -20,7 +21,7 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
    * Il path da aggiungere alla url del server per le comunicazioni
    */
   abstract apiDatasourcePath: string;
-  abstract LIST_NAME: string; //nome della lista a cui il dettaglio è legato. Serve per aggiornarla in caso di update
+  abstract LIST_NAME: string;//nome della lista a cui il dettaglio è legato. Serve per aggiornarla in caso di update
   /**
    * array di stringhe per stabilire se l'utente loggato è abilitato a modificare il detail
    */
@@ -28,9 +29,10 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
   /**
    * ricava la chiave primaria di element (di default è ID)
    */
-  idExtractor: (arg0: any) => any = (el) => el?.ID;
-  descriptionExtractor: (arg0: any) => any = (el) => el?.Descrizione;
-  childrenExtractor: (arg0: any) => T[] = (el) => el?.Children;
+  idExtractor: ((arg0: any) => any) = (el) => el?.ID;
+  descriptionExtractor: ((arg0: any) => any) = (el) => el?.Descrizione;
+  childrenExtractor: ((arg0: any) => T[]) = (el) => el?.Children;
+
 
   protected sub: Subscription = new Subscription();
 
@@ -43,8 +45,8 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
     protected httpClient: HttpClient,
     protected userMessageService: UserMessageService,
     protected authService: AuthenticationService<LoginInfo>,
-    protected titleService: TitleService
-  ) {}
+    protected titleService: TitleService) {
+  }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
@@ -55,12 +57,7 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
 
   protected get apiDatasource(): ApiDatasource<T> {
     if (!this._apiDatasource) {
-      this._apiDatasource = new ApiDatasource(
-        this.httpClient,
-        this.apiDatasourcePath,
-        this.userMessageService,
-        this.idExtractor
-      );
+      this._apiDatasource = new ApiDatasource(this.httpClient, this.apiDatasourcePath, this.userMessageService, this.idExtractor);
     }
     return this._apiDatasource;
   }
@@ -81,4 +78,5 @@ export abstract class GenericComponent<T, LoginInfo> implements OnDestroy {
       this.titleService.updateTitle(title);
     }
   }
+
 }

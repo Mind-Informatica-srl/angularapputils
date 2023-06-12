@@ -1,7 +1,8 @@
+import { ConfirmDialogData } from "./../confirm-dialog/confirm-dialog.component";
 import { TitleService } from "./../../services/title.service";
 import { Location } from "@angular/common";
-import { HttpClient } from "@angular/common/http";
-import { Directive, Input, OnInit, ViewChild } from "@angular/core";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Input, OnInit, ViewChild, Directive } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { ActivatedRoute, Router, RouterOutlet } from "@angular/router";
@@ -220,34 +221,62 @@ export abstract class DetailComponent<T, LoginInfo>
     this.updateTitle(this.descriptionExtractor(this.element));
   }
 
+  /**
+   * eventualmente da sovrascrivere per aggiungere HttpParams
+   * alla request di insert
+   */
+  protected get insertHttpParams(): HttpParams | undefined {
+    return;
+  }
+
+  /**
+   * eventualmente da sovrascrivere per aggiungere HttpParams
+   * alla request di update
+   */
+  protected get updateHttpParams(): HttpParams | undefined {
+    return;
+  }
+
+  /**
+   * eventualmente da sovrascrivere per aggiungere HttpParams
+   * alla request di delete
+   */
+  protected get deleteHttpParams(): HttpParams | undefined {
+    return;
+  }
+
   save() {
     this.prepareElementToSave();
     if (this.validate()) {
       this.saving = true;
       if (this.inserted) {
         this.sub.add(
-          this.apiDatasource.insert(this.element).subscribe(
-            (data) => {
-              console.log("elemento inserito");
-              this.onItemSaved(data, ApiActionsType.AddAction);
-            },
-            (err) => {
-              this.onSaveError(err);
-            }
-          )
+          this.apiDatasource
+            .insert(this.element, this.insertHttpParams)
+            .subscribe(
+              (data) => {
+                console.log("elemento inserito");
+                this.onItemSaved(data, ApiActionsType.AddAction);
+              },
+              (err) => {
+                this.onSaveError(err);
+              }
+            )
         );
       } else {
         this.sub.add(
-          this.apiDatasource.update(this.element).subscribe(
-            (data) => {
-              console.log("elemento salvato");
-              this.onItemSaved(data, ApiActionsType.UpdateAction);
-            },
-            (err) => {
-              this.onSaveError(err, this.idExtractor(this.element));
-              console.error("errore salvataggio elemento", err);
-            }
-          )
+          this.apiDatasource
+            .update(this.element, this.updateHttpParams)
+            .subscribe(
+              (data) => {
+                console.log("elemento salvato");
+                this.onItemSaved(data, ApiActionsType.UpdateAction);
+              },
+              (err) => {
+                this.onSaveError(err, this.idExtractor(this.element));
+                console.error("errore salvataggio elemento", err);
+              }
+            )
         );
       }
     } else {
@@ -322,16 +351,18 @@ export abstract class DetailComponent<T, LoginInfo>
       const oldId = this.idExtractor(this.element);
       this.saving = true;
       this.sub.add(
-        this.apiDatasource.delete(this.element).subscribe(
-          (data) => {
-            console.log("elemento eliminato");
-            this.originalElement = null;
-            this.onItemDeleted(oldId);
-          },
-          (err) => {
-            this.onSaveError(err, oldId);
-          }
-        )
+        this.apiDatasource
+          .delete(this.element, this.deleteHttpParams)
+          .subscribe(
+            (data) => {
+              console.log("elemento eliminato");
+              this.originalElement = null;
+              this.onItemDeleted(oldId);
+            },
+            (err) => {
+              this.onSaveError(err, oldId);
+            }
+          )
       );
     }
   }
@@ -402,7 +433,8 @@ export abstract class DetailComponent<T, LoginInfo>
     if (this.dataRefreshService != null) {
       this.callDataRefreshService(data, action);
       if (this.goToNextDetail) {
-        this.toNextDetail(data, action);
+        this.askNextDetail(this.idExtractor(data), data, action);
+        this.closeDetailOnSave = true;
       }
     }
     if (action == ApiActionsType.AddAction) {
@@ -413,11 +445,6 @@ export abstract class DetailComponent<T, LoginInfo>
     if (this.closeDetailOnSave) {
       this.closeDetail(true);
     }
-  }
-
-  toNextDetail(data: T, action: ApiActionsType) {
-    this.askNextDetail(this.idExtractor(data), data, action);
-    this.closeDetailOnSave = true;
   }
 
   callDataRefreshService(data: T, action: ApiActionsType) {
@@ -466,21 +493,31 @@ export abstract class DetailComponent<T, LoginInfo>
       this.validateErrorMessage = "Utente non autorizzato";
     } else if (this.form && !this.form.valid) {
       // se esiste una form e non è valida
-      this.validateErrorMessage = "Campi non validi";
+      this.validateErrorMessage = "Attenzione: campi non validi";
       ret = false;
     }
     return ret;
   }
 
+  get isValid(): boolean {
+    return this.validate();
+  }
+
   canCloseDetail(): Promise<boolean> {
+    let msg: string;
+    if (this.containerDialogRef != null && !this.isValid) {
+      msg = this.validateErrorMessage;
+    } else {
+      msg =
+        "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?";
+    }
     let dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: "Attenzione",
-        message:
-          "Ci sono delle modifiche non salvate.\nSicuri di volerle abbandonare?",
+        message: msg,
         action: MessageType.Warning,
         showNegativeButton: true,
-      },
+      } as ConfirmDialogData,
     });
     return dialogRef.afterClosed().toPromise();
   }
@@ -516,7 +553,7 @@ export abstract class DetailComponent<T, LoginInfo>
       this.router.navigate([path]);
       //this.location.back();
     } else if (this.containerDialogRef) {
-      this.containerDialogRef.close();
+      this.containerDialogRef.close(this.element);
     }
   }
 
@@ -546,9 +583,24 @@ export abstract class DetailComponent<T, LoginInfo>
   }
 
   get isElementChanged(): boolean {
-    const keys = Object.keys(this.element);
+    return DetailComponent.isObjectChanged(this.originalElement, this.element);
+  }
+
+  /**
+   * Restituisce false se original e obj hanno stessi valori
+   *
+   * @param original any elemento originario
+   * @param obj any nuovo elemento da confrontare con original
+   * @returns boolean
+   */
+  static isObjectChanged(original: any, obj: any): boolean {
+    const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++) {
-      let res = this.isElementPropertyChanged(keys[i]);
+      const prop = keys[i];
+      let res = DetailComponent.isElementPropertyChanged(
+        original[prop],
+        obj[prop]
+      );
       if (res) {
         console.log("isElementChanged", keys[i]);
         return true;
@@ -558,17 +610,54 @@ export abstract class DetailComponent<T, LoginInfo>
   }
 
   /**
-   * elemento di "backup" per confronare le modifiche effettuate prima di un eventuale salvataggio
-   */
-  protected _originalElement: T;
-
-  /**
    * ritorna true se la proprietà passata ha valore diverso in element e _originalElement
    * @param prop proprietà da confrontare
    */
-  isElementPropertyChanged(prop: string): boolean {
-    return this.originalElement[prop] !== this.element[prop];
+  static isElementPropertyChanged(originalValue: any, newValue: any): boolean {
+    if (
+      (originalValue == null && newValue != null) ||
+      (originalValue != null && newValue == null)
+    ) {
+      return true;
+    }
+    if (typeof newValue === "object" && newValue != null) {
+      if (!Array.isArray(newValue)) {
+        // se non è un array, si richiama isObjectChanged
+        return DetailComponent.isObjectChanged(originalValue, newValue);
+      } else {
+        // se è un array, prima si guarda se newValue e originalValue hanno stessa lunghezza
+        if (
+          !Array.isArray(originalValue) ||
+          originalValue.length != newValue.length
+        ) {
+          return true;
+        }
+        // si cicla sugli elementi dell'array di newValue
+        for (let i = 0; i < newValue.length; i++) {
+          const el = newValue[i];
+          const oldEl = originalValue[i];
+          if (oldEl != null) {
+            const res = DetailComponent.isObjectChanged(oldEl, el);
+            if (res) {
+              return res;
+            }
+          }
+        }
+        return false;
+      }
+    } else {
+      return originalValue !== newValue;
+    }
   }
+
+  // protected isObjectChanged(obj: any): boolean {
+  //   return DetailComponent.isObjectChangedFromOriginal(this.originalElement, obj);
+  // }
+
+  /**
+   * elemento di "backup" per confronare le modifiche effettuate prima di un eventuale salvataggio
+   */
+  protected _originalElement: T;
 
   get originalElement(): T {
     if (!this._originalElement) {

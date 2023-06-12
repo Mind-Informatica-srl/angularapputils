@@ -1,155 +1,262 @@
-import { SortDirection } from '@angular/material/sort';
-import { Inject, TemplateRef, ComponentFactoryResolver, ViewChild, ViewContainerRef, Type, OnInit, ComponentRef, Directive } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { DetailComponent } from '../detail/detail.component';
-import { ListComponent } from '../list/list.component';
+import { SortDirection } from "@angular/material/sort";
+import {
+  Inject,
+  ComponentFactoryResolver,
+  ViewChild,
+  ViewContainerRef,
+  Type,
+  OnInit,
+  ComponentRef,
+  Component,
+  Input,
+} from "@angular/core";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
+import { DetailComponent } from "../detail/detail.component";
+import { ListComponent } from "../list/list.component";
 
 export interface DialogData<T> {
-
-  listComponent?: Type<any>;//campo obbligatorio
-  detailComponent?: Type<any>;//campo obbligatorio
+  listComponent?: Type<any>; // campo obbligatorio
+  detailComponent?: Type<any>; // campo obbligatorio
   element: T;
   canEdit: boolean;
-  elementId?: number | string;//se è valorizzato elementId, significa che il detail dovrà caricare da server le info, altrimenti si prendono da element
-  chooseTitle?: string,
-  selectedTitle?: string
-  listMetaData?: any,
-  detailMetaData?: any,
+  /**
+   * se è valorizzato elementId, significa che il detail dovrà caricare da server le info, altrimenti si prendono da element
+   */
+  elementId?: number | string;
+  chooseTitle?: string;
+  selectedTitle?: string;
+  listMetaData?: any;
+  detailMetaData?: any;
   showDetailIfSelected?: boolean;
   annullaTextBtn?: string;
   cambiaTextBtn?: string;
   selezionaTextBtn?: string;
+  style2?: boolean;
 }
 
 export interface SelectorDialogDataResponse<T> {
-
-  result: T;
+  result: T | undefined;
   pageIndex?: number;
   rowsPerPage?: number;
   searchCreteria?: any;
   sortBy?: string;
   sortDirection?: SortDirection;
-
 }
 
-@Directive({
-  selector: '[selectorDialogComponent]'
+@Component({
+  selector: "aaul-selector-dialog",
+  templateUrl: "./selector-dialog.component.html",
+  styleUrls: ["./selector-dialog.component.scss"],
 })
 export class SelectorDialogComponent<T> implements OnInit {
-
-  _preselectedElement: T;
+  /**
+   * eventuale elemento già preselezionato al momento dell'apertura
+   * del dialog
+   */
+  _preselectedElement: T | null = null;
+  /**
+   * true se si può modificare
+   * false se si può solo visualizzare
+   */
   canEdit: boolean = false;
+  /**
+   * titolo del dialog
+   */
   chooseTitle: string = "Seleziona";
+  /**
+   * titolo del detail
+   */
   selectedTitle: string = "Elemento selezionato";
-  listTemplate: TemplateRef<any>;
-  detailTemplate: TemplateRef<any>;
+  // listTemplate?: TemplateRef<any>;
+  // detailTemplate?: TemplateRef<any>;
+  /**
+   * true se si deve mostrare il component del detail
+   * quando si seleziona una riga dal list component
+   */
   showDetailIfSelected: boolean = true;
-  annullaTextBtn: string = 'Annulla';
-  cambiaTextBtn: string = 'Cambia';
-  selezionaTextBtn: string = 'Seleziona';
+  /**
+   * testo del pulsante per chiudere dialog
+   */
+  annullaTextBtn: string = "Annulla";
+  /**
+   * testo per pulsante cambia
+   */
+  cambiaTextBtn: string = "Cambia";
+  /**
+   * testo per pulsante di selezione
+   */
+  selezionaTextBtn: string = "Seleziona";
 
-  selectedElement: T;
-  //@ViewChild(AdDirective, {static: true}) adHost: AdDirective;
-  @ViewChild('listHost', { static: true, read: ViewContainerRef }) listHost: ViewContainerRef;
-  @ViewChild('detailHost', { static: true, read: ViewContainerRef }) detailHost: ViewContainerRef;
+  /**
+   * eventuale elemento che è stato selezionato
+   */
+  selectedElement?: T;
 
-  _detailComponentRef: ComponentRef<any>;
+  /**
+   * host in cui è ospitato il list component nel template html
+   */
+  @ViewChild("listHost", { static: true, read: ViewContainerRef })
+  listHost!: ViewContainerRef;
+  /**
+   * host in cui è ospitato il detail component nel template html
+   */
+  @ViewChild("detailHost", { static: true, read: ViewContainerRef })
+  detailHost!: ViewContainerRef;
 
-  get detailComponent(): DetailComponent<any, any> {
+  _detailComponentRef?: ComponentRef<any>;
+
+  get detailComponent(): DetailComponent<any, any> | null {
     try {
-      return this._detailComponentRef.instance as any as DetailComponent<any, any>;
+      return this._detailComponentRef?.instance as any as DetailComponent<
+        any,
+        any
+      >;
     } catch (ex) {
       console.log(ex);
       return null;
     }
   }
 
-  _listComponentRef: ComponentRef<any>;
+  _listComponentRef?: ComponentRef<any>;
 
-  get listComponent(): ListComponent<any, any> {
+  get listComponent(): ListComponent<any, any> | null {
     try {
-      return this._listComponentRef.instance as any as ListComponent<any, any>;
+      return this._listComponentRef?.instance as any as ListComponent<any, any>;
     } catch (ex) {
       console.log(ex);
       return null;
     }
   }
 
-  constructor(public dialogRef: MatDialogRef<any>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData<T>, protected componentFactoryResolver: ComponentFactoryResolver) {
-    if (data.showDetailIfSelected != null) {
-      this.showDetailIfSelected = data.showDetailIfSelected;
-    }
-    if (data.annullaTextBtn != null) {
-      this.annullaTextBtn = data.annullaTextBtn;
-    }
-    if (data.selezionaTextBtn != null) {
-      this.selezionaTextBtn = data.selezionaTextBtn;
-    }
-    if (data.cambiaTextBtn != null) {
-      this.cambiaTextBtn = data.cambiaTextBtn;
-    }
-    this._preselectedElement = data.element;
-    this.canEdit = data.canEdit;
-    if (data.chooseTitle) {
-      this.chooseTitle = data.chooseTitle
-    }
-    if (data.selectedTitle) {
-      this.selectedTitle = data.selectedTitle
+  /**
+   * permette di passare in input tramite template html i valori
+   * da attribuire a data: DialogData<T>
+   */
+  @Input() set dataParams(val: DialogData<T> | undefined) {
+    if (val) {
+      this.data = val;
+      this.onDataSetted();
     }
   }
 
-  onNoClick() {
+  /**
+   * chiamato quando viene valorizzato this.data
+   */
+  onDataSetted(): void {
+    if (this.data) {
+      if (this.data.showDetailIfSelected != null) {
+        this.showDetailIfSelected = this.data.showDetailIfSelected;
+      }
+      if (this.data.annullaTextBtn != null) {
+        this.annullaTextBtn = this.data.annullaTextBtn;
+      }
+      if (this.data.selezionaTextBtn != null) {
+        this.selezionaTextBtn = this.data.selezionaTextBtn;
+      }
+      if (this.data.cambiaTextBtn != null) {
+        this.cambiaTextBtn = this.data.cambiaTextBtn;
+      }
+      this._preselectedElement = this.data.element;
+      this.canEdit = this.data.canEdit;
+      if (this.data.chooseTitle) {
+        this.chooseTitle = this.data.chooseTitle;
+      }
+      if (this.data.selectedTitle) {
+        this.selectedTitle = this.data.selectedTitle;
+      }
+    }
+  }
+
+  constructor(
+    public dialogRef: MatDialogRef<any>,
+    @Inject(MAT_DIALOG_DATA) public data: DialogData<T>,
+    protected componentFactoryResolver: ComponentFactoryResolver
+  ) {
+    this.onDataSetted();
+  }
+
+  /**
+   * chiamato alla chiusura del dialog tramite il pulsante annulla
+   */
+  onNoClick(): void {
     this.dialogRef.close();
   }
 
   /**
-   * evento chiamato alla selezione di un Cliente dalla lista dei clienti disponibili
-   * @param element Cliente
+   * evento chiamato alla selezione di un elemento dalla lista
+   * @param element T
    */
-  onSelectedElement(element: T) {
+  onSelectedElement(element: T): void {
     this.selectedElement = element;
   }
 
-  selectAndClose(element: T) {
+  /**
+   * seleziona l'elemento e chiude il dialog passando
+   * l'elemento selezionato
+   * @param element T
+   */
+  selectAndClose(element: T): void {
     this.selectedElement = element;
     this.dialogRef.close(this.responseData);
   }
 
-  removePreselected() {
+  removePreselected(): void {
     this._preselectedElement = null;
     this.loadAllComponents();
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadAllComponents();
   }
 
-  loadAllComponents() {
-    if ((!this.showDetailIfSelected || this._preselectedElement == null) && this.data.listComponent) {
-      let comp = this.loadComponent(this.listHost, this.data.listComponent, this.data.listMetaData);
+  /**
+   * carica i template del list e/o detail
+   */
+  loadAllComponents(): void {
+    if (
+      (!this.showDetailIfSelected || this._preselectedElement == null) &&
+      this.data.listComponent
+    ) {
+      const comp = this.loadComponent(
+        this.listHost,
+        this.data.listComponent,
+        this.data.listMetaData
+      );
       this._listComponentRef = comp;
-      //if (!comp || !comp.instance || !comp.instance.onCheckedChange) continue;
+      // if (!comp || !comp.instance || !comp.instance.onCheckedChange) continue;
       if (comp && comp.instance) {
         comp.instance.selectedElement = this._preselectedElement;
         if (comp.instance.onSelectElement) {
-          comp.instance.onSelectElement.subscribe(el => this.onSelectedElement(el));
+          comp.instance.onSelectElement.subscribe((el: T) =>
+            this.onSelectedElement(el)
+          );
         }
         if (comp.instance.onDoubleSelectElement) {
-          comp.instance.onDoubleSelectElement.subscribe(el => this.selectAndClose(el));
+          comp.instance.onDoubleSelectElement.subscribe((el: T) =>
+            this.selectAndClose(el)
+          );
         }
         comp.instance.inSelectorDialog = true;
       }
-
     } else {
       this.listHost.clear();
     }
-    if (this.showDetailIfSelected && this._preselectedElement != null && this.data.detailComponent) {
-      let comp = this.loadComponent(this.detailHost, this.data.detailComponent, this.data.detailMetaData);
+    if (
+      this.showDetailIfSelected &&
+      this._preselectedElement != null &&
+      this.data.detailComponent
+    ) {
+      const comp = this.loadComponent(
+        this.detailHost,
+        this.data.detailComponent,
+        this.data.detailMetaData
+      );
       this._detailComponentRef = comp;
-      if (this.data.elementId) {//se è valorizzato elementId, significa che il detail dovrà caricare da server le info, altrimenti si prendono da _preselectedElement
+      if (this.data.elementId) {
+        // se è valorizzato elementId, significa che il detail dovrà caricare
+        // da server le info, altrimenti si prendono da _preselectedElement
         if (comp && comp.instance && comp.instance.loadData) {
-          //(<GenericComponent<T, any>>comp.instance).idExtractor(this._preselectedElement);
+          // (<GenericComponent<T, any>>comp.instance).idExtractor(this._preselectedElement);
           comp.instance.loadData(this.data.elementId);
         }
       } else {
@@ -161,9 +268,21 @@ export class SelectorDialogComponent<T> implements OnInit {
     }
   }
 
-  loadComponent(host: ViewContainerRef, component: Type<any>, metaData): ComponentRef<any> {
+  /**
+   * carica un component dentro il template html
+   * @param host ViewContainerRef
+   * @param component Type<any>
+   * @param metaData any
+   * @returns
+   */
+  loadComponent(
+    host: ViewContainerRef,
+    component: Type<any>,
+    metaData: any
+  ): ComponentRef<any> {
     host.clear();
-    const factory = this.componentFactoryResolver.resolveComponentFactory(component);
+    const factory =
+      this.componentFactoryResolver.resolveComponentFactory(component);
     const ref = host.createComponent(factory);
     if (ref.instance) {
       if (metaData) {
@@ -178,7 +297,7 @@ export class SelectorDialogComponent<T> implements OnInit {
         ref.instance.showOnlyPreview = true;
       }
       if (ref.instance.pageTitle) {
-        //si toglie il pageTitle in modo da non chiamare il refresh title della navbar
+        // si toglie il pageTitle in modo da non chiamare il refresh title della navbar
         ref.instance.pageTitle = null;
       }
     }
@@ -193,8 +312,8 @@ export class SelectorDialogComponent<T> implements OnInit {
       rowsPerPage: this.listRowsPerPage,
       searchCreteria: this.listSearchCreteria,
       sortBy: this.listSortBy,
-      sortDirection: this.listSortDirection
-    }
+      sortDirection: this.listSortDirection,
+    };
   }
 
   get listPageIndex(): number {
@@ -213,16 +332,23 @@ export class SelectorDialogComponent<T> implements OnInit {
 
   get listSearchCreteria(): any {
     if (this.listComponent && this.listComponent.searchForm) {
-      return this.listComponent.searchForm.prepareSearchToBeSaved('', this.listComponent.searchForm.selectedFilters);
+      return this.listComponent.searchForm.prepareSearchToBeSaved(
+        "",
+        this.listComponent.searchForm.selectedFilters
+      );
     }
     return null;
   }
 
   get listSortBy(): string {
-    if (this.listComponent && this.listComponent.sort && this.listComponent.sort.active) {
+    if (
+      this.listComponent &&
+      this.listComponent.sort &&
+      this.listComponent.sort.active
+    ) {
       return this.listComponent.sort.active;
     }
-    return null;
+    return "";
   }
 
   get listSortDirection(): SortDirection {
@@ -231,5 +357,4 @@ export class SelectorDialogComponent<T> implements OnInit {
     }
     return "asc";
   }
-
 }

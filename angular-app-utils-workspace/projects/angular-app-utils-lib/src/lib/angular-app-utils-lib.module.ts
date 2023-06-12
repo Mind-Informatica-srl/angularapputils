@@ -5,7 +5,6 @@ import { ForgotPasswordDialogComponent } from "./components/forgot-password-dial
 import { ResetPasswordDialogComponent } from "./components/reset-password-dialog/reset-password-dialog.component";
 import { PromptDialogComponent } from "./components/prompt-dialog/prompt-dialog.component";
 import { ConfirmDialogComponent } from "./components/confirm-dialog/confirm-dialog.component";
-import { DateTimePickerComponent } from "./components/date-time-picker/date-time-picker.component";
 import { NgModule } from "@angular/core";
 import { AngularAppUtilsLibComponent } from "./angular-app-utils-lib.component";
 import { AauDateAdapter } from "./adapters/aau-date-adapter";
@@ -53,7 +52,6 @@ import { StampaModalComponent } from "./components/stampa/stampa-modal/stampa-mo
 @NgModule({
   declarations: [
     AngularAppUtilsLibComponent,
-    DateTimePickerComponent,
     ConfirmDialogComponent,
     PromptDialogComponent,
     ResetPasswordDialogComponent,
@@ -77,7 +75,6 @@ import { StampaModalComponent } from "./components/stampa/stampa-modal/stampa-mo
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxMaterialTimepickerModule.setLocale("it-IT"),
     LayoutModule,
     MatDatepickerModule,
     MatNativeDateModule,
@@ -106,7 +103,6 @@ import { StampaModalComponent } from "./components/stampa/stampa-modal/stampa-mo
   ],
   exports: [
     AngularAppUtilsLibComponent,
-    DateTimePickerComponent,
     ConfirmDialogComponent,
     PromptDialogComponent,
     ResetPasswordDialogComponent,
@@ -137,4 +133,6 @@ import { StampaModalComponent } from "./components/stampa/stampa-modal/stampa-mo
     StampaFormComponent,
   ],
 })
-export class AngularAppUtilsLibModule {}
+export class AngularAppUtilsLibModule {
+  
+}

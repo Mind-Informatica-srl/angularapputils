@@ -23,7 +23,6 @@ export * from "./lib/adapters/aau-date-adapter";
 export * from "./lib/components/app/abstract-app.component";
 export * from "./lib/components/confirm-dialog/confirm-dialog.component";
 export * from "./lib/components/prompt-dialog/prompt-dialog.component";
-export * from "./lib/components/date-time-picker/date-time-picker.component";
 export * from "./lib/components/detail/detail.component";
 export * from "./lib/components/detail-reactive/detail-reactive.component";
 
